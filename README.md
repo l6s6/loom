@@ -22,8 +22,6 @@ Beyond its personal use, this project is also a long-term learning project in fu
 - **AI-assisted reflection** — cluster summarization and a chat interface over your own notes (RAG), using a cloud LLM API
 - **Obsidian-compatible export** — Markdown with frontmatter and wikilinks, so your data is never locked in
 
-Full use cases and requirements are documented in [`docs/concept.md`](docs/concept.md).
-
 ## Tech Stack
 
 | Layer | Technology |
@@ -90,7 +88,3 @@ loom/
 ## Why "Loom"
 
 A loom weaves separate threads into a single fabric. That's the idea here: individual, scattered thoughts — captured as they occur — gradually woven together into a visible, connected picture of how you think.
-
-## License
-
-MIT — see [`LICENSE`](LICENSE) *(update if you'd prefer a different license)*.
