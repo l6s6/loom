@@ -4,8 +4,6 @@ from app.db.database import engine, Base
 
 #from routers import notes
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
 
 #app.include_router(notes.router)
