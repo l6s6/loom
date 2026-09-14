@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-#from database import engine, Base
+
+from app.db.database import engine, Base
+
 #from routers import notes
 
-#Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -10,4 +12,4 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Hallo Welt"}
+    return {"message": "Hello World"}
