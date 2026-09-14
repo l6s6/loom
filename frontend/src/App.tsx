@@ -8,6 +8,8 @@ function App() {
 
 
   return (
+      <div>
+
         <button
         type="button"
         className="counter"
@@ -15,6 +17,8 @@ function App() {
       >
         Fetch API GET Notes
       </button>
+          <h1 className="text-3xl font-bold text-blue-600">Test</h1>
+      </div>
   )
 }
 
