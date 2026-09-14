@@ -29,13 +29,13 @@ class NoteTypeUpdate(BaseModel):
 class NoteCreate(BaseModel):
     title: str
     content: str
-    note_type_id: int
+    note_type_name: str
     status: Optional[NoteStatus] = None
 
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
-    note_type_id: Optional[int] = None
+    note_type_name: Optional[str] = None
     status: Optional[NoteStatus] = None
 
 class NoteResponse(BaseModel):

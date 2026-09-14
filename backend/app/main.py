@@ -1,12 +1,10 @@
 from fastapi import FastAPI
 
-from app.db.database import engine, Base
-
-#from routers import notes
+from app.routers.notes import router
 
 app = FastAPI()
 
-#app.include_router(notes.router)
+app.include_router(router)
 
 @app.get("/")
 def read_root():
