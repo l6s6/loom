@@ -9,23 +9,6 @@ class NoteStatus(str, Enum):
     ongoing = "ongoing"
     closed = "closed"
 
-
-
-class NoteTypeCreate(BaseModel):
-    name: str
-
-class NoteTypeResponse(BaseModel):
-    id: int
-    name: str
-    class Config:
-        from_attributes = True
-
-class NoteTypeUpdate(BaseModel):
-    name: str
-
-
-
-
 class NoteCreate(BaseModel):
     title: str
     content: str

@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session, joinedload
 from app.db.database import get_db
 from app.models.note import *
 from app.schemas.note import *
+from models.note_type import NoteType
+from schemas.note_type import NoteTypeResponse
 
 router = APIRouter(
     prefix="/notes",
