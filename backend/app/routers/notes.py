@@ -1,23 +1,39 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.sql.operators import or_
 
 from app.db.database import get_db
 from app.models.note import Note
 from app.models.note_type import NoteType
 from app.models.note_tag import NoteTag
 from app.schemas.note_type import NoteTypeResponse
-from app.schemas.note import  NoteCreate, NoteResponse, NoteUpdate
+from app.schemas.note import NoteCreate, NoteResponse, NoteUpdate, NoteStatus
 from app.schemas.note_tag import NoteTagResponse
 
 router = APIRouter(
-    prefix="/notes",    
+    prefix="/notes",
     tags=["notes"]
 )
 
 
 @router.get("/", response_model=list[NoteResponse])
-def get_notes(db: Session = Depends(get_db)):
-    return db.query(Note).options(joinedload(Note.note_type, Note.tags)).all()
+def get_notes(db: Session = Depends(get_db), note_type_name: str | None = None,
+              tag: str | None = None, status: NoteStatus | None = None,
+              is_archived: bool | None = None, search: str | None = None):
+    queries = []
+    if note_type_name is not None:
+        queries.append(Note.note_type.has(name=note_type_name))
+    if status is not None:
+        queries.append(Note.status == status)
+    if is_archived is not None:
+        queries.append(Note.is_archived == is_archived)
+    if tag is not None:
+        queries.append(Note.tags.any(NoteTag.name == tag))
+    if search is not None:
+        queries.append(or_(Note.title.ilike(f"%{search}%"), Note.content.ilike(f"%{search}%")))
+
+    # Filters with AND for all queries
+    return db.query(Note).options(joinedload(Note.note_type)).filter(*queries).all()
 
 
 @router.post("/", response_model=NoteResponse)
