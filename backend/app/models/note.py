@@ -5,7 +5,6 @@ from sqlalchemy.orm import relationship
 
 from app.db.database import Base
 from app.models.note_tag import association_table
-from app.models.note_type import NoteType
 
 
 class Note(Base):

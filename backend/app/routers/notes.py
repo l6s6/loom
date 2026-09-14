@@ -2,21 +2,22 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session, joinedload
 
 from app.db.database import get_db
-from app.models.note import *
-from app.schemas.note import *
+from app.models.note import Note
 from app.models.note_type import NoteType
-from app.schemas.note_type import NoteTypeResponse
 from app.models.note_tag import NoteTag
+from app.schemas.note_type import NoteTypeResponse
+from app.schemas.note import  NoteCreate, NoteResponse, NoteUpdate
+from app.schemas.note_tag import NoteTagResponse
 
 router = APIRouter(
-    prefix="/notes",
+    prefix="/notes",    
     tags=["notes"]
 )
 
 
 @router.get("/", response_model=list[NoteResponse])
 def get_notes(db: Session = Depends(get_db)):
-    return db.query(Note).options(joinedload(Note.note_type)).all()
+    return db.query(Note).options(joinedload(Note.note_type, Note.tags)).all()
 
 
 @router.post("/", response_model=NoteResponse)
@@ -55,7 +56,7 @@ def get_note_types(db: Session = Depends(get_db)):
     return db.query(NoteType).all()
 
 @router.get("/tags", response_model=list[NoteTagResponse])
-def get_note_types(db: Session = Depends(get_db)):
+def get_tag_types(db: Session = Depends(get_db)):
     return db.query(NoteTag).all()
 
 
