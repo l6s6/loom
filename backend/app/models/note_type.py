@@ -6,7 +6,7 @@ from app.db.database import Base
 
 
 class NoteType(Base):
-    __tablename__ = "note_type"
+    __tablename__ = "note_types"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
