@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[NoteResponse])
+@router.get("", response_model=list[NoteResponse])
 def get_notes(db: Session = Depends(get_db), note_type_name: str | None = None,
               tag: str | None = None, status: NoteStatus | None = None,
               is_archived: bool | None = None, search: str | None = None):
@@ -36,7 +36,7 @@ def get_notes(db: Session = Depends(get_db), note_type_name: str | None = None,
     return db.query(Note).options(joinedload(Note.note_type)).filter(*queries).all()
 
 
-@router.post("/", response_model=NoteResponse)
+@router.post("", response_model=NoteResponse)
 def create_note(note: NoteCreate, db: Session = Depends(get_db)):
     note_type_name = note.note_type_name
     if note_type_name == "":
