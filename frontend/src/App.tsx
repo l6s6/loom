@@ -1,14 +1,14 @@
-import {useNotes} from "./hooks/useNotes.ts";
+import { useNotes } from "./hooks/useNotes.ts";
+import NoteList from "./components/NoteList.tsx";
+import NoteForm from "./components/NoteForm.tsx";
 
-export default function App() {
-  const { notes, loading, error } = useNotes();
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+export function App() {
+  const { notes, loading, error, refetch } = useNotes();
 
   return (
-    <ul>
-      {notes.map(note => <li key={note.id}>{note.title}</li>)}
-    </ul>
+    <div>
+      <NoteForm onCreated={refetch} />
+      <NoteList notes={notes} loading={loading} error={error} />
+    </div>
   );
 }

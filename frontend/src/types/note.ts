@@ -1,9 +1,9 @@
-export default interface Note {
+export interface Note {
     id: number,
     title: string,
     content: string,
     status: string,
-    note_type: {
+    noteType: {
         id: number,
         name: string
     },
@@ -11,6 +11,16 @@ export default interface Note {
         id: number,
         name: string
     }[],
-    created_at: Date,
-    modified_at: Date,
+    createdAt: Date,
+    modifiedAt: Date,
+}
+
+
+
+export interface CreateNote {
+    title: string,
+    content: string,
+    status?: string,
+    note_type_name: string,
+    tag_names: string[]
 }
