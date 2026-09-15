@@ -7,7 +7,7 @@ export function App() {
 
   return (
     <div>
-      <NoteForm onCreated={refetch} />
+      <NoteForm onSubmitted={refetch} mode="update" />
       <NoteList notes={notes} loading={loading} error={error} />
     </div>
   );

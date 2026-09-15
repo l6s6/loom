@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.operators import or_
@@ -126,6 +128,8 @@ def update_note(note_id: int, note_update: NoteUpdate, db: Session = Depends(get
 
     for key, value in update_data.items():
         setattr(note, key, value)
+
+    note.modified_at = datetime.now()
 
     db.commit()
     db.refresh(note)
