@@ -1,25 +1,14 @@
-function App() {
-  const fetchAPIGet = () => {
-    fetch('http://localhost:8000/notes')
-      .then(response => response.json())
-      .then(json => console.log(json))
-      .catch(error => console.error(error));
-  }
+import {useNotes} from "./hooks/useNotes.ts";
 
+export default function App() {
+  const { notes, loading, error } = useNotes();
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
-      <div>
-
-        <button
-        type="button"
-        className="counter"
-        onClick={fetchAPIGet}
-      >
-        Fetch API GET Notes
-      </button>
-          <h1 className="text-3xl font-bold text-blue-600">Test</h1>
-      </div>
-  )
+    <ul>
+      {notes.map(note => <li key={note.id}>{note.title}</li>)}
+    </ul>
+  );
 }
-
-export default App
