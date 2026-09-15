@@ -1,65 +1,84 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.operators import or_
 
 from app.db.database import get_db
 from app.models.note import Note
-from app.models.note_type import NoteType
 from app.models.note_tag import NoteTag
-from app.schemas.note_type import NoteTypeResponse
-from app.schemas.note import NoteCreate, NoteResponse, NoteUpdate, NoteStatus
+from app.models.note_type import NoteType
+from app.schemas.note import NoteCreate, NoteResponse, NoteStatus, NoteUpdate
 from app.schemas.note_tag import NoteTagResponse
+from app.schemas.note_type import NoteTypeResponse
 
-router = APIRouter(
-    prefix="/notes",
-    tags=["notes"]
-)
+router = APIRouter(prefix="/notes", tags=["notes"])
 
 
-@router.get("", response_model=list[NoteResponse])
-def get_notes(db: Session = Depends(get_db), note_type_name: str | None = None,
-              tag: str | None = None, status: NoteStatus | None = None,
-              is_archived: bool | None = None, search: str | None = None):
-    queries = []
-    if note_type_name is not None:
-        queries.append(Note.note_type.has(name=note_type_name))
-    if status is not None:
-        queries.append(Note.status == status)
-    if is_archived is not None:
-        queries.append(Note.is_archived == is_archived)
-    if tag is not None:
-        queries.append(Note.tags.any(NoteTag.name == tag))
-    if search is not None:
-        queries.append(or_(Note.title.ilike(f"%{search}%"), Note.content.ilike(f"%{search}%")))
-
-    # Filters with AND for all queries
-    return db.query(Note).options(joinedload(Note.note_type)).filter(*queries).all()
-
-
-@router.post("", response_model=NoteResponse)
-def create_note(note: NoteCreate, db: Session = Depends(get_db)):
-    note_type_name = note.note_type_name
-    if note_type_name == "":
-        raise HTTPException(status_code=400, detail=f"Note type must not be empty")
-
+def _get_or_create_note_type(db: Session, note_type_name: str) -> NoteType:
     note_type = db.query(NoteType).filter(NoteType.name == note_type_name).first()
     if note_type is None:
         note_type = NoteType(name=note_type_name)
         db.add(note_type)
+    return note_type
 
 
-    new_note = Note(title=note.title, content=note.content, note_type=note_type,
-                    status=note.status.value if note.status else None)
+def _get_or_create_tag(db: Session, tag_name: str) -> NoteTag:
+    tag = db.query(NoteTag).filter(NoteTag.name == tag_name).first()
+    if tag is None:
+        tag = NoteTag(name=tag_name)
+        db.add(tag)
+    return tag
 
-    for tag_name in note.tag_names:
+
+def _apply_tags(db: Session, note: Note, tag_names: list[str]) -> None:
+    note.tags = []
+    for tag_name in tag_names:
         if tag_name == "":
             continue
-        tag = db.query(NoteTag).filter(NoteTag.name == tag_name).first()
-        if tag is None:
-            tag = NoteTag(name=tag_name)
-            db.add(tag)
-        if tag not in new_note.tags:
-            new_note.tags.append(tag)
+        tag = _get_or_create_tag(db, tag_name)
+        if tag not in note.tags:
+            note.tags.append(tag)
+
+
+@router.get("", response_model=list[NoteResponse])
+def get_notes(
+    db: Session = Depends(get_db),
+    note_type_name: str | None = None,
+    tag: str | None = None,
+    status: NoteStatus | None = None,
+    is_archived: bool | None = None,
+    search: str | None = None,
+):
+    filters = []
+
+    if note_type_name is not None:
+        filters.append(Note.note_type.has(name=note_type_name))
+    if status is not None:
+        filters.append(Note.status == status)
+    if is_archived is not None:
+        filters.append(Note.is_archived == is_archived)
+    if tag is not None:
+        filters.append(Note.tags.any(NoteTag.name == tag))
+    if search is not None:
+        filters.append(or_(Note.title.ilike(f"%{search}%"), Note.content.ilike(f"%{search}%")))
+
+    return db.query(Note).options(joinedload(Note.note_type)).filter(*filters).all()
+
+
+@router.post("", response_model=NoteResponse)
+def create_note(note: NoteCreate, db: Session = Depends(get_db)):
+    if note.note_type_name == "":
+        raise HTTPException(status_code=400, detail="Note type must not be empty")
+
+    note_type = _get_or_create_note_type(db, note.note_type_name)
+
+    new_note = Note(
+        title=note.title,
+        content=note.content,
+        note_type=note_type,
+        status=note.status.value if note.status else None,
+    )
+
+    _apply_tags(db, new_note, note.tag_names)
 
     db.add(new_note)
     db.commit()
@@ -70,6 +89,7 @@ def create_note(note: NoteCreate, db: Session = Depends(get_db)):
 @router.get("/types", response_model=list[NoteTypeResponse])
 def get_note_types(db: Session = Depends(get_db)):
     return db.query(NoteType).all()
+
 
 @router.get("/tags", response_model=list[NoteTagResponse])
 def get_tag_types(db: Session = Depends(get_db)):
@@ -91,30 +111,17 @@ def update_note(note_id: int, note_update: NoteUpdate, db: Session = Depends(get
         raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
 
     update_data = note_update.model_dump(exclude_unset=True)
+
     if "note_type_name" in update_data:
         note_type_name = update_data["note_type_name"]
         if note_type_name == "":
-            raise HTTPException(status_code=400, detail=f"Note type must not be empty")
+            raise HTTPException(status_code=400, detail="Note type must not be empty")
 
-        note_type = db.query(NoteType).filter(NoteType.name == note_type_name).first()
-        if note_type is None:
-            note_type = NoteType(name=note_type_name)
-            db.add(note_type)
-        setattr(note, "note_type", note_type)
+        note.note_type = _get_or_create_note_type(db, note_type_name)
         del update_data["note_type_name"]
 
     if "tag_names" in update_data:
-        note.tags = []
-        tag_names = update_data["tag_names"]
-        for tag_name in tag_names:
-            if tag_name == "":
-                continue
-            tag = db.query(NoteTag).filter(NoteTag.name == tag_name).first()
-            if tag is None:
-                tag = NoteTag(name=tag_name)
-                db.add(tag)
-            if tag not in note.tags:
-                note.tags.append(tag)
+        _apply_tags(db, note, update_data["tag_names"])
         del update_data["tag_names"]
 
     for key, value in update_data.items():
@@ -130,6 +137,7 @@ def delete_note(note_id: int, db: Session = Depends(get_db)):
     note = db.query(Note).filter(Note.id == note_id).first()
     if note is None:
         raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
+
     db.delete(note)
     db.commit()
     return {"message": "Note deleted"}
