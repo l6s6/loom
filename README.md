@@ -10,7 +10,7 @@ Beyond its personal use, this project is also a long-term learning project in fu
 
 ## Status
 
-🚧 **Early development.** Currently working through the initial backend setup and a minimal note-capture flow. See [Roadmap](#roadmap) below for the full plan.
+🚧 **Early development.** Backend has full CRUD for notes (with types, tags, status, filtering, and search) and a test suite. Frontend is up and running with note listing and creation. See [Roadmap](#roadmap) below for the full plan.
 
 ## Core Features (planned)
 
@@ -22,22 +22,25 @@ Beyond its personal use, this project is also a long-term learning project in fu
 - **AI-assisted reflection** — cluster summarization and a chat interface over your own notes (RAG), using a cloud LLM API
 - **Obsidian-compatible export** — Markdown with frontmatter and wikilinks, so your data is never locked in
 
+Full use cases and requirements are documented in [`docs/concept.md`](docs/concept.md).
+
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
 | Backend | Python, FastAPI, SQLAlchemy, Alembic |
 | Database | SQLite (local) → PostgreSQL (later) |
-| Frontend (web) | React |
+| Testing | Pytest (backend) |
+| Frontend (web) | React, TypeScript, Vite, Tailwind CSS |
 | Frontend (mobile) | Flutter *(later phase)* |
 | AI | Cloud LLM API (e.g. Claude) for embeddings, summarization, and RAG chat |
 | Deployment | Docker, self-hosted, accessed privately via Tailscale |
 
 ## Roadmap
 
-- [ ] Phase 0 — Project setup (backend skeleton, DB connection, frontend skeleton)
-- [ ] Phase 1 — MVP quick-capture (create & list notes)
-- [ ] Phase 2 — Organization (types, tags, status, filtering, search)
+- [x] Phase 0 — Project setup (backend skeleton, DB connection, frontend skeleton)
+- [x] Phase 1 — MVP quick-capture (create & list notes)
+- [x] Phase 2 — Organization (types, tags, status, filtering, search)
 - [ ] Phase 3 — "Quiet minute" reflection flow
 - [ ] Phase 4 — Manual linking, backlinks, thought threads
 - [ ] Phase 5 — Graph visualization
@@ -64,7 +67,13 @@ Visit `http://127.0.0.1:8000/docs` for the interactive API docs.
 
 ### Frontend
 
-*Coming soon — not yet set up.*
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Visit `http://localhost:5173`. Requires the backend to be running (see above) for data to load — CORS is configured to allow requests from the Vite dev server.
 
 ## Project Structure
 
@@ -78,9 +87,18 @@ loom/
 │   │   ├── models/
 │   │   ├── schemas/
 │   │   └── routers/
+│   ├── alembic/
 │   ├── tests/
+│   │   ├── conftest.py
+│   │   └── test_notes.py
 │   └── requirements.txt
 ├── frontend/
+│   └── src/
+│       ├── api/
+│       ├── hooks/
+│       ├── components/
+│       ├── types/
+│       └── App.tsx
 └── docs/
     └── concept.md
 ```
