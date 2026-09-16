@@ -7,11 +7,13 @@ const Sidebar = () => {
   const [search, setSearch] = useState("");
   const { notes } = useGetNotes();
 
-  const filteredNotes = notes.filter(
-    (note) =>
-      note.title.toLowerCase().includes(search.toLowerCase()) ||
-      note.content.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filteredNotes = notes
+    .filter(
+      (note) =>
+        note.title.toLowerCase().includes(search.toLowerCase()) ||
+        note.content.toLowerCase().includes(search.toLowerCase()),
+    )
+    .sort((a, b) => a.title.localeCompare(b.title));
 
   return (
     <aside className="bg-white transition-all duration-300 w-96 flex flex-col h-full border-r border-gray-200 p-4 ">

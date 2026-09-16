@@ -9,7 +9,7 @@ from app.schemas.note_type import NoteTypeResponse
 
 
 class NoteStatus(str, Enum):
-    none = ""
+    none = "none"
     open = "open"
     ongoing = "ongoing"
     closed = "closed"
