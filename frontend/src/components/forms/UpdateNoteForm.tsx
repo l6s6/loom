@@ -1,0 +1,56 @@
+import { NoteFields } from "./NoteFields.tsx";
+import { useNoteFieldsState } from "../../hooks/useNoteFieldsState.ts";
+import { useUpdateNote } from "../../hooks/useNotes.ts";
+import { type ChangeEvent, useState } from "react";
+import { FormField } from "./FormField.tsx";
+import Button from "../Button.tsx";
+
+const UpdateNoteForm = ({
+  onSubmitted,
+}: {
+  onSubmitted: () => Promise<void>;
+}) => {
+  const [noteId, setNoteId] = useState("");
+  const fields = useNoteFieldsState();
+  const { updateNote } = useUpdateNote();
+
+  const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    let noteIdInt: number = parseInt(noteId);
+    if (isNaN(noteIdInt)) {
+      throw new Error(`Invalid noteId: ${noteId}`);
+    }
+    await updateNote({
+      id: noteIdInt,
+      title: fields.title || undefined,
+      content: fields.content || undefined,
+      note_type_name: fields.noteTypeName || undefined,
+      status: fields.status || undefined,
+      tag_names:
+        fields.tagNames.trim() === ""
+          ? undefined
+          : fields.tagNames.split(",").map((tag: string) => tag.trim()),
+    });
+    await onSubmitted();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="flex flex-col gap-4">
+        <FormField
+          label="noteId"
+          value={noteId}
+          onChange={setNoteId}
+          placeholder="123"
+        />
+        <NoteFields {...fields} />
+      </div>
+
+      <div className="my-6">
+        <Button label="Update Note" buttonType="submit" />
+      </div>
+    </form>
+  );
+};
+
+export default UpdateNoteForm;

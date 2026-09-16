@@ -3,7 +3,7 @@ export interface Note {
   title: string;
   content: string;
   status: string;
-  noteType: {
+  note_type: {
     id: number;
     name: string;
   };
@@ -11,8 +11,8 @@ export interface Note {
     id: number;
     name: string;
   }[];
-  createdAt: Date;
-  modifiedAt: Date;
+  created_at: Date;
+  modified_at: Date;
 }
 
 export interface CreateNote {
