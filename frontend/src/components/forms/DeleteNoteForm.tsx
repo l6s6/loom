@@ -18,9 +18,7 @@ const DeleteNoteForm = ({
     if (isNaN(noteIdInt)) {
       throw new Error(`Invalid noteId: ${noteId}`);
     }
-    await deleteNote({
-      id: noteIdInt,
-    });
+    await deleteNote(noteIdInt);
     setNoteId("");
     await onSubmitted();
   };

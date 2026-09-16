@@ -31,10 +31,6 @@ export interface CreateNote {
   tag_names: string[];
 }
 
-export interface DeleteNote {
-  id: number;
-}
-
 export interface UpdateNote {
   id: number;
   title?: string;

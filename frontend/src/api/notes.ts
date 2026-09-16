@@ -1,9 +1,4 @@
-import type {
-  CreateNote,
-  DeleteNote,
-  Note,
-  UpdateNote,
-} from "../types/note.ts";
+import type { CreateNote, Note, UpdateNote } from "../types/note.ts";
 
 export const getNotes = async (): Promise<Note[]> => {
   const response = await fetch("http://localhost:8000/notes");
@@ -11,6 +6,16 @@ export const getNotes = async (): Promise<Note[]> => {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
   return (await response.json()) as Note[];
+};
+
+export const getNoteById = async (noteId: number): Promise<Note> => {
+  const response = await fetch(
+    `http://localhost:8000/notes/${noteId.toString()}`,
+  );
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return (await response.json()) as Note;
 };
 
 export const createNote = async (note: CreateNote): Promise<Note> => {
@@ -44,15 +49,14 @@ export const updateNote = async (note: UpdateNote): Promise<Note> => {
   return (await response.json()) as Note;
 };
 
-export const deleteNote = async (note: DeleteNote): Promise<Note> => {
+export const deleteNote = async (noteId: number): Promise<Note> => {
   const response = await fetch(
-    "http://localhost:8000/notes/" + note.id.toString(),
+    "http://localhost:8000/notes/" + noteId.toString(),
     {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(note),
     },
   );
   if (!response.ok) {
