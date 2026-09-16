@@ -36,12 +36,15 @@ const CreateNoteForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <NoteFields {...fields} />
-      <div className="my-6">
-        <Button label="Create Note" buttonType="submit" />
-      </div>
-    </form>
+    <div className="w-full">
+      <h1 className="mb-8 text-2xl font-bold text-indigo-600">Create Note</h1>
+      <form onSubmit={handleSubmit}>
+        <NoteFields {...fields} />
+        <div className="my-6">
+          <Button label="Create Note" buttonType="submit" />
+        </div>
+      </form>
+    </div>
   );
 };
 

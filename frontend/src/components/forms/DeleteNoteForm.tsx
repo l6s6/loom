@@ -26,17 +26,20 @@ const DeleteNoteForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <FormField
-        label="noteId"
-        value={noteId}
-        onChange={setNoteId}
-        placeholder="123"
-      />
-      <div className="my-6">
-        <Button label="Delete Note" buttonType="submit" />
-      </div>
-    </form>
+    <div className="w-full">
+      <h1 className="mb-8 text-2xl font-bold text-indigo-600">Delete Note</h1>
+      <form onSubmit={handleSubmit} className="w-full">
+        <FormField
+          label="NoteId"
+          value={noteId}
+          onChange={setNoteId}
+          placeholder="123"
+        />
+        <div className="my-6">
+          <Button label="Delete Note" buttonType="submit" />
+        </div>
+      </form>
+    </div>
   );
 };
 

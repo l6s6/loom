@@ -35,21 +35,24 @@ const UpdateNoteForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <div className="flex flex-col gap-4">
-        <FormField
-          label="noteId"
-          value={noteId}
-          onChange={setNoteId}
-          placeholder="123"
-        />
-        <NoteFields {...fields} />
-      </div>
+    <div className="w-full">
+      <h1 className="mb-8 text-2xl font-bold text-indigo-600">Update Note</h1>
+      <form onSubmit={handleSubmit} className="w-full">
+        <div className="flex flex-col gap-4">
+          <FormField
+            label="NoteId"
+            value={noteId}
+            onChange={setNoteId}
+            placeholder="123"
+          />
+          <NoteFields {...fields} />
+        </div>
 
-      <div className="my-6">
-        <Button label="Update Note" buttonType="submit" />
-      </div>
-    </form>
+        <div className="my-6">
+          <Button label="Update Note" buttonType="submit" />
+        </div>
+      </form>{" "}
+    </div>
   );
 };
 
