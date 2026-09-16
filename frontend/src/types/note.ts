@@ -19,8 +19,8 @@ export interface Note {
     name: string;
   };
   tags: Tag[];
-  created_at: Date;
-  modified_at: Date;
+  created_at: string;
+  modified_at: string;
 }
 
 export interface CreateNote {
