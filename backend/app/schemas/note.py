@@ -9,6 +9,7 @@ from app.schemas.note_type import NoteTypeResponse
 
 
 class NoteStatus(str, Enum):
+    none = ""
     open = "open"
     ongoing = "ongoing"
     closed = "closed"
@@ -18,7 +19,7 @@ class NoteCreate(BaseModel):
     content: str
     note_type_name: str
     tag_names: list[str]
-    status: Optional[NoteStatus] = None
+    status: NoteStatus = None
 
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
@@ -31,7 +32,7 @@ class NoteResponse(BaseModel):
     id: int
     title: str
     content: str
-    status: Optional[NoteStatus] = None
+    status: NoteStatus
     note_type: NoteTypeResponse
     tags: list[NoteTagResponse]
     created_at: datetime

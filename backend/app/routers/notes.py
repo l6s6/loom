@@ -77,7 +77,7 @@ def create_note(note: NoteCreate, db: Session = Depends(get_db)):
         title=note.title,
         content=note.content,
         note_type=note_type,
-        status=note.status.value if note.status else None,
+        status=note.status,
     )
 
     _apply_tags(db, new_note, note.tag_names)
