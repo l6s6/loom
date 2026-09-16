@@ -1,3 +1,14 @@
+import type { Tag } from "./tag.ts";
+
+export const NoteStatus = {
+  None: "none",
+  Open: "open",
+  Ongoing: "ongoing",
+  Closed: "closed",
+} as const;
+
+export type NoteStatus = (typeof NoteStatus)[keyof typeof NoteStatus];
+
 export interface Note {
   id: number;
   title: string;
@@ -7,10 +18,7 @@ export interface Note {
     id: number;
     name: string;
   };
-  tags: {
-    id: number;
-    name: string;
-  }[];
+  tags: Tag[];
   created_at: Date;
   modified_at: Date;
 }
@@ -18,7 +26,7 @@ export interface Note {
 export interface CreateNote {
   title: string;
   content: string;
-  status?: string;
+  status: string;
   note_type_name: string;
   tag_names: string[];
 }

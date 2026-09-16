@@ -1,4 +1,9 @@
 import { FormField } from "./FormField.tsx";
+import { SelectField } from "./SelectField.tsx";
+import { NoteStatus } from "../../types/note.ts";
+import { type Dispatch, type SetStateAction } from "react";
+import { SuggestionFormField } from "./SuggestionFormField.tsx";
+import { TagField } from "./TagField.tsx";
 
 interface NoteFieldsProps {
   title: string;
@@ -9,8 +14,10 @@ interface NoteFieldsProps {
   setNoteTypeName: (v: string) => void;
   status: string;
   setStatus: (v: string) => void;
-  tagNames: string;
-  setTagNames: (v: string) => void;
+  tags: string[];
+  setTags: Dispatch<SetStateAction<string[]>>;
+  existingTags: string[];
+  existingTypes: string[];
 }
 
 export function NoteFields({
@@ -22,8 +29,10 @@ export function NoteFields({
   setNoteTypeName,
   status,
   setStatus,
-  tagNames,
-  setTagNames,
+  tags,
+  setTags,
+  existingTags,
+  existingTypes,
 }: NoteFieldsProps) {
   return (
     <div className="flex flex-col gap-4">
@@ -39,24 +48,20 @@ export function NoteFields({
         onChange={setContent}
         placeholder="This note is about..."
       />
-      <FormField
+      <SuggestionFormField
         label="NoteType"
         value={noteTypeName}
         onChange={setNoteTypeName}
         placeholder="question"
+        suggestions={existingTypes}
       />
-      <FormField
+      <SelectField
         label="Status"
         value={status}
         onChange={setStatus}
-        placeholder="open | ongoing | closed"
+        options={Object.values(NoteStatus)}
       />
-      <FormField
-        label="Tags"
-        value={tagNames}
-        onChange={setTagNames}
-        placeholder="life, inspiration, ..."
-      />
+      <TagField tags={tags} onChange={setTags} suggestions={existingTags} />
     </div>
   );
 }

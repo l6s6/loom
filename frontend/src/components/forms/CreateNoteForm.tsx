@@ -4,11 +4,13 @@ import { useCreateNote } from "../../hooks/useNotes.ts";
 import type { ChangeEvent } from "react";
 import Button from "../Button.tsx";
 
-const CreateNoteForm = ({
-  onSubmitted,
-}: {
+interface CreateNoteFormProps {
   onSubmitted: () => Promise<void>;
-}) => {
+  types: string[];
+  tags: string[];
+}
+
+const CreateNoteForm = ({ onSubmitted, types, tags }: CreateNoteFormProps) => {
   const fields = useNoteFieldsState();
   const { createNote } = useCreateNote();
 
@@ -18,10 +20,8 @@ const CreateNoteForm = ({
       title: fields.title,
       content: fields.content,
       note_type_name: fields.noteTypeName,
-      status: fields.status || undefined,
-      tag_names: fields.tagNames
-        ? fields.tagNames.split(",").map((tag: string) => tag.trim())
-        : [],
+      status: fields.status,
+      tag_names: fields.tags,
     });
     clearForm();
     await onSubmitted();
@@ -32,14 +32,14 @@ const CreateNoteForm = ({
     fields.setContent("");
     fields.setStatus("");
     fields.setNoteTypeName("");
-    fields.setTagNames("");
+    fields.setTags([]);
   };
 
   return (
     <div className="w-full">
       <h1 className="mb-8 text-2xl font-bold text-indigo-600">Create Note</h1>
       <form onSubmit={handleSubmit}>
-        <NoteFields {...fields} />
+        <NoteFields {...fields} existingTypes={types} existingTags={tags} />
         <div className="my-6">
           <Button label="Create Note" buttonType="submit" />
         </div>

@@ -5,11 +5,13 @@ import { type ChangeEvent, useState } from "react";
 import { FormField } from "./FormField.tsx";
 import Button from "../Button.tsx";
 
-const UpdateNoteForm = ({
-  onSubmitted,
-}: {
+interface UpdateNoteFormProps {
   onSubmitted: () => Promise<void>;
-}) => {
+  types: string[];
+  tags: string[];
+}
+
+const UpdateNoteForm = ({ onSubmitted, types, tags }: UpdateNoteFormProps) => {
   const [noteId, setNoteId] = useState("");
   const fields = useNoteFieldsState();
   const { updateNote } = useUpdateNote();
@@ -26,10 +28,7 @@ const UpdateNoteForm = ({
       content: fields.content || undefined,
       note_type_name: fields.noteTypeName || undefined,
       status: fields.status || undefined,
-      tag_names:
-        fields.tagNames.trim() === ""
-          ? undefined
-          : fields.tagNames.split(",").map((tag: string) => tag.trim()),
+      tag_names: fields.tags,
     });
     await onSubmitted();
   };
@@ -45,7 +44,7 @@ const UpdateNoteForm = ({
             onChange={setNoteId}
             placeholder="123"
           />
-          <NoteFields {...fields} />
+          <NoteFields {...fields} existingTypes={types} existingTags={tags} />
         </div>
 
         <div className="my-6">
