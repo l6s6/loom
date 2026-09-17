@@ -3,7 +3,6 @@ import { useNoteFieldsState } from "../../hooks/useNoteFieldsState.ts";
 import { useUpdateNote } from "../../hooks/useNotes.ts";
 import { type ChangeEvent, useState } from "react";
 import { FormField } from "./FormField.tsx";
-import Button from "../Button.tsx";
 
 interface UpdateNoteFormProps {
   onSubmitted: () => Promise<void>;
@@ -47,9 +46,7 @@ const UpdateNoteForm = ({ onSubmitted, types, tags }: UpdateNoteFormProps) => {
           <NoteFields {...fields} existingTypes={types} existingTags={tags} />
         </div>
 
-        <div className="my-6">
-          <Button label="Update Note" buttonType="submit" />
-        </div>
+        <div className="my-6"></div>
       </form>{" "}
     </div>
   );

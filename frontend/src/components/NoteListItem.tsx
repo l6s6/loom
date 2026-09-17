@@ -15,9 +15,9 @@ const NoteListItem = ({ note }: NoteListItemProps) => {
       ? note.title.substring(0, limit) + "..."
       : note.title;
   return (
-    <div className="flex flex-col hover:bg-gray-100 rounded-md px-6 py-2">
+    <div className="flex flex-col hover:bg-bg-hover rounded-md px-4 py-2">
       <span className="font-bold">{titlePreview}</span>
-      <span className="text-gray-500">{contentPreview}</span>
+      <span className="text-content-muted">{contentPreview}</span>
     </div>
   );
 };

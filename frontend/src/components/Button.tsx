@@ -1,24 +1,35 @@
+import type { ReactNode } from "react";
+
 interface ButtonProps {
-  label: string;
+  children: ReactNode;
   buttonType?: "button" | "submit" | "reset";
   onClick?: () => void;
+  variant?: "primary" | "secondary" | "ghost";
 }
 
-const Button = ({
-  label,
+export default function Button({
+  children,
+  onClick,
   buttonType = "button",
-  onClick = () => {},
-}: ButtonProps) => {
+  variant = "primary",
+}: ButtonProps) {
+  const baseStyles =
+    "inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-50 disabled:cursor-not-allowed";
+
+  const variants = {
+    primary: "bg-accent text-white hover:bg-accent-hover shadow-sm",
+    secondary:
+      "bg-bg-editor border border-border-subtle text-content-main hover:bg-bg-hover shadow-sm",
+    ghost: "text-content-muted hover:text-content-main hover:bg-bg-hover",
+  };
+
   return (
     <button
-      type={buttonType}
       onClick={onClick}
-      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md
-                 shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      type={buttonType}
+      className={`${baseStyles} ${variants[variant]}`}
     >
-      {label}
+      {children}
     </button>
   );
-};
-
-export default Button;
+}

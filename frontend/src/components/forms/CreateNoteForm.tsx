@@ -2,7 +2,6 @@ import { NoteFields } from "./NoteFields.tsx";
 import { useNoteFieldsState } from "../../hooks/useNoteFieldsState.ts";
 import { useCreateNote } from "../../hooks/useNotes.ts";
 import type { ChangeEvent } from "react";
-import Button from "../Button.tsx";
 
 interface CreateNoteFormProps {
   onSubmitted: () => Promise<void>;
@@ -40,9 +39,7 @@ const CreateNoteForm = ({ onSubmitted, types, tags }: CreateNoteFormProps) => {
       <h1 className="mb-8 text-2xl font-bold text-indigo-600">Create Note</h1>
       <form onSubmit={handleSubmit}>
         <NoteFields {...fields} existingTypes={types} existingTags={tags} />
-        <div className="my-6">
-          <Button label="Create Note" buttonType="submit" />
-        </div>
+        <div className="my-6"></div>
       </form>
     </div>
   );
