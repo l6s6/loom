@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Plus, X, Hash, AlignLeft, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,67 +24,27 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-
-// --- DOMAIN TYPES ---
-
-export type NoteStatus = "open" | "ongoing" | "closed";
-
-export interface NoteType {
-  id: string;
-  name: string;
-}
-
-export interface NoteTag {
-  id: string;
-  name: string;
-}
-
-const STATUS_CONFIG: Record<
-  NoteStatus,
-  { label: string; dotColor: string; textColor: string }
-> = {
-  open: {
-    label: "Open",
-    dotColor: "bg-green-500",
-    textColor: "text-green-700",
-  },
-  ongoing: {
-    label: "Ongoing",
-    dotColor: "bg-blue-500",
-    textColor: "text-blue-700",
-  },
-  closed: {
-    label: "Closed",
-    dotColor: "bg-gray-400",
-    textColor: "text-gray-600",
-  },
-};
+import { type NoteStatus, NOTE_STATUS_CONFIG } from "@/types/note.ts";
+import { useParams } from "react-router-dom";
+import { useGetNoteById, useUpdateNote } from "@/hooks/useNotes.ts";
+import { useGetTypes } from "@/hooks/useTypes.ts";
+import { useGetTags } from "@/hooks/useTags.ts";
+import type { NoteTag } from "@/types/noteTag.ts";
 
 export default function NoteEditor() {
-  // App State
+  const { noteId } = useParams();
+  const noteIdInt = noteId ? parseInt(noteId) : NaN;
+  const { updateNote } = useUpdateNote();
+  const { note, error, refetchNote } = useGetNoteById(noteIdInt);
+  const { types, refetchTypes } = useGetTypes();
+  const { tags, refetchTags } = useGetTags();
+
+  // Note State
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
-
-  // Metadata State
-  const [status, setStatus] = useState<NoteStatus>("open");
-  const [type, setType] = useState<NoteType | null>({
-    id: "t-1",
-    name: "Observation",
-  });
-  const [tags, setTags] = useState<NoteTag[]>([{ id: "tag-1", name: "React" }]);
-
-  // DB Mock State
-  const [availableTypes, setAvailableTypes] = useState<NoteType[]>([
-    { id: "t-1", name: "Observation" },
-    { id: "t-2", name: "Question" },
-    { id: "t-3", name: "Quote" },
-  ]);
-
-  const [availableTags, setAvailableTags] = useState<NoteTag[]>([
-    { id: "tag-1", name: "React" },
-    { id: "tag-2", name: "TypeScript" },
-    { id: "tag-3", name: "UI Design" },
-  ]);
+  const [status, setStatus] = useState("open");
+  const [typeName, setTypeName] = useState("");
+  const [availableTags, setAvailableTags] = useState<NoteTag[]>();
 
   // Search States for Popovers
   const [typeSearch, setTypeSearch] = useState("");
@@ -94,30 +54,104 @@ export default function NoteEditor() {
   const [typeOpen, setTypeOpen] = useState(false);
   const [tagOpen, setTagOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
+  const [loadingNote, setLoadingNote] = useState(true);
 
-  const filteredTags = availableTags.filter(
-    (t) => !tags.some((selected) => selected.id === t.id),
-  );
+  // Update Note fields when note is loaded
+  useEffect(() => {
+    if (note) {
+      setTitle(note.title);
+      setContent(note.content);
+      setStatus(note.status);
+      setTypeName(note.note_type.name);
+      updateAvailableTags();
+    }
+    setLoadingNote(false);
+  }, [note]);
 
-  const handleAddType = (name: string) => {
-    const newType: NoteType = { id: `t-${Date.now()}`, name };
-    setAvailableTypes((prev) => [...prev, newType]);
-    setType(newType);
-    setTypeOpen(false);
-    setTypeSearch("");
+  // Debouncing to avoid too many db updates
+  useEffect(() => {
+    const titleChanged = note && title !== note.title;
+    const contentChanged = note && content !== note.content;
+
+    if (!titleChanged && !contentChanged) return;
+    const timerId = setTimeout(() => {
+      updateNote({
+        id: noteIdInt,
+        title: title,
+        content: content,
+      });
+    }, 500);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [title, content, note, noteIdInt, updateNote]);
+
+  const updateAvailableTags = () => {
+    setAvailableTags(
+      tags
+        .filter((t) => !note?.tags.some((selected) => selected.id === t.id))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    );
   };
 
-  const handleAddTag = (name: string) => {
-    const newTag: NoteTag = { id: `tag-${Date.now()}`, name };
-    setAvailableTags((prev) => [...prev, newTag]);
-    setTags((prev) => [...prev, newTag]);
+  const handleStatusChange = async (newStatus: string) => {
+    setStatus(newStatus);
+    setStatusOpen(false);
+    await updateNote({
+      id: noteIdInt,
+      status: newStatus,
+    });
+  };
+
+  const handleTypeChange = async (newType: string) => {
+    setTypeName(newType);
+    setTypeOpen(false);
+    setTypeSearch("");
+    await updateNote({
+      id: noteIdInt,
+      note_type_name: newType,
+    });
+    await refetchTypes();
+  };
+
+  const handleAddTag = async (name: string) => {
+    if (note === undefined) {
+      return;
+    }
+    const newTagArr = [...note.tags.map((tag) => tag.name), name];
+    await updateNote({
+      id: noteIdInt,
+      tag_names: newTagArr,
+    });
     setTagSearch("");
+    setTagOpen(false);
+    setTagSearch("");
+    await refetchNote(noteIdInt);
+    await refetchTags();
+    updateAvailableTags();
     // Keep popover open for adding more tags
   };
 
-  const handleRemoveTag = (idToRemove: string) => {
-    setTags((prev) => prev.filter((t) => t.id !== idToRemove));
+  const handleRemoveTag = async (tagToRemove: string) => {
+    if (note === undefined) {
+      return;
+    }
+    const newTagArr = note.tags
+      .filter((tag) => tag.name !== tagToRemove)
+      .map((tag) => tag.name);
+    await updateNote({
+      id: noteIdInt,
+      tag_names: newTagArr,
+    });
+    await refetchNote(noteIdInt);
+    await refetchTags();
+    updateAvailableTags();
   };
+
+  if (note === undefined) return <p>Note undefined</p>;
+  if (loadingNote) return <p>Loading</p>;
+  else if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100 flex flex-col">
@@ -136,14 +170,20 @@ export default function NoteEditor() {
             <DropdownMenu onOpenChange={setStatusOpen} open={statusOpen}>
               <DropdownMenuTrigger
                 render={
-                  <Button variant="outline">
+                  <Button
+                    variant="outline"
+                    className={NOTE_STATUS_CONFIG[status].bgColor}
+                  >
                     <span
-                      className={`w-2 h-2 rounded-full ${STATUS_CONFIG[status].dotColor}`}
+                      className={`w-2 h-2 rounded-full bg- ${NOTE_STATUS_CONFIG[status].dotColor}`}
                     />
-                    <span className={STATUS_CONFIG[status].textColor}>
-                      {STATUS_CONFIG[status].label}
+                    <span className={NOTE_STATUS_CONFIG[status].textColor}>
+                      {NOTE_STATUS_CONFIG[status].label}
                     </span>
-                    <ChevronDown size={14} className="text-slate-400" />
+                    <ChevronDown
+                      size={14}
+                      className={NOTE_STATUS_CONFIG[status].textColor}
+                    />
                   </Button>
                 }
               />
@@ -152,15 +192,12 @@ export default function NoteEditor() {
                   <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
                   <DropdownMenuRadioGroup
                     value={status}
-                    onValueChange={(value) => {
-                      setStatus(value);
-                      setStatusOpen(false);
-                    }}
+                    onValueChange={(value) => handleStatusChange(value)}
                   >
                     {(
-                      Object.entries(STATUS_CONFIG) as [
+                      Object.entries(NOTE_STATUS_CONFIG) as [
                         NoteStatus,
-                        (typeof STATUS_CONFIG)[NoteStatus],
+                        (typeof NOTE_STATUS_CONFIG)[NoteStatus],
                       ][]
                     ).map(([key, config]) => (
                       <DropdownMenuRadioItem value={key}>
@@ -180,7 +217,7 @@ export default function NoteEditor() {
               <PopoverTrigger
                 render={
                   <Button variant="outline">
-                    {type?.name}
+                    {typeName}
                     <ChevronDown size={14} className="text-slate-400" />
                   </Button>
                 }
@@ -194,7 +231,7 @@ export default function NoteEditor() {
                   <CommandList>
                     <CommandEmpty>
                       <Button
-                        onClick={() => handleAddType(typeSearch)}
+                        onClick={() => handleTypeChange(typeSearch)}
                         variant="secondary"
                       >
                         <Plus size={14} className="mr-2 shrink-0" />
@@ -204,17 +241,13 @@ export default function NoteEditor() {
                       </Button>
                     </CommandEmpty>
                     <CommandGroup heading="Existing Types">
-                      {availableTypes.map((t) => (
+                      {types.map((t) => (
                         <CommandItem
-                          value={t.id}
-                          onSelect={() => {
-                            setType(t);
-                            setTypeOpen(false);
-                            setTypeSearch("");
-                          }}
+                          value={t.name}
+                          onSelect={() => handleTypeChange(t.name)}
                         >
                           <span className="flex-1">{t.name}</span>
-                          {type?.id === t.id && (
+                          {typeName === t.name && (
                             <Check size={14} className="text-slate-600" />
                           )}
                         </CommandItem>
@@ -228,24 +261,26 @@ export default function NoteEditor() {
             {/* 3. TAGS (Popover + Command + Multi Select Pills) */}
             <div className="flex flex-wrap items-center gap-2">
               {/* Selected Tags */}
-              {tags.map((tag) => (
-                <span
-                  key={tag.id}
-                  className="px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-1 group"
-                >
-                  <Hash
-                    size={12}
-                    className="text-slate-400 group-hover:text-slate-500"
-                  />
-                  {tag.name}
-                  <button
-                    onClick={() => handleRemoveTag(tag.id)}
-                    className="ml-1 text-slate-400 hover:text-slate-900 hover:bg-slate-200 rounded-full p-0.5 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+              {note.tags
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-1 group"
                   >
-                    <X size={12} />
-                  </button>
-                </span>
-              ))}
+                    <Hash
+                      size={12}
+                      className="text-slate-400 group-hover:text-slate-500"
+                    />
+                    {tag.name}
+                    <button
+                      onClick={() => handleRemoveTag(tag.name)}
+                      className="ml-1 text-slate-400 hover:text-slate-900 hover:bg-slate-200 rounded-full p-0.5 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
 
               {/* Add Tag Trigger */}
               <Popover open={tagOpen} onOpenChange={setTagOpen}>
@@ -263,40 +298,40 @@ export default function NoteEditor() {
                       onValueChange={setTagSearch}
                     />
                     <CommandList>
-                      {filteredTags.length === 0 && (
-                        <CommandEmpty>
-                          {tagSearch ? (
-                            <Button
-                              onClick={() => handleAddTag(tagSearch)}
-                              variant="secondary"
-                            >
-                              <Plus size={14} className="mr-2 shrink-0" />
-                              <span className="truncate">
-                                Create Tag "{tagSearch}"
-                              </span>
-                            </Button>
-                          ) : (
-                            "No tags found."
-                          )}
-                        </CommandEmpty>
-                      )}
+                      {availableTags === undefined ||
+                        (availableTags.length === 0 && (
+                          <CommandEmpty>
+                            {tagSearch ? (
+                              <Button
+                                onClick={() => handleAddTag(tagSearch)}
+                                variant="secondary"
+                              >
+                                <Plus size={14} className="mr-2 shrink-0" />
+                                <span className="truncate">
+                                  Create Tag "{tagSearch}"
+                                </span>
+                              </Button>
+                            ) : (
+                              "No tags found."
+                            )}
+                          </CommandEmpty>
+                        ))}
 
-                      {filteredTags.length > 0 && (
-                        <CommandGroup heading="Existing Tags">
-                          {filteredTags.map((t) => (
-                            <CommandItem
-                              value={t.id}
-                              onSelect={() => {
-                                setTags([...tags, t]);
-                                setTagSearch("");
-                                setTagOpen(false);
-                              }}
-                            >
-                              <span className="flex-1">{t.name}</span>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      )}
+                      {availableTags !== undefined &&
+                        availableTags.length > 0 && (
+                          <CommandGroup heading="Existing Tags">
+                            {availableTags.map((t) => (
+                              <CommandItem
+                                value={t.name}
+                                onSelect={() => {
+                                  handleAddTag(t.name);
+                                }}
+                              >
+                                <span className="flex-1">{t.name}</span>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        )}
                     </CommandList>
                   </Command>
                 </PopoverContent>

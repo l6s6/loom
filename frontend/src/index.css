@@ -11,20 +11,20 @@
   /* --- COLORS --- */
 
   /* Background */
-  --color-bg-editor: #FFFFFF;
-  --color-bg-sidebar: #F9FAFB;
-  --color-bg-hover: #F4F4F5;
+  --color-bg-editor: var(--color-white);
+  --color-bg-sidebar: var(--color-gray-50);
+  --color-bg-hover: var(--color-gray-50);
 
   /* Text */
-  --color-content-muted: #71717A;
+  --color-content-muted: var(--color-gray-500);
 
   /* Frame */
-  --color-border-subtle: #E4E4E7;
+  --color-border-subtle: var(--color-gray-200);
 
   /* Accent */
-  --color-accent: #4F46E5;
-  --color-accent-hover: #4338CA;
-  --color-accent-bg: #A4A1E6;
+  --color-primary: var(--color-indigo-600);
+  --color-primary-bg: var(--color-indigo-200);
+  --color-primary-bg-hover: var(--color-indigo-300);
 
   /* --- TYPOGRAPHY --- */
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
