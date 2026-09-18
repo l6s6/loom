@@ -1,19 +1,42 @@
 import { Link } from "react-router-dom";
 import NoteListItem from "./NoteListItem.tsx";
-import { useCreateNote, useGetNotes } from "../hooks/useNotes.ts";
+import {
+  useCreateNote,
+  useDeleteNote,
+  useGetNotes,
+} from "../hooks/useNotes.ts";
 import { SquarePen } from "lucide-react";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu.tsx";
 
 const Sidebar = () => {
-  const { notes } = useGetNotes();
+  const { notes, refetchNotes } = useGetNotes();
   const { createNote } = useCreateNote();
+  const { deleteNote } = useDeleteNote();
 
   const filteredNotes = notes.sort((a, b) => a.title.localeCompare(b.title));
 
-  const createNewNote = async () => {
+  const handleCreateNote = async () => {
     const newNote = await createNote();
     if (newNote) {
       window.location.href = `/n/${newNote.id}`;
     }
+  };
+
+  const handleDeleteNote = async (noteId: number) => {
+    if (window.location.href.includes(`/n/${noteId}`)) {
+      window.location.href = "/";
+    }
+    await deleteNote(noteId);
+    await refetchNotes();
   };
 
   return (
@@ -21,15 +44,53 @@ const Sidebar = () => {
       <div className="pl-4 h-16 items-center border-gray-300 flex flex-row justify-between">
         <span className="text-2xl font-bold">Notes</span>
         <SquarePen
-          onClick={createNewNote}
+          onClick={handleCreateNote}
           className="size-5 m-2 hover:cursor-pointer"
         />
       </div>
       <div className="flex-1 overflow-y-auto">
         {filteredNotes.map((note) => (
-          <Link to={`/n/${note.id}`} key={note.id}>
-            <NoteListItem note={note} key={note.id} />
-          </Link>
+          <ContextMenu key={note.id}>
+            <ContextMenuTrigger>
+              <Link to={`/n/${note.id}`} key={note.id}>
+                <NoteListItem note={note} key={note.id} />
+              </Link>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+              <ContextMenuGroup>
+                <ContextMenuLabel>File</ContextMenuLabel>
+                <ContextMenuItem onClick={handleCreateNote}>
+                  New File
+                  <ContextMenuShortcut>Ctrl + N</ContextMenuShortcut>
+                </ContextMenuItem>
+              </ContextMenuGroup>
+              <ContextMenuSeparator />
+              <ContextMenuGroup>
+                <ContextMenuItem>
+                  Cut
+                  <ContextMenuShortcut>Ctrl + X</ContextMenuShortcut>
+                </ContextMenuItem>
+                <ContextMenuItem>
+                  Copy
+                  <ContextMenuShortcut>Ctrl + C</ContextMenuShortcut>
+                </ContextMenuItem>
+                <ContextMenuItem>
+                  Paste
+                  <ContextMenuShortcut>Ctrl + V</ContextMenuShortcut>
+                </ContextMenuItem>
+              </ContextMenuGroup>
+              <ContextMenuSeparator />
+              <ContextMenuGroup>
+                <ContextMenuItem
+                  variant="destructive"
+                  onClick={() => handleDeleteNote(note.id)}
+                >
+                  Delete
+                  <ContextMenuShortcut>⌫</ContextMenuShortcut>
+                </ContextMenuItem>
+              </ContextMenuGroup>
+            </ContextMenuContent>
+          </ContextMenu>
         ))}
 
         {filteredNotes.length === 0 && (
