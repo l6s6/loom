@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import type { Type } from "../types/type.ts";
+import type { NoteType } from "../types/noteType.ts";
 import { getNoteTypes } from "../api/noteTypes.ts";
 
 export function useGetTypes() {
-  const [types, setTypes] = useState<Type[]>([]);
+  const [types, setTypes] = useState<NoteType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

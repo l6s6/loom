@@ -1,4 +1,4 @@
-export interface Type {
+export interface NoteTag {
   name: string;
   id: number;
 }

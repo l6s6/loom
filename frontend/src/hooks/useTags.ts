@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import type { Tag } from "../types/tag.ts";
+import type { NoteTag } from "../types/noteTag.ts";
 import { getNoteTags } from "../api/noteTags.ts";
 
 export function useGetTags() {
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [tags, setTags] = useState<NoteTag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

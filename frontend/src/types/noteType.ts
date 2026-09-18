@@ -1,4 +1,4 @@
-export interface Tag {
+export interface NoteType {
   name: string;
   id: number;
 }
