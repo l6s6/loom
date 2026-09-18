@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, Plus, X, Hash, AlignLeft, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,6 @@ import { useParams } from "react-router-dom";
 import { useGetNoteById, useUpdateNote } from "@/hooks/useNotes.ts";
 import { useGetTypes } from "@/hooks/useTypes.ts";
 import { useGetTags } from "@/hooks/useTags.ts";
-import type { NoteTag } from "@/types/noteTag.ts";
 
 export default function NoteEditor() {
   const { noteId } = useParams();
@@ -44,7 +43,6 @@ export default function NoteEditor() {
   const [content, setContent] = useState<string>("");
   const [status, setStatus] = useState("open");
   const [typeName, setTypeName] = useState("");
-  const [availableTags, setAvailableTags] = useState<NoteTag[]>();
 
   // Search States for Popovers
   const [typeSearch, setTypeSearch] = useState("");
@@ -56,6 +54,14 @@ export default function NoteEditor() {
   const [statusOpen, setStatusOpen] = useState(false);
   const [loadingNote, setLoadingNote] = useState(true);
 
+  const availableTags = useMemo(
+    () =>
+      tags
+        .filter((t) => !note?.tags.some((selected) => selected.id === t.id))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [tags, note],
+  );
+
   // Update Note fields when note is loaded
   useEffect(() => {
     if (note) {
@@ -63,9 +69,8 @@ export default function NoteEditor() {
       setContent(note.content);
       setStatus(note.status);
       setTypeName(note.note_type.name);
-      updateAvailableTags();
+      setLoadingNote(false);
     }
-    setLoadingNote(false);
   }, [note]);
 
   // Debouncing to avoid too many db updates
@@ -86,14 +91,6 @@ export default function NoteEditor() {
       clearTimeout(timerId);
     };
   }, [title, content, note, noteIdInt, updateNote]);
-
-  const updateAvailableTags = () => {
-    setAvailableTags(
-      tags
-        .filter((t) => !note?.tags.some((selected) => selected.id === t.id))
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    );
-  };
 
   const handleStatusChange = async (newStatus: string) => {
     setStatus(newStatus);
@@ -129,8 +126,6 @@ export default function NoteEditor() {
     setTagSearch("");
     await refetchNote(noteIdInt);
     await refetchTags();
-    updateAvailableTags();
-    // Keep popover open for adding more tags
   };
 
   const handleRemoveTag = async (tagToRemove: string) => {
@@ -146,12 +141,11 @@ export default function NoteEditor() {
     });
     await refetchNote(noteIdInt);
     await refetchTags();
-    updateAvailableTags();
   };
 
-  if (note === undefined) return <p>Note undefined</p>;
+  if (error) return <p>Error: {error}</p>;
   if (loadingNote) return <p>Loading</p>;
-  else if (error) return <p>Error: {error}</p>;
+  if (note === undefined) return <p>Note undefined</p>;
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100 flex flex-col">
@@ -175,7 +169,7 @@ export default function NoteEditor() {
                     className={NOTE_STATUS_CONFIG[status].bgColor}
                   >
                     <span
-                      className={`w-2 h-2 rounded-full bg- ${NOTE_STATUS_CONFIG[status].dotColor}`}
+                      className={`w-2 h-2 rounded-full ${NOTE_STATUS_CONFIG[status].dotColor}`}
                     />
                     <span className={NOTE_STATUS_CONFIG[status].textColor}>
                       {NOTE_STATUS_CONFIG[status].label}
@@ -298,40 +292,38 @@ export default function NoteEditor() {
                       onValueChange={setTagSearch}
                     />
                     <CommandList>
-                      {availableTags === undefined ||
-                        (availableTags.length === 0 && (
-                          <CommandEmpty>
-                            {tagSearch ? (
-                              <Button
-                                onClick={() => handleAddTag(tagSearch)}
-                                variant="secondary"
-                              >
-                                <Plus size={14} className="mr-2 shrink-0" />
-                                <span className="truncate">
-                                  Create Tag "{tagSearch}"
-                                </span>
-                              </Button>
-                            ) : (
-                              "No tags found."
-                            )}
-                          </CommandEmpty>
-                        ))}
+                      {availableTags.length === 0 && (
+                        <CommandEmpty>
+                          {tagSearch ? (
+                            <Button
+                              onClick={() => handleAddTag(tagSearch)}
+                              variant="secondary"
+                            >
+                              <Plus size={14} className="mr-2 shrink-0" />
+                              <span className="truncate">
+                                Create Tag "{tagSearch}"
+                              </span>
+                            </Button>
+                          ) : (
+                            "No tags found."
+                          )}
+                        </CommandEmpty>
+                      )}
 
-                      {availableTags !== undefined &&
-                        availableTags.length > 0 && (
-                          <CommandGroup heading="Existing Tags">
-                            {availableTags.map((t) => (
-                              <CommandItem
-                                value={t.name}
-                                onSelect={() => {
-                                  handleAddTag(t.name);
-                                }}
-                              >
-                                <span className="flex-1">{t.name}</span>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        )}
+                      {availableTags.length > 0 && (
+                        <CommandGroup heading="Existing Tags">
+                          {availableTags.map((t) => (
+                            <CommandItem
+                              value={t.name}
+                              onSelect={() => {
+                                handleAddTag(t.name);
+                              }}
+                            >
+                              <span className="flex-1">{t.name}</span>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
                     </CommandList>
                   </Command>
                 </PopoverContent>

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import NoteListItem from "./NoteListItem.tsx";
 import {
   useCreateNote,
@@ -18,6 +18,11 @@ import {
 } from "@/components/ui/context-menu.tsx";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const match = useMatch("/n/:noteId");
+
+  const urlNoteId = match?.params.noteId;
+
   const { notes, refetchNotes } = useGetNotes();
   const { createNote } = useCreateNote();
   const { deleteNote } = useDeleteNote();
@@ -27,15 +32,15 @@ const Sidebar = () => {
   const handleCreateNote = async () => {
     const newNote = await createNote();
     if (newNote) {
-      window.location.href = `/n/${newNote.id}`;
+      navigate(`/n/${newNote.id}`);
     }
   };
 
-  const handleDeleteNote = async (noteId: number) => {
-    if (window.location.href.includes(`/n/${noteId}`)) {
-      window.location.href = "/";
+  const handleDeleteNote = async (noteToDeleteIt: number) => {
+    if (urlNoteId === noteToDeleteIt.toString()) {
+      navigate("/");
     }
-    await deleteNote(noteId);
+    await deleteNote(noteToDeleteIt);
     await refetchNotes();
   };
 
