@@ -30,7 +30,7 @@ import { useGetNoteById, useUpdateNote } from "@/hooks/useNotes.ts";
 import { useGetTypes } from "@/hooks/useTypes.ts";
 import { useGetTags } from "@/hooks/useTags.ts";
 
-export default function NoteEditor() {
+export default function EditorView() {
   const { noteId } = useParams();
   const noteIdInt = noteId ? parseInt(noteId) : NaN;
   const { updateNote } = useUpdateNote();
