@@ -13,6 +13,7 @@
   /* Background */
   --color-bg-editor: var(--color-white);
   --color-bg-sidebar: var(--color-gray-50);
+  --color-bg-sidebar-hover: var(--color-gray-200);
   --color-bg-hover: var(--color-gray-50);
 
   /* Text */
@@ -23,7 +24,7 @@
 
   /* Accent */
   --color-primary: var(--color-indigo-600);
-  --color-primary-bg: var(--color-indigo-200);
+  --color-primary-bg: var(--color-indigo-100);
   --color-primary-bg-hover: var(--color-indigo-300);
 
   /* --- TYPOGRAPHY --- */

@@ -61,6 +61,14 @@ export interface CreateNote {
   tag_names: string[];
 }
 
+export const EMPTY_NEW_NOTE = {
+  title: "Untitled",
+  content: "",
+  status: "none",
+  note_type_name: "none",
+  tag_names: [],
+};
+
 export interface UpdateNote {
   id: number;
   title?: string;
