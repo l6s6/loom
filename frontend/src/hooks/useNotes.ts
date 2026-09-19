@@ -15,7 +15,7 @@ import {
 
 export function useGetNotes() {
   const [notes, setNotes] = useState<Note[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
@@ -24,7 +24,7 @@ export function useGetNotes() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -32,12 +32,12 @@ export function useGetNotes() {
     load();
   }, []);
 
-  return { refetchNotes: load, notes, loading, error };
+  return { refetchNotes: load, notes, loading: isLoading, error };
 }
 
 export function useGetNoteById(noteId: number) {
   const [note, setNote] = useState<Note>();
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = async (id: number) => {
@@ -46,7 +46,7 @@ export function useGetNoteById(noteId: number) {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -54,7 +54,7 @@ export function useGetNoteById(noteId: number) {
     load(noteId);
   }, [noteId]);
 
-  return { refetchNote: load, note, loading, error };
+  return { refetchNote: load, note, loading: isLoading, error };
 }
 
 export function useCreateNote() {

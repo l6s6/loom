@@ -4,7 +4,7 @@ import { getNoteTags } from "../api/noteTags.ts";
 
 export function useGetTags() {
   const [tags, setTags] = useState<NoteTag[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
@@ -13,7 +13,7 @@ export function useGetTags() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -21,5 +21,5 @@ export function useGetTags() {
     load();
   }, []);
 
-  return { refetchTags: load, tags, loading, error };
+  return { refetchTags: load, tags, loading: isLoading, error };
 }

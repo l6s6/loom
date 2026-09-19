@@ -4,7 +4,7 @@ import { getNoteTypes } from "../api/noteTypes.ts";
 
 export function useGetTypes() {
   const [types, setTypes] = useState<NoteType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
@@ -13,7 +13,7 @@ export function useGetTypes() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -21,5 +21,5 @@ export function useGetTypes() {
     load();
   }, []);
 
-  return { refetchTypes: load, types, loading, error };
+  return { refetchTypes: load, types, loading: isLoading, error };
 }
