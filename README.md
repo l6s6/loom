@@ -10,7 +10,7 @@ Beyond its personal use, this project is also a long-term learning project in fu
 
 ## Status
 
-🚧 **Early development.** Backend has full CRUD for notes (with types, tags, status, filtering, and search) and a test suite. Frontend is up and running with note listing and creation. See [Roadmap](#roadmap) below for the full plan.
+🚧 **Early development.** Backend has full CRUD for notes (types, tags, status, filtering, search) and a test suite. Frontend has a working note editor (title/content autosave, status/type/tag editing with autocomplete) and a sidebar with note list, creation, and deletion, all kept in sync via shared state. See [Roadmap](#roadmap) below for the full plan.
 
 ## Core Features (planned)
 
@@ -31,7 +31,7 @@ Full use cases and requirements are documented in [`docs/concept.md`](docs/conce
 | Backend | Python, FastAPI, SQLAlchemy, Alembic |
 | Database | SQLite (local) → PostgreSQL (later) |
 | Testing | Pytest (backend) |
-| Frontend (web) | React, TypeScript, Vite, Tailwind CSS |
+| Frontend (web) | React, TypeScript, Vite, Tailwind CSS, React Router, shadcn/ui |
 | Frontend (mobile) | Flutter *(later phase)* |
 | AI | Cloud LLM API (e.g. Claude) for embeddings, summarization, and RAG chat |
 | Deployment | Docker, self-hosted, accessed privately via Tailscale |
@@ -96,11 +96,17 @@ loom/
 │   └── src/
 │       ├── api/
 │       ├── hooks/
+│       ├── context/
 │       ├── components/
+│       │   ├── ui/          # shadcn/ui components
+│       │   └── editor/      # note editor building blocks (title, status, type, tags)
 │       ├── types/
+│       ├── Layout.tsx
+│       ├── EditorView.tsx
 │       └── App.tsx
 └── docs/
-    └── concept.md
+    ├── concept.md
+    └── architektur-notizen.md
 ```
 
 ## Why "Loom"
