@@ -1,10 +1,6 @@
 import { Link, useMatch, useNavigate } from "react-router-dom";
 import NoteListItem from "./NoteListItem.tsx";
-import {
-  useCreateNote,
-  useDeleteNote,
-  useGetNotes,
-} from "../hooks/useNotes.ts";
+import { useCreateNote, useDeleteNote } from "../hooks/useNotes.ts";
 import { SquarePen } from "lucide-react";
 import {
   ContextMenu,
@@ -16,6 +12,7 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu.tsx";
+import { useNotesContext } from "@/context/NotesContext.tsx";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -23,14 +20,18 @@ const Sidebar = () => {
 
   const urlNoteId = match?.params.noteId;
 
-  const { notes, refetchNotes } = useGetNotes();
+  const { notes, refetchNotes } = useNotesContext();
   const { createNote } = useCreateNote();
   const { deleteNote } = useDeleteNote();
 
-  const filteredNotes = notes.sort((a, b) => a.title.localeCompare(b.title));
+  // Copy notes to prevent modifying it
+  const filteredNotes = [...notes].sort((a, b) =>
+    a.title.localeCompare(b.title),
+  );
 
   const handleCreateNote = async () => {
     const newNote = await createNote();
+    await refetchNotes();
     if (newNote) {
       navigate(`/n/${newNote.id}`);
     }

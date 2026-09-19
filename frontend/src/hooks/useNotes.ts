@@ -32,7 +32,7 @@ export function useGetNotes() {
     load();
   }, []);
 
-  return { refetchNotes: load, notes, loading: isLoading, error };
+  return { refetchNotes: load, notes, loading: isLoading, error, setNotes };
 }
 
 export function useGetNoteById(noteId: number) {
@@ -42,7 +42,9 @@ export function useGetNoteById(noteId: number) {
 
   const load = async (id: number) => {
     try {
-      setNote(await getNoteById(id));
+      const data = await getNoteById(id);
+      setNote(data);
+      return data;
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -56,7 +58,6 @@ export function useGetNoteById(noteId: number) {
 
   return { refetchNote: load, note, loading: isLoading, error };
 }
-
 export function useCreateNote() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
