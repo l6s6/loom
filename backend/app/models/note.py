@@ -1,42 +1,43 @@
-from datetime import datetime
+import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import func, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
-from app.models.note_tag import has_tag
-from app.models.link_type import NoteLink
+from app.models.associations import note_has_tags
 
 
 class Note(Base):
     __tablename__ = "notes"
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
-    content = Column(String)
-    status = Column(String)
-    is_archived = Column(Boolean, default=False)
-    created_at = Column(DateTime,  default=datetime.now)
-    modified_at = Column(DateTime,  default=datetime.now)
-
-    note_type = relationship("NoteType", back_populates="notes")
-    note_type_id = Column(Integer, ForeignKey('note_types.id'), nullable=False)
-
-    tags = relationship(
-        "NoteTag",
-        secondary=has_tag, back_populates="notes"
+    # Standard attributes
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str]
+    content: Mapped[str]
+    status: Mapped[str | None]
+    is_archived: Mapped[bool] = mapped_column(default=False)
+    is_pinned: Mapped[bool] = mapped_column(default=False)
+    is_private: Mapped[bool] = mapped_column(default=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    modified_at: Mapped[datetime.datetime] = mapped_column(
+        server_default=func.now(), onupdate=func.now()
     )
 
-    outgoing_links = relationship(
-        "NoteLink",
-        foreign_keys=[NoteLink.source_id],
-        back_populates="source"
+    # N:1 relationship with NoteType
+    note_type_id: Mapped[int] = mapped_column(ForeignKey("note_types.id"))
+    note_type: Mapped["NoteType"] = relationship(back_populates="notes")
+
+    # N:M relationship with NoteTag
+    tags: Mapped[list["NoteTag"]] = relationship(
+        secondary=note_has_tags, back_populates="notes"
     )
 
-    incoming_links = relationship(
-        "NoteLink",
-        foreign_keys=[NoteLink.target_id],
-        back_populates="target"
+    # N:M relationship with self, via the NoteLink association object
+    outgoing_links: Mapped[list["NoteLink"]] = relationship(
+        back_populates="source",
+        foreign_keys="NoteLink.source_id",
     )
-
-
+    incoming_links: Mapped[list["NoteLink"]] = relationship(
+        back_populates="target",
+        foreign_keys="NoteLink.target_id",
+    )

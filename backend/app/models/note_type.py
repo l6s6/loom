@@ -1,13 +1,12 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
-
 
 
 class NoteType(Base):
     __tablename__ = "note_types"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)
-    notes = relationship("Note", back_populates="note_type")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+
+    notes: Mapped[list["Note"]] = relationship(back_populates="note_type")
