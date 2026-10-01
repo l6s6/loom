@@ -1,27 +1,19 @@
-import { Link, useMatch, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCreateNote } from "../../hooks/useNotes.ts";
-import { BookOpen, Settings, SquarePen } from "lucide-react";
+import { BookOpen, Search, SquarePen } from "lucide-react";
 import { useNotesContext } from "@/context/NotesContext.tsx";
-import { Separator } from "@/components/ui/separator.tsx";
 import {
   mainNavItems,
   smartViewsConfig,
 } from "@/components/sidebar/SidebarNavigation.ts";
 import SidebarBlock from "@/components/sidebar/SidebarBlock.tsx";
+import { Button } from "@/components/ui/button.tsx";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  //const match = useMatch("/n/:noteId");
 
-  //const urlNoteId = match?.params.noteId;
-
-  const { notes, refetchNotes } = useNotesContext();
+  const { refetchNotes } = useNotesContext();
   const { createNote } = useCreateNote();
-
-  // Copy notes to prevent modifying it
-  // const filteredNotes = [...notes].sort((a, b) =>
-  //   a.title.localeCompare(b.title),
-  // );
 
   const handleCreateNote = async () => {
     const newNote = await createNote();
@@ -43,21 +35,28 @@ const Sidebar = () => {
         </div>
       </div>
       <div className="py-4 flex-1">
+        <div className="relative group mb-4">
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            <Search size={16} className="text-content-muted" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none ransition-all placeholder:text-content-muted focus:shadow-sm"
+          />
+        </div>
         <SidebarBlock label="workbench" configObject={mainNavItems} />
         <SidebarBlock label="smart views" configObject={smartViewsConfig} />
       </div>
-      <div className="border-t border-border-subtle pt-2">
-        <div
-          className="px-4 py-2 rounded-md cursor-pointer transition-all bg-transparent hover:bg-slate-200/50"
-          onClick={handleCreateNote}
-        >
-          <div className="flex flex-row h-full items-center gap-4 mb-1">
-            <SquarePen size={20} className="text-content-muted font-medium" />
-            <h3 className="text-sm truncate pr-2 text-content-muted font-medium">
-              Create Note
+      <div className="border-t border-border-subtle pt-4 w-full">
+        <Button onClick={handleCreateNote} className="w-full" size="lg">
+          <div className="flex flex-row items-center gap-4">
+            <SquarePen size={20} className="text-white font-medium" />
+            <h3 className="text-sm truncate text-white font-medium">
+              Capture Thought
             </h3>
           </div>
-        </div>
+        </Button>
       </div>
     </aside>
   );
