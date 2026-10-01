@@ -1,11 +1,19 @@
+import { BookOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 const Navbar = () => {
+  const navigate = useNavigate();
   return (
     <header className="bg-bg-sidebar border-b border-border-subtle">
       <div className="flex flex-row px-8 py-4">
         <div className="w-sidebar">
-          <a href="/" className="text-2xl font-bold text-primary">
+          <div
+            className="flex flex-row just items-center gap-2 text-2xl font-bold text-primary cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            <BookOpen />
             Loom
-          </a>
+          </div>
         </div>
         <div className="flex flex-row gap-16 items-center">
           <a href="/" className="hover:underline">
