@@ -12,3 +12,9 @@ class NoteLinkResponse(BaseModel):
     link_type: LinkTypeResponse
     source: NoteResponse
     target: NoteResponse
+
+class NoteLinkCreate(BaseModel):
+    origin: str
+    link_type_name: str
+    source_id: int
+    target_id: int

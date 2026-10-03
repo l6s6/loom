@@ -5,10 +5,8 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.operators import or_
 
 from app.db.database import get_db
-from app.models.note import Note
-from app.models.note_tag import NoteTag
-from app.models.note_type import NoteType
 from app.schemas.note import NoteResponse, NoteStatus, NoteUpdate
+from app.models import Note, NoteType, NoteTag
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
@@ -79,7 +77,7 @@ def get_notes(
 def create_note(db: Session = Depends(get_db)):
     note_type = _get_or_create_note_type(db, "None")
 
-    new_note = Note(note_type=note_type, status="none")
+    new_note = Note(note_type=note_type)
 
     db.add(new_note)
     db.commit()
