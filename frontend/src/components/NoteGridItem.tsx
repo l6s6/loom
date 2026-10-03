@@ -5,21 +5,22 @@ interface NoteListItemProps {
   note: Note;
 }
 
-const NoteListItem = ({ note }: NoteListItemProps) => {
+const NoteGridItem = ({ note }: NoteListItemProps) => {
   const location = useLocation();
 
   // Get the last part of the path (e.g., "profile" from "/user/profile")
   const noteId = location.pathname.split("/").filter(Boolean).pop();
   const isActiveNote = noteId === note.id.toString();
 
-  const limit = 30;
+  const titleLimit = 25;
+  const contentLimit = 35;
   const contentPreview =
-    note.content.length > limit
-      ? note.content.substring(0, limit) + "..."
+    note.content.length > contentLimit
+      ? note.content.substring(0, contentLimit) + "..."
       : note.content;
   const titlePreview =
-    note.title.length > limit
-      ? note.title.substring(0, limit) + "..."
+    note.title.length > titleLimit
+      ? note.title.substring(0, titleLimit) + "..."
       : note.title;
   return (
     <div
@@ -31,4 +32,4 @@ const NoteListItem = ({ note }: NoteListItemProps) => {
   );
 };
 
-export default NoteListItem;
+export default NoteGridItem;
