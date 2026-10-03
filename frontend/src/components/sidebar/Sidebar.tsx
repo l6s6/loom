@@ -24,8 +24,8 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="bg-bg-sidebar transition-all duration-300 w-sidebar flex flex-col h-full border-r border-border-subtle p-4">
-      <div className="items-center flex flex-row justify-between pb-2 border-b border-border-subtle">
+    <aside className="bg-bg-sidebar transition-all duration-300 w-sidebar flex flex-col h-full border-r border-border-subtle px-4">
+      <div className="items-center flex flex-row justify-between h-navbar border-b border-border-subtle">
         <div
           className="flex flex-row items-center gap-2 text-2xl font-bold text-primary cursor-pointer"
           onClick={() => navigate("/")}
@@ -38,7 +38,7 @@ const Sidebar = () => {
         <SidebarBlock label="workbench" configObject={mainNavItems} />
         <SidebarBlock label="smart views" configObject={smartViewsConfig} />
       </div>
-      <div className="flex gap-2  flex-row border-t border-border-subtle pt-4 w-full">
+      <div className="flex gap-2  flex-row border-t border-border-subtle py-4 w-full">
         <Button onClick={handleCreateNote} className="flex-1" size="xl">
           <div className="flex flex-row items-center gap-4">
             <h3 className="text-sm truncate text-white font-medium">
