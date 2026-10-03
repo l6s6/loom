@@ -17,10 +17,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(notes.router)
 app.include_router(note_types.router)
 app.include_router(note_tags.router)
 #app.include_router(note_links.router)
+# This has to come last so that e.g. /notes/types is not interpreted as note_id=types
+app.include_router(notes.router)
 
 @app.get("/")
 def read_root():
