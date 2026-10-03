@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Sidebar from "./components/sidebar/Sidebar.tsx";
+import Sidebar from "../sidebar/Sidebar.tsx";
 import { NotesProvider } from "@/context/NotesContext.tsx";
 
 interface LayoutProps {
