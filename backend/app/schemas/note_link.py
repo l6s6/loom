@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from app.schemas.note import NoteResponse
 
 
-
 class LinkTypeResponse(BaseModel):
     id: int
     name: str

@@ -19,7 +19,7 @@ app.add_middleware(
 
 app.include_router(note_types.router)
 app.include_router(note_tags.router)
-#app.include_router(note_links.router)
+app.include_router(note_links.router)
 # This has to come last so that e.g. /notes/types is not interpreted as note_id=types
 app.include_router(notes.router)
 

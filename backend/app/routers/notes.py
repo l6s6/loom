@@ -8,7 +8,7 @@ from app.db.database import get_db
 from app.models.note import Note
 from app.models.note_tag import NoteTag
 from app.models.note_type import NoteType
-from app.schemas.note import NoteCreate, NoteResponse, NoteStatus, NoteUpdate
+from app.schemas.note import NoteResponse, NoteStatus, NoteUpdate
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
@@ -47,20 +47,26 @@ def _apply_tags(db: Session, note: Note, tag_names: list[str]) -> None:
 @router.get("", response_model=list[NoteResponse])
 def get_notes(
     db: Session = Depends(get_db),
-    note_type_name: str | None = None,
+    type: str | None = None,
     tag: str | None = None,
     status: NoteStatus | None = None,
     is_archived: bool | None = None,
+    is_pinned: bool | None = None,
+    is_private: bool | None = None,
     search: str | None = None,
 ):
     filters = []
 
-    if note_type_name is not None:
-        filters.append(Note.note_type.has(name=note_type_name))
+    if type is not None:
+        filters.append(Note.note_type.has(name=type))
     if status is not None:
         filters.append(Note.status == status)
     if is_archived is not None:
         filters.append(Note.is_archived == is_archived)
+    if is_pinned is not None:
+        filters.append(Note.is_pinned == is_pinned)
+    if is_private is not None:
+        filters.append(Note.is_private == is_private)
     if tag is not None:
         filters.append(Note.tags.any(NoteTag.name == tag))
     if search is not None:

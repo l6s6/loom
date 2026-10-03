@@ -14,13 +14,6 @@ class NoteStatus(str, Enum):
     ongoing = "ongoing"
     closed = "closed"
 
-class NoteCreate(BaseModel):
-    title: str
-    content: str
-    note_type_name: str
-    tag_names: list[str]
-    status: NoteStatus = None
-
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
