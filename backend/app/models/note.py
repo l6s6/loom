@@ -1,10 +1,16 @@
 import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
 from app.models.associations import note_has_tags
+
+if TYPE_CHECKING:
+    from app.models.note_type import NoteType
+    from app.models.note_tag  import NoteTag
+    from app.models.note_link  import NoteLink
 
 
 class Note(Base):
