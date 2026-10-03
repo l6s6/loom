@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
-import { useCreateNote } from "../../hooks/useNotes.ts";
-import { BookOpen, Search, SquarePen } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useCreateNote } from "@/hooks/useNotes.ts";
+import { BookOpen, Search } from "lucide-react";
 import { useNotesContext } from "@/context/NotesContext.tsx";
 import {
   mainNavItems,
@@ -35,28 +35,22 @@ const Sidebar = () => {
         </div>
       </div>
       <div className="py-4 flex-1">
-        <div className="relative group mb-4">
-          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <Search size={16} className="text-content-muted" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none ransition-all placeholder:text-content-muted focus:shadow-sm"
-          />
-        </div>
         <SidebarBlock label="workbench" configObject={mainNavItems} />
         <SidebarBlock label="smart views" configObject={smartViewsConfig} />
       </div>
-      <div className="border-t border-border-subtle pt-4 w-full">
-        <Button onClick={handleCreateNote} className="w-full" size="lg">
+      <div className="flex gap-2  flex-row border-t border-border-subtle pt-4 w-full">
+        <Button onClick={handleCreateNote} className="flex-1" size="xl">
           <div className="flex flex-row items-center gap-4">
-            <SquarePen size={20} className="text-white font-medium" />
             <h3 className="text-sm truncate text-white font-medium">
               Capture Thought
             </h3>
           </div>
         </Button>
+        <Link to="/">
+          <Button variant="outline" className="flex" size="icon-xl">
+            <Search />
+          </Button>
+        </Link>
       </div>
     </aside>
   );
