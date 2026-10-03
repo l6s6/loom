@@ -18,9 +18,9 @@ class Note(Base):
 
     # Standard attributes
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str]
-    content: Mapped[str]
-    status: Mapped[str | None]
+    title: Mapped[str] = mapped_column(default="Untitled")
+    content: Mapped[str] = mapped_column(default="")
+    status: Mapped[str] = mapped_column(default="none")
     is_archived: Mapped[bool] = mapped_column(default=False)
     is_pinned: Mapped[bool] = mapped_column(default=False)
     is_private: Mapped[bool] = mapped_column(default=False)

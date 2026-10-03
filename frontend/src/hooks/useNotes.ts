@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  type CreateNote,
-  EMPTY_NEW_NOTE,
-  type Note,
-  type UpdateNote,
-} from "../types/note.ts";
+import { type Note, type UpdateNote } from "../types/note.ts";
 import {
   getNotes,
   createNote,
@@ -64,9 +59,9 @@ export function useCreateNote() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const create = async (note: CreateNote = EMPTY_NEW_NOTE) => {
+  const create = async () => {
     try {
-      return await createNote(note);
+      return await createNote();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

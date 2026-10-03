@@ -70,20 +70,10 @@ def get_notes(
 
 
 @router.post("", response_model=NoteResponse)
-def create_note(note: NoteCreate, db: Session = Depends(get_db)):
-    if note.note_type_name == "":
-        raise HTTPException(status_code=400, detail="Note type must not be empty")
+def create_note(db: Session = Depends(get_db)):
+    note_type = _get_or_create_note_type(db, "None")
 
-    note_type = _get_or_create_note_type(db, note.note_type_name)
-
-    new_note = Note(
-        title=note.title,
-        content=note.content,
-        note_type=note_type,
-        status=note.status,
-    )
-
-    _apply_tags(db, new_note, note.tag_names)
+    new_note = Note(note_type=note_type, status="none")
 
     db.add(new_note)
     db.commit()
