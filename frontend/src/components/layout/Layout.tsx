@@ -1,6 +1,5 @@
-import Navbar from "./components/Navbar.tsx";
 import type { ReactNode } from "react";
-import Sidebar from "./components/Sidebar.tsx";
+import Sidebar from "../sidebar/Sidebar.tsx";
 import { NotesProvider } from "@/context/NotesContext.tsx";
 
 interface LayoutProps {
@@ -10,7 +9,6 @@ interface LayoutProps {
 export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="h-screen flex flex-col bg-bg-editor overflow-hidden">
-      <Navbar />
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <NotesProvider>
           <Sidebar />

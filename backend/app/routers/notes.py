@@ -5,15 +5,16 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.operators import or_
 
 from app.db.database import get_db
-from app.models.note import Note
-from app.models.note_tag import NoteTag
-from app.models.note_type import NoteType
-from app.schemas.note import NoteCreate, NoteResponse, NoteStatus, NoteUpdate
-from app.schemas.note_tag import NoteTagResponse
-from app.schemas.note_type import NoteTypeResponse
+from app.schemas.note import NoteResponse, NoteStatus, NoteUpdate
+from app.models import Note, NoteType, NoteTag
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
+def _get_note_or_404(db: Session, note_id: int) -> Note:
+    note = db.query(Note).filter(Note.id == note_id).first()
+    if note is None:
+        raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
+    return note
 
 def _get_or_create_note_type(db: Session, note_type_name: str) -> NoteType:
     note_type = db.query(NoteType).filter(NoteType.name == note_type_name).first()
@@ -44,20 +45,26 @@ def _apply_tags(db: Session, note: Note, tag_names: list[str]) -> None:
 @router.get("", response_model=list[NoteResponse])
 def get_notes(
     db: Session = Depends(get_db),
-    note_type_name: str | None = None,
+    type: str | None = None,
     tag: str | None = None,
     status: NoteStatus | None = None,
     is_archived: bool | None = None,
+    is_pinned: bool | None = None,
+    is_private: bool | None = None,
     search: str | None = None,
 ):
     filters = []
 
-    if note_type_name is not None:
-        filters.append(Note.note_type.has(name=note_type_name))
+    if type is not None:
+        filters.append(Note.note_type.has(name=type))
     if status is not None:
         filters.append(Note.status == status)
     if is_archived is not None:
         filters.append(Note.is_archived == is_archived)
+    if is_pinned is not None:
+        filters.append(Note.is_pinned == is_pinned)
+    if is_private is not None:
+        filters.append(Note.is_private == is_private)
     if tag is not None:
         filters.append(Note.tags.any(NoteTag.name == tag))
     if search is not None:
@@ -67,20 +74,10 @@ def get_notes(
 
 
 @router.post("", response_model=NoteResponse)
-def create_note(note: NoteCreate, db: Session = Depends(get_db)):
-    if note.note_type_name == "":
-        raise HTTPException(status_code=400, detail="Note type must not be empty")
+def create_note(db: Session = Depends(get_db)):
+    note_type = _get_or_create_note_type(db, "None")
 
-    note_type = _get_or_create_note_type(db, note.note_type_name)
-
-    new_note = Note(
-        title=note.title,
-        content=note.content,
-        note_type=note_type,
-        status=note.status,
-    )
-
-    _apply_tags(db, new_note, note.tag_names)
+    new_note = Note(note_type=note_type)
 
     db.add(new_note)
     db.commit()
@@ -88,29 +85,14 @@ def create_note(note: NoteCreate, db: Session = Depends(get_db)):
     return new_note
 
 
-@router.get("/types", response_model=list[NoteTypeResponse])
-def get_note_types(db: Session = Depends(get_db)):
-    return db.query(NoteType).all()
-
-
-@router.get("/tags", response_model=list[NoteTagResponse])
-def get_tag_types(db: Session = Depends(get_db)):
-    return db.query(NoteTag).all()
-
-
 @router.get("/{note_id}", response_model=NoteResponse)
 def get_note(note_id: int, db: Session = Depends(get_db)):
-    note = db.query(Note).filter(Note.id == note_id).first()
-    if note is None:
-        raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
-    return note
+    return _get_note_or_404(db, note_id)
 
 
 @router.put("/{note_id}", response_model=NoteResponse)
 def update_note(note_id: int, note_update: NoteUpdate, db: Session = Depends(get_db)):
-    note = db.query(Note).filter(Note.id == note_id).first()
-    if note is None:
-        raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
+    note =  _get_note_or_404(db, note_id)
 
     update_data = note_update.model_dump(exclude_unset=True)
 
@@ -138,9 +120,7 @@ def update_note(note_id: int, note_update: NoteUpdate, db: Session = Depends(get
 
 @router.delete("/{note_id}")
 def delete_note(note_id: int, db: Session = Depends(get_db)):
-    note = db.query(Note).filter(Note.id == note_id).first()
-    if note is None:
-        raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
+    note =  _get_note_or_404(db, note_id)
 
     db.delete(note)
     db.commit()

@@ -36,10 +36,12 @@ const TypeSelector = ({ typeName, types, onChange }: TypeSelectorProps) => {
     <Popover open={isTypeOpen} onOpenChange={setIsTypeOpen}>
       <PopoverTrigger
         render={
-          <Button variant="outline">
-            {typeName}
-            <ChevronDown size={14} className="text-slate-400" />
-          </Button>
+          <div className="pr-2 border-r border-border-subtle">
+            <Button variant="outline">
+              {typeName}
+              <ChevronDown size={14} className="text-slate-400" />
+            </Button>
+          </div>
         }
       />
       <PopoverContent className="w-64 p-1" align="start">

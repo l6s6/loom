@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  type CreateNote,
-  EMPTY_NEW_NOTE,
-  type Note,
-  type UpdateNote,
-} from "../types/note.ts";
+import { type Note, type UpdateNote } from "../types/note.ts";
 import {
   getNotes,
   createNote,
@@ -12,6 +7,8 @@ import {
   deleteNote,
   getNoteById,
 } from "../api/notes.ts";
+import { useNavigate } from "react-router-dom";
+import { useNotesContext } from "@/context/NotesContext.tsx";
 
 export function useGetNotes() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -62,9 +59,9 @@ export function useCreateNote() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const create = async (note: CreateNote = EMPTY_NEW_NOTE) => {
+  const create = async () => {
     try {
-      return await createNote(note);
+      return await createNote();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -72,6 +69,22 @@ export function useCreateNote() {
     }
   };
   return { createNote: create, loading, error };
+}
+
+export function useCreateAndNavigateNote() {
+  const navigate = useNavigate();
+  const { refetchNotes } = useNotesContext();
+  const { createNote } = useCreateNote();
+
+  const createAndNavigate = async () => {
+    const newNote = await createNote();
+    if (newNote) {
+      await refetchNotes();
+      navigate(`/n/${newNote.id}`);
+    }
+  };
+
+  return { createAndNavigate };
 }
 
 export function useUpdateNote() {
@@ -91,12 +104,19 @@ export function useUpdateNote() {
 }
 
 export function useDeleteNote() {
+  const navigate = useNavigate();
+  const { refetchNotes } = useNotesContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const remove = async (noteId: number) => {
+  const remove = async (noteId: number, currentUrl?: string) => {
+    console.log("delete");
     try {
-      return await deleteNote(noteId);
+      if (!currentUrl || currentUrl === noteId.toString()) {
+        navigate("/");
+      }
+      await deleteNote(noteId);
+      await refetchNotes();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

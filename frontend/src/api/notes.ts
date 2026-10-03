@@ -1,4 +1,4 @@
-import type { CreateNote, Note, UpdateNote } from "../types/note.ts";
+import type { Note, UpdateNote } from "../types/note.ts";
 
 export const getNotes = async (): Promise<Note[]> => {
   const response = await fetch("http://localhost:8000/notes");
@@ -18,13 +18,12 @@ export const getNoteById = async (noteId: number): Promise<Note> => {
   return (await response.json()) as Note;
 };
 
-export const createNote = async (note: CreateNote): Promise<Note> => {
+export const createNote = async (): Promise<Note> => {
   const response = await fetch("http://localhost:8000/notes", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(note),
   });
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);

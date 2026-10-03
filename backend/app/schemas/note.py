@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from enum import Enum
 
@@ -14,13 +14,6 @@ class NoteStatus(str, Enum):
     ongoing = "ongoing"
     closed = "closed"
 
-class NoteCreate(BaseModel):
-    title: str
-    content: str
-    note_type_name: str
-    tag_names: list[str]
-    status: NoteStatus = None
-
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
@@ -29,14 +22,16 @@ class NoteUpdate(BaseModel):
     status: Optional[NoteStatus] = None
 
 class NoteResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
     content: str
     status: NoteStatus
+    is_archived: bool
+    is_pinned: bool
+    is_private: bool
     note_type: NoteTypeResponse
     tags: list[NoteTagResponse]
     created_at: datetime
     modified_at: datetime
-
-    class Config:
-        from_attributes = True

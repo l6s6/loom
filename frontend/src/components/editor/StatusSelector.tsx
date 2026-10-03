@@ -29,21 +29,24 @@ const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {
     <DropdownMenu onOpenChange={setIsStatusOpen} open={isStatusOpen}>
       <DropdownMenuTrigger
         render={
-          <Button
-            variant="outline"
-            className={NOTE_STATUS_CONFIG[status].bgColor}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${NOTE_STATUS_CONFIG[status].dotColor}`}
-            />
-            <span className={NOTE_STATUS_CONFIG[status].textColor}>
-              {NOTE_STATUS_CONFIG[status].label}
-            </span>
-            <ChevronDown
-              size={14}
-              className={NOTE_STATUS_CONFIG[status].textColor}
-            />
-          </Button>
+          <div className="pr-2 border-r border-border-subtle">
+            <Button
+              variant="outline"
+              className={`${NOTE_STATUS_CONFIG[status].bgColor}
+              ${NOTE_STATUS_CONFIG[status].hoverColor}`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${NOTE_STATUS_CONFIG[status].dotColor}`}
+              />
+              <span className={NOTE_STATUS_CONFIG[status].textColor}>
+                {NOTE_STATUS_CONFIG[status].label}
+              </span>
+              <ChevronDown
+                size={14}
+                className={NOTE_STATUS_CONFIG[status].textColor}
+              />
+            </Button>
+          </div>
         }
       />
       <DropdownMenuContent className="w-32">

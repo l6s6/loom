@@ -1,4 +1,5 @@
 import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -6,15 +7,20 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.database import Base
 from app.models.associations import note_has_tags
 
+if TYPE_CHECKING:
+    from app.models.note_type import NoteType
+    from app.models.note_tag  import NoteTag
+    from app.models.note_link  import NoteLink
+
 
 class Note(Base):
     __tablename__ = "notes"
 
     # Standard attributes
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str]
-    content: Mapped[str]
-    status: Mapped[str | None]
+    title: Mapped[str] = mapped_column(default="Untitled")
+    content: Mapped[str] = mapped_column(default="")
+    status: Mapped[str] = mapped_column(default="none")
     is_archived: Mapped[bool] = mapped_column(default=False)
     is_pinned: Mapped[bool] = mapped_column(default=False)
     is_private: Mapped[bool] = mapped_column(default=False)
