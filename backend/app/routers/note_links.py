@@ -8,6 +8,12 @@ from app.schemas.note_link import NoteLinkCreate
 
 router = APIRouter(prefix="/links", tags=["links"])
 
+def _get_link_or_404(db: Session, link_id: int) -> NoteLink:
+    note = db.query(NoteLink).filter(NoteLink.id == link_id).first()
+    if note is None:
+        raise HTTPException(status_code=404, detail=f"Link with id {link_id} not found")
+    return note
+
 def _get_or_create_link_type(db: Session, link_type_name: str) -> LinkType:
     link_type = db.query(LinkType).filter(LinkType.name == link_type_name).first()
     if link_type is None:
@@ -54,3 +60,11 @@ def create_link(link: NoteLinkCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_link)
     return new_link
+
+@router.delete("/{link_id}")
+def delete_note(link_id: int, db: Session = Depends(get_db)):
+    link =  _get_link_or_404(db, link_id)
+
+    db.delete(link)
+    db.commit()
+    return {"message": "Link deleted"}
