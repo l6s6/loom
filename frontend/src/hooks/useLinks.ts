@@ -1,6 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createLink, deleteLink } from "@/api/noteLinks.ts";
-import type { CreateNoteLink } from "@/types/noteLink.ts";
+import type { CreateNoteLink, NoteLink } from "@/types/noteLink.ts";
+import { getLinks } from "@/api/noteLinks.ts";
+
+export function useGetLink() {
+  const [links, setLinks] = useState<NoteLink[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = async () => {
+    try {
+      setLinks(await getLinks());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  return { refetchLinks: load, links, loading: isLoading, error, setLinks };
+}
 
 export function useCreateLink() {
   const [loading, setLoading] = useState(true);
@@ -15,7 +38,7 @@ export function useCreateLink() {
       setLoading(false);
     }
   };
-  return { createNote: create, loading, error };
+  return { createLink: create, loading, error };
 }
 
 export function useDeleteLink() {
@@ -31,5 +54,5 @@ export function useDeleteLink() {
       setLoading(false);
     }
   };
-  return { deleteNote: remove, loading, error };
+  return { deleteLink: remove, loading, error };
 }
