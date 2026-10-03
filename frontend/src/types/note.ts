@@ -1,4 +1,5 @@
 import type { NoteTag } from "./noteTag.ts";
+import type { NoteType } from "@/types/noteType.ts";
 
 export const NoteStatus = {
   None: "none",
@@ -54,21 +55,10 @@ export interface Note {
   title: string;
   content: string;
   status: string;
-  note_type: {
-    id: number;
-    name: string;
-  };
+  note_type: NoteType;
   tags: NoteTag[];
   created_at: string;
   modified_at: string;
-}
-
-export interface CreateNote {
-  title: string;
-  content: string;
-  status: string;
-  note_type_name: string;
-  tag_names: string[];
 }
 
 export interface UpdateNote {
