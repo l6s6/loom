@@ -1,4 +1,4 @@
-import { MessageCircle, Network } from "lucide-react";
+import { Network } from "lucide-react";
 import { useState } from "react";
 import { useNotesContext } from "@/context/NotesContext.tsx";
 import {
@@ -9,7 +9,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command.tsx";
-import { NOTE_STATUS_CONFIG } from "@/types/note.ts";
+import { getStringPreview } from "@/lib/utils.ts";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 
 const EditorFooter = () => {
   const { notes } = useNotesContext();
@@ -37,66 +38,40 @@ const EditorFooter = () => {
         </h3>
       </div>
       <div>
-        <Command>
+        <Command className="mt-4">
           <CommandInput
             placeholder="Search Notes to add Connections"
             onValueChange={setSearchQuery}
           />
-          <CommandList className="h-36">
-            <CommandEmpty>
-              <span className="text-content-muted">No Notes found.</span>
-            </CommandEmpty>
-            <CommandGroup heading="Notes">
-              {filteredNotes.map((note) => (
-                <CommandItem
-                  key={note.id}
-                  onSelect={() => handleAddLink(note.id)}
-                >
-                  <div className="w-full h-33 border border-border-subtle rounded-md px-4 py-2">
-                    <div className="flex flex-row items-center justify-between mb-2">
-                      <div className="flex flex-row gap-2">
-                        <div
-                          className={`px-2 py-1 rounded-sm flex flex-row items-center gap-1  ${NOTE_STATUS_CONFIG[note.status].bgColor}`}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${NOTE_STATUS_CONFIG[note.status].dotColor}`}
-                          />
-                          <span
-                            className={`text-xs ${NOTE_STATUS_CONFIG[note.status].textColor}`}
-                          >
-                            {note.status}
-                          </span>
-                        </div>
-                        <div className="px-2 py-1 rounded-sm flex flex-row items-center gap-1 bg-primary-bg">
-                          <MessageCircle className="text-primary" size={12} />
-                          <span className="text-xs text-primary">
-                            {note.note_type.name.charAt(0).toUpperCase() +
-                              note.note_type.name.slice(1)}
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-xs text-content-muted">
-                        {formattedModifiedAt}
+
+          <ScrollArea className="max-h-72 rounded-md border mt-4">
+            <CommandList>
+              <CommandEmpty>
+                <span className="text-content-muted">No Notes found.</span>
+              </CommandEmpty>
+              <CommandGroup heading="Notes">
+                {filteredNotes.map((note) => (
+                  <CommandItem
+                    key={note.id}
+                    onSelect={() => handleAddLink(note.id)}
+                  >
+                    <div className="w-full rounded-md px-2">
+                      <h1 className="font-bold">
+                        {getStringPreview(25, note.title, "Untitled")}
+                      </h1>
+                      <span className="text-content-muted text-sm">
+                        {getStringPreview(
+                          35,
+                          note.content,
+                          "No content yet...",
+                        )}
                       </span>
                     </div>
-                    <h1 className="font-bold">{titlePreview}</h1>
-                    <span className="text-content-muted text-sm">
-                      {contentPreview}
-                    </span>
-                    <div className="flex flex-row overflow-clip gap-1 mt-2">
-                      {note.tags.map((tag) => (
-                        <div className="px-2 py-1 border border-border-subtle rounded-sm flex bg-bg-sidebar">
-                          <span className="text-xs text-content-muted">
-                            #{tag.name}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </ScrollArea>
         </Command>
       </div>
     </div>
