@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useGetNoteById, useUpdateNote } from "@/hooks/useNotes.ts";
-import { useGetTypes } from "@/hooks/useTypes.ts";
+import { useGetNoteTypes } from "@/hooks/useNoteTypes.ts";
 import { useGetTags } from "@/hooks/useTags.ts";
 import { useNotesContext } from "@/context/NotesContext.tsx";
 
@@ -8,7 +8,7 @@ export function useNoteEditor(noteId: number) {
   const { updateNote } = useUpdateNote();
   const { patchNoteInList } = useNotesContext();
   const { note, error, refetchNote } = useGetNoteById(noteId);
-  const { types, refetchTypes } = useGetTypes();
+  const { types, refetchTypes } = useGetNoteTypes();
   const { tags, refetchTags } = useGetTags();
 
   const [isLoading, setIsLoading] = useState(true);

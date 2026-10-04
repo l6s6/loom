@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import type { NoteType } from "../types/noteType.ts";
-import { getNoteTypes } from "../api/noteTypes.ts";
+import type { LinkType } from "../types/linkType.ts";
+import { getLinkTypes } from "@/api/linkTypes.ts";
 
-export function useGetTypes() {
-  const [types, setTypes] = useState<NoteType[]>([]);
+export function useGetLinkTypes() {
+  const [types, setTypes] = useState<LinkType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
     try {
-      setTypes(await getNoteTypes());
+      setTypes(await getLinkTypes());
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
