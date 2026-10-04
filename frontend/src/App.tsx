@@ -55,7 +55,7 @@ export function App() {
           placeholder="Search Notes..."
           onValueChange={setSearchQuery}
         />
-        <CommandList>
+        <CommandList className="max-h-full">
           <CommandEmpty>
             <span className="text-content-muted">No Notes found.</span>
           </CommandEmpty>
@@ -66,7 +66,7 @@ export function App() {
           >
             {/* Use [&>svg]:hidden on CommandItem to hide Check Mark placeholder  */}
             {filteredNotes.map((note) => (
-              <CommandItem className="p-0 w-full [&>svg]:hidden">
+              <CommandItem key={note.id} className="p-0 w-full [&>svg]:hidden">
                 <ContextMenu key={note.id}>
                   <ContextMenuTrigger className="w-full h-full">
                     <NoteGridItem note={note} key={note.id} />

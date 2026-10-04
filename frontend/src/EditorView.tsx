@@ -43,7 +43,7 @@ export default function EditorView() {
         </div>
         <ContentArea value={editor.content} onChange={editor.setContent} />
       </div>
-      <EditorFooter note={editor.note} />
+      <EditorFooter noteId={editor.note.id} />
     </CenterContainer>
   );
 }

@@ -1,5 +1,5 @@
 import { MoveDownLeft, MoveUpRight, Network } from "lucide-react";
-import { Component, useState } from "react";
+import { useState } from "react";
 import { useNotesContext } from "@/context/NotesContext.tsx";
 import {
   Command,
@@ -16,39 +16,38 @@ import type { CreateNoteLink } from "@/types/noteLink.ts";
 import type { Note } from "@/types/note.ts";
 import { Link } from "react-router-dom";
 
-class LinkListItem extends Component<{ note: Note }> {
-  render() {
-    return (
-      <div className="w-full rounded-md px-2">
-        <h1 className="font-bold">
-          {getStringPreview(25, this.props.note.title, "Untitled")}
-        </h1>
-        <span className="text-content-muted text-sm">
-          {getStringPreview(35, this.props.note.content, "No content yet...")}
-        </span>
-      </div>
-    );
-  }
-}
+const LinkListItem = ({ note }: { note: Note }) => {
+  return (
+    <div className="w-full rounded-md px-2">
+      <h1 className="font-bold">
+        {getStringPreview(25, note.title, "Untitled")}
+      </h1>
+      <span className="text-content-muted text-sm">
+        {getStringPreview(35, note.content, "No content yet...")}
+      </span>
+    </div>
+  );
+};
 
-const EditorFooter = ({ note }: { note: Note }) => {
+const EditorFooter = ({ noteId }: { noteId: number }) => {
   const { notes } = useNotesContext();
-  const { links } = useGetLink();
+  const { links, refetchLinks } = useGetLink();
   const { createLink } = useCreateLink();
   const [searchQuery, setSearchQuery] = useState("");
 
   const incomingLinks = [...links]
     .sort((a, b) => a.source.title.localeCompare(b.source.title))
-    .filter((link) => link.target.id == note.id);
+    .filter((link) => link.target.id == noteId);
   const outgoingLinks = [...links]
     .sort((a, b) => a.target.title.localeCompare(b.target.title))
-    .filter((link) => link.source.id == note.id);
+    .filter((link) => link.source.id == noteId);
 
   const filteredNotes = [...notes]
     .sort((a, b) => a.title.localeCompare(b.title))
     .filter(
       (note) =>
-        note.id !== note.id &&
+        note.id !== noteId &&
+        !outgoingLinks.some((link) => link.target.id == note.id) &&
         (note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           note.content.toLowerCase().includes(searchQuery.toLowerCase())),
     );
@@ -57,10 +56,12 @@ const EditorFooter = ({ note }: { note: Note }) => {
     const link: CreateNoteLink = {
       origin: "manual",
       target_id: target_id,
-      source_id: note.id,
+      source_id: noteId,
       link_type_name: "test",
     };
+    setSearchQuery("");
     await createLink(link);
+    await refetchLinks();
     return;
   };
 
@@ -88,6 +89,7 @@ const EditorFooter = ({ note }: { note: Note }) => {
                   {filteredNotes.map((note) => (
                     <CommandItem
                       key={note.id}
+                      value={note.title}
                       onSelect={() => handleAddLink(note.id)}
                     >
                       <LinkListItem note={note} />
@@ -106,7 +108,7 @@ const EditorFooter = ({ note }: { note: Note }) => {
             <span className="text-sm text-content-muted">Incoming Links</span>
           </div>
           {incomingLinks.map((link) => (
-            <Link to={`/n/${link.source.id}`}>
+            <Link key={link.id} to={`/n/${link.source.id}`}>
               <div className="border border-border-subtle rounded-md px-2 py-1">
                 <LinkListItem key={link.id} note={link.source} />
               </div>
@@ -120,7 +122,7 @@ const EditorFooter = ({ note }: { note: Note }) => {
             <span className="text-sm text-content-muted">Outgoing Links</span>
           </div>
           {outgoingLinks.map((link) => (
-            <Link to={`/n/${link.target.id}`}>
+            <Link key={link.id} to={`/n/${link.target.id}`}>
               <div className="border border-border-subtle rounded-md px-2 py-1">
                 <LinkListItem key={link.id} note={link.target} />
               </div>
