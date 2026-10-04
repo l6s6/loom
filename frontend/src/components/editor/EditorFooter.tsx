@@ -9,25 +9,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command.tsx";
-import { getStringPreview } from "@/lib/utils.ts";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { useCreateLink, useGetLink } from "@/hooks/useLinks.ts";
 import type { CreateNoteLink } from "@/types/noteLink.ts";
-import type { Note } from "@/types/note.ts";
-import { Link } from "react-router-dom";
-
-const LinkListItem = ({ note }: { note: Note }) => {
-  return (
-    <div className="w-full rounded-md px-2">
-      <h1 className="font-bold">
-        {getStringPreview(25, note.title, "Untitled")}
-      </h1>
-      <span className="text-content-muted text-sm">
-        {getStringPreview(35, note.content, "No content yet...")}
-      </span>
-    </div>
-  );
-};
+import LinkListItem from "@/components/editor/LinkListItem.tsx";
+import EditorLinks from "@/components/editor/EditorLinks.tsx";
 
 const EditorFooter = ({ noteId }: { noteId: number }) => {
   const { notes } = useNotesContext();
@@ -110,34 +96,17 @@ const EditorFooter = ({ noteId }: { noteId: number }) => {
           )}
         </Command>
       </div>
-      <div className="flex flex-row w-full gap-2">
-        <div className="bg-bg-sidebar border border-border-subtle w-full rounded-md px-4 py-2">
-          <div className="flex flex-row items-center gap-2  mb-4">
-            <MoveDownLeft className="text-content-muted" size={12} />
-            <span className="text-sm text-content-muted">Incoming Links</span>
-          </div>
-          {incomingLinks.map((link) => (
-            <Link key={link.id} to={`/n/${link.source.id}`}>
-              <div className="border border-border-subtle rounded-md px-2 py-1">
-                <LinkListItem key={link.id} note={link.source} />
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="bg-bg-sidebar border border-border-subtle w-full rounded-md px-4 py-2">
-          <div className="flex flex-row items-center gap-2 mb-4">
-            <MoveUpRight className="text-content-muted" size={12} />
-            <span className="text-sm text-content-muted">Outgoing Links</span>
-          </div>
-          {outgoingLinks.map((link) => (
-            <Link key={link.id} to={`/n/${link.target.id}`}>
-              <div className="border border-border-subtle rounded-md px-2 py-1">
-                <LinkListItem key={link.id} note={link.target} />
-              </div>
-            </Link>
-          ))}
-        </div>
+      <div className="flex flex-row w-full gap-2 mt-2">
+        <EditorLinks
+          links={incomingLinks}
+          icon={MoveDownLeft}
+          label="Incoming Links"
+        />
+        <EditorLinks
+          links={outgoingLinks}
+          icon={MoveUpRight}
+          label="Outgoing Links"
+        />
       </div>
     </div>
   );
