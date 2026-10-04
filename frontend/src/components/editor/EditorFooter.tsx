@@ -1,25 +1,32 @@
-import { MoveDownLeft, MoveUpRight, Network } from "lucide-react";
+import { MoveDownLeft, MoveUpRight, Network, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNotesContext } from "@/context/NotesContext.tsx";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command.tsx";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { useCreateLink, useGetLinks } from "@/hooks/useLinks.ts";
 import type { CreateNoteLink } from "@/types/noteLink.ts";
-import LinkListItem from "@/components/editor/LinkListItem.tsx";
 import EditorLinks from "@/components/editor/EditorLinks.tsx";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group.tsx";
+import LinkTypeSelector from "@/components/editor/LinkTypeSelector.tsx";
+import { useGetLinkTypes } from "@/hooks/useLinkTypes.ts";
 
 const EditorFooter = ({ noteId }: { noteId: number }) => {
   const { notes } = useNotesContext();
   const { links, refetchLinks } = useGetLinks(noteId);
+  const { types } = useGetLinkTypes();
   const { createLink } = useCreateLink();
   const [searchQuery, setSearchQuery] = useState("");
+  const [typeName, setTypeName] = useState("relates to");
 
   const incomingLinks = useMemo(
     () =>
@@ -52,7 +59,7 @@ const EditorFooter = ({ noteId }: { noteId: number }) => {
       origin: "manual",
       target_id: target_id,
       source_id: noteId,
-      link_type_name: "test",
+      link_type_name: typeName,
     };
     setSearchQuery("");
     await createLink(link);
@@ -69,24 +76,37 @@ const EditorFooter = ({ noteId }: { noteId: number }) => {
       </div>
       <div>
         <Command className="mt-4 px-0">
-          <CommandInput
-            placeholder="Search Notes to add Connections"
-            onValueChange={setSearchQuery}
-          />
+          <InputGroup className="w-full">
+            <InputGroupInput
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search Notes to add Connections"
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            <InputGroupAddon align="inline-end">
+              <LinkTypeSelector
+                typeName={typeName}
+                types={types}
+                onChange={(newType) => setTypeName(newType)}
+              />
+            </InputGroupAddon>
+          </InputGroup>
           {searchQuery && (
             <ScrollArea className="max-h-72 rounded-md border mt-4">
-              <CommandList>
-                <CommandEmpty>
+              <CommandList className="p-2">
+                <CommandEmpty className="p-0">
                   <span className="text-content-muted">No Notes found.</span>
                 </CommandEmpty>
-                <CommandGroup heading="Notes">
+                <CommandGroup className="p-0">
                   {filteredNotes.map((note) => (
                     <CommandItem
                       key={note.id}
                       value={note.title}
                       onSelect={() => handleAddLink(note.id)}
                     >
-                      <LinkListItem note={note} />
+                      {note.title}
                     </CommandItem>
                   ))}
                 </CommandGroup>

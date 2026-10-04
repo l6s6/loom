@@ -2,7 +2,7 @@ import { type Note, NOTE_STATUS_CONFIG } from "../types/note.ts";
 import { Link } from "react-router-dom";
 import { isToday, isYesterday, format } from "date-fns";
 import { MessageCircle } from "lucide-react";
-import { getStringPreview } from "@/lib/utils.ts";
+import { capitalizeFirstLetter, getStringPreview } from "@/lib/utils.ts";
 
 interface NoteListItemProps {
   note: Note;
@@ -44,8 +44,7 @@ const NoteGridItem = ({ note }: NoteListItemProps) => {
             <div className="px-2 py-1 rounded-sm flex flex-row items-center gap-1 bg-primary-bg">
               <MessageCircle className="text-primary" size={12} />
               <span className="text-xs text-primary">
-                {note.note_type.name.charAt(0).toUpperCase() +
-                  note.note_type.name.slice(1)}
+                {capitalizeFirstLetter(note.note_type.name)}
               </span>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useNoteEditor } from "@/hooks/useNoteEditor.ts";
 import TitleInput from "@/components/editor/TitleInput.tsx";
 import StatusSelector from "@/components/editor/StatusSelector.tsx";
-import TypeSelector from "@/components/editor/TypeSelector.tsx";
+import NoteTypeSelector from "@/components/editor/NoteTypeSelector.tsx";
 import TagSelector from "@/components/editor/TagSelector.tsx";
 import ContentArea from "@/components/editor/ContentArea.tsx";
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
@@ -29,7 +29,7 @@ export default function EditorView() {
             status={editor.status}
             onChange={editor.handleStatusChange}
           />
-          <TypeSelector
+          <NoteTypeSelector
             typeName={editor.typeName}
             types={editor.types}
             onChange={editor.handleTypeChange}

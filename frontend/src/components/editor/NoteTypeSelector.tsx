@@ -22,7 +22,7 @@ interface TypeSelectorProps {
   onChange: (newType: string) => Promise<void>;
 }
 
-const TypeSelector = ({ typeName, types, onChange }: TypeSelectorProps) => {
+const NoteTypeSelector = ({ typeName, types, onChange }: TypeSelectorProps) => {
   const [typeSearch, setTypeSearch] = useState("");
   const [isTypeOpen, setIsTypeOpen] = useState(false);
 
@@ -80,4 +80,4 @@ const TypeSelector = ({ typeName, types, onChange }: TypeSelectorProps) => {
   );
 };
 
-export default TypeSelector;
+export default NoteTypeSelector;
