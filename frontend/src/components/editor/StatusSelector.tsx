@@ -27,9 +27,9 @@ const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {
 
   return (
     <DropdownMenu onOpenChange={setIsStatusOpen} open={isStatusOpen}>
-      <DropdownMenuTrigger
-        render={
-          <div className="pr-2 border-r border-border-subtle">
+      <div className="pr-2 border-r border-border-subtle">
+        <DropdownMenuTrigger
+          render={
             <Button
               variant="outline"
               className={`${NOTE_STATUS_CONFIG[status].bgColor}
@@ -46,9 +46,9 @@ const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {
                 className={NOTE_STATUS_CONFIG[status].textColor}
               />
             </Button>
-          </div>
-        }
-      />
+          }
+        />
+      </div>
       <DropdownMenuContent className="w-32">
         <DropdownMenuGroup>
           <DropdownMenuLabel>Panel Position</DropdownMenuLabel>

@@ -2,24 +2,19 @@ import { type Note, NOTE_STATUS_CONFIG } from "../types/note.ts";
 import { Link } from "react-router-dom";
 import { isToday, isYesterday, format } from "date-fns";
 import { MessageCircle } from "lucide-react";
+import { getStringPreview } from "@/lib/utils.ts";
 
 interface NoteListItemProps {
   note: Note;
 }
 
 const NoteGridItem = ({ note }: NoteListItemProps) => {
-  const titleLimit = 25;
-  const contentLimit = 35;
-  const contentPreview =
-    note.content.length > 0
-      ? contentLimit
-        ? note.content.substring(0, contentLimit) + "..."
-        : note.content
-      : "No content yet...";
-  const titlePreview =
-    note.title.length > titleLimit
-      ? note.title.substring(0, titleLimit) + "..."
-      : note.title;
+  const contentPreview = getStringPreview(
+    35,
+    note.content,
+    "No content yet...",
+  );
+  const titlePreview = getStringPreview(25, note.title, "Untitled");
   const modifiedAt: Date = new Date(note.modified_at);
   let formattedModifiedAt: string;
   if (isToday(modifiedAt)) {

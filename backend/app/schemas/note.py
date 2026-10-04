@@ -35,3 +35,11 @@ class NoteResponse(BaseModel):
     tags: list[NoteTagResponse]
     created_at: datetime
     modified_at: datetime
+
+class NoteSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    content: str
+    note_type: NoteTypeResponse

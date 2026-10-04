@@ -7,6 +7,7 @@ import TagSelector from "@/components/editor/TagSelector.tsx";
 import ContentArea from "@/components/editor/ContentArea.tsx";
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
 import EditorTopBar from "@/components/editor/EditorTopBar.tsx";
+import EditorFooter from "@/components/editor/EditorFooter.tsx";
 
 export default function EditorView() {
   const { noteId } = useParams();
@@ -17,8 +18,11 @@ export default function EditorView() {
   if (!editor.note) return <p>Note not found.</p>;
 
   return (
-    <div>
-      <CenterContainer navbar={<EditorTopBar noteId={editor.note.id} />}>
+    <CenterContainer
+      navbar={<EditorTopBar noteId={editor.note.id} />}
+      className="flex flex-col justify-between"
+    >
+      <div>
         <TitleInput title={editor.title} onChange={editor.setTitle} />
         <div className="flex flex-wrap items-center gap-2 mb-8">
           <StatusSelector
@@ -38,8 +42,8 @@ export default function EditorView() {
           />
         </div>
         <ContentArea value={editor.content} onChange={editor.setContent} />
-        <div className="flex flex-wrap items-center gap-2 mb-8"></div>
-      </CenterContainer>
-    </div>
+      </div>
+      <EditorFooter note={editor.note} />
+    </CenterContainer>
   );
 }

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.sql.operators import or_
 
 from app.db.database import get_db
 from app.schemas.note_link import NoteLinkResponse
@@ -22,9 +23,15 @@ def _get_or_create_link_type(db: Session, link_type_name: str) -> LinkType:
     return link_type
 
 @router.get("", response_model=list[NoteLinkResponse])
-def get_links(db: Session = Depends(get_db), source_id: int | None = None, target_id: int | None = None, origin: str | None = None, type: str | None = None):
+def get_links(db: Session = Depends(get_db),
+              note_id: int | None = None,
+              source_id: int | None = None,
+              target_id: int | None = None,
+              origin: str | None = None,
+              type: str | None = None):
     filters = []
-
+    if note_id is not None:
+        filters.append(or_(NoteLink.source_id == note_id, NoteLink.target_id == note_id))
     if source_id is not None:
         filters.append(NoteLink.source_id == source_id)
     if target_id is not None:

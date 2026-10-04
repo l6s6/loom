@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from app.schemas.note import NoteResponse
+from app.schemas.note import NoteSummary
 
 
 class LinkTypeResponse(BaseModel):
@@ -10,8 +11,8 @@ class NoteLinkResponse(BaseModel):
     id: int
     origin: str
     link_type: LinkTypeResponse
-    source: NoteResponse
-    target: NoteResponse
+    source: NoteSummary
+    target: NoteSummary
 
 class NoteLinkCreate(BaseModel):
     origin: str
