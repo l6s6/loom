@@ -18,10 +18,15 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command.tsx";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group.tsx";
+import { Search } from "lucide-react";
 
 export function App() {
   const { notes } = useNotesContext();
@@ -51,10 +56,19 @@ export function App() {
         Your Notes
       </h1>
       <Command>
-        <CommandInput
-          placeholder="Search Notes..."
-          onValueChange={setSearchQuery}
-        />
+        <InputGroup className="w-full">
+          <InputGroupInput
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search..."
+          />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+          <InputGroupAddon align="inline-end">
+            {filteredNotes.length} results
+          </InputGroupAddon>
+        </InputGroup>
         <CommandList className="max-h-full">
           <CommandEmpty>
             <span className="text-content-muted">No Notes found.</span>
