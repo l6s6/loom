@@ -10,14 +10,14 @@ import {
   CommandList,
 } from "@/components/ui/command.tsx";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-import { useCreateLink, useGetLink } from "@/hooks/useLinks.ts";
+import { useCreateLink, useGetLinks } from "@/hooks/useLinks.ts";
 import type { CreateNoteLink } from "@/types/noteLink.ts";
 import LinkListItem from "@/components/editor/LinkListItem.tsx";
 import EditorLinks from "@/components/editor/EditorLinks.tsx";
 
 const EditorFooter = ({ noteId }: { noteId: number }) => {
   const { notes } = useNotesContext();
-  const { links, refetchLinks } = useGetLink(noteId);
+  const { links, refetchLinks } = useGetLinks(noteId);
   const { createLink } = useCreateLink();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -57,7 +57,6 @@ const EditorFooter = ({ noteId }: { noteId: number }) => {
     setSearchQuery("");
     await createLink(link);
     await refetchLinks();
-    return;
   };
 
   return (
@@ -99,10 +98,16 @@ const EditorFooter = ({ noteId }: { noteId: number }) => {
       <div className="flex flex-row w-full gap-2 mt-2">
         <EditorLinks
           links={incomingLinks}
+          refetch={refetchLinks}
           icon={MoveDownLeft}
           type="incoming"
         />
-        <EditorLinks links={outgoingLinks} icon={MoveUpRight} type="outgoing" />
+        <EditorLinks
+          links={outgoingLinks}
+          refetch={refetchLinks}
+          icon={MoveUpRight}
+          type="outgoing"
+        />
       </div>
     </div>
   );

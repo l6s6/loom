@@ -3,7 +3,7 @@ import { createLink, deleteLink } from "@/api/noteLinks.ts";
 import type { CreateNoteLink, NoteLink } from "@/types/noteLink.ts";
 import { getLinks } from "@/api/noteLinks.ts";
 
-export function useGetLink(note_id: number) {
+export function useGetLinks(note_id?: number) {
   const [links, setLinks] = useState<NoteLink[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
