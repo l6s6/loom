@@ -26,7 +26,7 @@ export const createLink = async (link: CreateNoteLink): Promise<NoteLink> => {
 
 export const deleteLink = async (linkId: number): Promise<NoteLink> => {
   const response = await fetch(
-    "http://localhost:8000/notes/" + linkId.toString(),
+    "http://localhost:8000/links/" + linkId.toString(),
     {
       method: "DELETE",
       headers: {
