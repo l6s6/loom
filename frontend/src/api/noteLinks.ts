@@ -1,7 +1,9 @@
 import type { CreateNoteLink, NoteLink } from "@/types/noteLink.ts";
 
-export const getLinks = async (): Promise<NoteLink[]> => {
-  const response = await fetch("http://localhost:8000/links");
+export const getLinks = async (note_id?: number): Promise<NoteLink[]> => {
+  const response = await fetch(
+    `http://localhost:8000/links${note_id && `?note_id=${note_id}`}`,
+  );
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }

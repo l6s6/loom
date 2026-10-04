@@ -1,5 +1,5 @@
 import { MoveDownLeft, MoveUpRight, Network } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNotesContext } from "@/context/NotesContext.tsx";
 import {
   Command,
@@ -31,16 +31,25 @@ const LinkListItem = ({ note }: { note: Note }) => {
 
 const EditorFooter = ({ noteId }: { noteId: number }) => {
   const { notes } = useNotesContext();
-  const { links, refetchLinks } = useGetLink();
+  const { links, refetchLinks } = useGetLink(noteId);
   const { createLink } = useCreateLink();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const incomingLinks = [...links]
-    .sort((a, b) => a.source.title.localeCompare(b.source.title))
-    .filter((link) => link.target.id == noteId);
-  const outgoingLinks = [...links]
-    .sort((a, b) => a.target.title.localeCompare(b.target.title))
-    .filter((link) => link.source.id == noteId);
+  const incomingLinks = useMemo(
+    () =>
+      links
+        .filter((link) => link.target.id === noteId)
+        .sort((a, b) => a.source.title.localeCompare(b.source.title)),
+    [links, noteId],
+  );
+
+  const outgoingLinks = useMemo(
+    () =>
+      links
+        .filter((link) => link.source.id === noteId)
+        .sort((a, b) => a.target.title.localeCompare(b.target.title)),
+    [links, noteId],
+  );
 
   const filteredNotes = [...notes]
     .sort((a, b) => a.title.localeCompare(b.title))

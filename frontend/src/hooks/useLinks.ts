@@ -3,14 +3,14 @@ import { createLink, deleteLink } from "@/api/noteLinks.ts";
 import type { CreateNoteLink, NoteLink } from "@/types/noteLink.ts";
 import { getLinks } from "@/api/noteLinks.ts";
 
-export function useGetLink() {
+export function useGetLink(note_id: number) {
   const [links, setLinks] = useState<NoteLink[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
     try {
-      setLinks(await getLinks());
+      setLinks(await getLinks(note_id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
