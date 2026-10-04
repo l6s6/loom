@@ -26,7 +26,7 @@ const NoteGridItem = ({ note }: NoteListItemProps) => {
   }
   return (
     <Link to={`/n/${note.id}`}>
-      <div className="w-full h-33 border border-border-subtle rounded-md px-4 py-2">
+      <div className="w-full border border-border-subtle rounded-md px-4 py-2">
         <div className="flex flex-row items-center justify-between mb-2">
           <div className="flex flex-row gap-2">
             <div
