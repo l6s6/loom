@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
@@ -14,10 +14,14 @@ class NoteLink(Base):
     __tablename__ = "note_links"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    source_id: Mapped[int] = mapped_column(ForeignKey("notes.id"))
-    target_id: Mapped[int] = mapped_column(ForeignKey("notes.id"))
+    source_id: Mapped[int] = mapped_column(ForeignKey("notes.id"), index=True)
+    target_id: Mapped[int] = mapped_column(ForeignKey("notes.id"), index=True)
     link_type_id: Mapped[int | None] = mapped_column(ForeignKey("link_types.id"))
     origin: Mapped[str]  # "manual" / "tag" / "ai"
+
+    __table_args__ = (
+        UniqueConstraint("source_id", "target_id", "link_type_id", name="uq_note_link"),
+    )
 
     link_type: Mapped["LinkType | None"] = relationship(back_populates="links")
     source: Mapped["Note"] = relationship(
