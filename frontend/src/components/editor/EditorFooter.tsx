@@ -100,13 +100,9 @@ const EditorFooter = ({ noteId }: { noteId: number }) => {
         <EditorLinks
           links={incomingLinks}
           icon={MoveDownLeft}
-          label="Incoming Links"
+          type="incoming"
         />
-        <EditorLinks
-          links={outgoingLinks}
-          icon={MoveUpRight}
-          label="Outgoing Links"
-        />
+        <EditorLinks links={outgoingLinks} icon={MoveUpRight} type="outgoing" />
       </div>
     </div>
   );
