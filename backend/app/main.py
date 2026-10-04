@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import notes, note_links, note_types, note_tags
+from app.routers import notes, links, note_types, note_tags, link_types
 
 app = FastAPI()
 
@@ -19,7 +19,8 @@ app.add_middleware(
 
 app.include_router(note_types.router)
 app.include_router(note_tags.router)
-app.include_router(note_links.router)
+app.include_router(link_types.router)
+app.include_router(links.router)
 # This has to come last so that e.g. /notes/types is not interpreted as note_id=types
 app.include_router(notes.router)
 

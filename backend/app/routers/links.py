@@ -44,11 +44,6 @@ def get_links(db: Session = Depends(get_db),
 
     return db.query(NoteLink).options(joinedload(NoteLink.link_type)).filter(*filters).all()
 
-@router.get("/types", response_model=list[NoteLinkResponse])
-def get_link_types(db: Session = Depends(get_db)):
-    return db.query(LinkType).all()
-
-
 @router.post("", response_model=NoteLinkResponse)
 def create_link(link: NoteLinkCreate, db: Session = Depends(get_db)):
     if link.link_type_name == "":
