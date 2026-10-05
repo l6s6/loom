@@ -21,7 +21,6 @@ note_has_tags = Table(
 class Note(Base):
     __tablename__ = "notes"
 
-    # Standard attributes
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(default="Untitled")
     content: Mapped[str] = mapped_column(default="")

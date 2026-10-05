@@ -5,7 +5,7 @@ from sqlalchemy.sql.operators import or_
 from core.database import get_db
 from domains.links.models import NoteLink, LinkType
 from domains.notes.models import Note
-from domains.notes.routers import _get_note_or_404
+from domains.notes.routers import get_note_or_404
 
 from domains.links.schemas import LinkTypeResponse, NoteLinkResponse, NoteLinkCreate
 
@@ -66,8 +66,8 @@ def create_link(link: NoteLinkCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Note type must not be empty")
 
     # Validating foreign keys
-    _get_note_or_404(db, link.source_id)
-    _get_note_or_404(db, link.target_id)
+    get_note_or_404(db, link.source_id)
+    get_note_or_404(db, link.target_id)
 
     link_type = _get_or_create_link_type(db, link.link_type_name)
 

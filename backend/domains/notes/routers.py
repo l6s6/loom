@@ -10,7 +10,7 @@ from domains.notes.models import Note, NoteType, NoteTag
 router = APIRouter(prefix="/notes", tags=["notes"])
 
 
-def _get_note_or_404(db: Session, note_id: int) -> Note:
+def get_note_or_404(db: Session, note_id: int) -> Note:
     note = db.query(Note).filter(Note.id == note_id).first()
     if note is None:
         raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
@@ -99,12 +99,12 @@ def create_note(db: Session = Depends(get_db)):
 
 @router.get("/{note_id}", response_model=NoteResponse)
 def get_note(note_id: int, db: Session = Depends(get_db)):
-    return _get_note_or_404(db, note_id)
+    return get_note_or_404(db, note_id)
 
 
 @router.put("/{note_id}", response_model=NoteResponse)
 def update_note(note_id: int, note_update: NoteUpdate, db: Session = Depends(get_db)):
-    note =  _get_note_or_404(db, note_id)
+    note =  get_note_or_404(db, note_id)
 
     update_data = note_update.model_dump(exclude_unset=True)
 
@@ -130,7 +130,7 @@ def update_note(note_id: int, note_update: NoteUpdate, db: Session = Depends(get
 
 @router.delete("/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_note(note_id: int, db: Session = Depends(get_db)):
-    note =  _get_note_or_404(db, note_id)
+    note =  get_note_or_404(db, note_id)
 
     db.delete(note)
     db.commit()
