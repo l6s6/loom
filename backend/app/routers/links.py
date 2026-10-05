@@ -4,7 +4,8 @@ from sqlalchemy.sql.operators import or_
 
 from app.db.database import get_db
 from app.schemas.note_link import NoteLinkResponse
-from app.models.note_link import NoteLink, LinkType
+from app.models.note_link import NoteLink
+from app.models.link_type import LinkType
 from app.schemas.note_link import NoteLinkCreate
 
 router = APIRouter(prefix="/links", tags=["links"])
@@ -40,7 +41,6 @@ def get_links(db: Session = Depends(get_db),
         filters.append(NoteLink.origin == origin)
     if type is not None:
         filters.append(NoteLink.link_type.has(name=type))
-
 
     return db.query(NoteLink).options(joinedload(NoteLink.link_type)).filter(*filters).all()
 

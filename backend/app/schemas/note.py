@@ -41,5 +41,4 @@ class NoteSummary(BaseModel):
 
     id: int
     title: str
-    content: str
     note_type: NoteTypeResponse

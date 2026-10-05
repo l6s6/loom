@@ -1,9 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.schemas.note import NoteSummary
-from schemas.link_type import LinkTypeResponse
+from app.schemas.link_type import LinkTypeResponse
 
 
 class NoteLinkResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     origin: str
     link_type: LinkTypeResponse
