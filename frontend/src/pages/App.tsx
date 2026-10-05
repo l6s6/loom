@@ -72,7 +72,7 @@ export function App() {
             {filteredNotes.length} results
           </InputGroupAddon>
         </InputGroup>
-        <CommandList className="max-h-full">
+        <CommandList className="max-h-full mt-4">
           <CommandEmpty>
             <span className="text-content-muted">No Notes found.</span>
           </CommandEmpty>

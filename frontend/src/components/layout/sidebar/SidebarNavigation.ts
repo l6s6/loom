@@ -5,6 +5,8 @@ import {
   Unlink,
   Quote,
   Clock,
+  Hash,
+  Tag,
   type LucideIcon,
 } from "lucide-react";
 
@@ -17,6 +19,8 @@ export interface SidebarItemConfig {
 export const mainNavItems: SidebarItemConfig[] = [
   { label: "Notes", icon: Home, path: "/" },
   { label: "Graph", icon: Network, path: "/graph" },
+  { label: "Tags", icon: Hash, path: "/tags" },
+  { label: "Note Types", icon: Tag, path: "/note-types" },
 ];
 
 export const smartViewsConfig: SidebarItemConfig[] = [
