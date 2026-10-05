@@ -1,12 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useCreateAndNavigateNote } from "@/hooks/useNotes.ts";
 import { BookOpen, Search } from "lucide-react";
 import {
   mainNavItems,
   smartViewsConfig,
-} from "@/components/sidebar/SidebarNavigation.ts";
-import SidebarBlock from "@/components/sidebar/SidebarBlock.tsx";
+} from "@/components/layout/sidebar/SidebarNavigation.ts";
+import SidebarBlock from "@/components/layout/sidebar/SidebarBlock.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import { useCreateAndNavigateNote } from "@/features/notes/hooks.ts";
 
 const Sidebar = () => {
   const navigate = useNavigate();

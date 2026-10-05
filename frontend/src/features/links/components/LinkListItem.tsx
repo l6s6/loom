@@ -1,10 +1,10 @@
-import type { Note } from "@/types/note.ts";
 import { getStringPreview } from "@/lib/utils.ts";
-import type { NoteLink } from "@/types/noteLink.ts";
 import { Link } from "react-router-dom";
-import { useDeleteLink } from "@/hooks/useLinks.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { Unlink } from "lucide-react";
+import { useDeleteLink } from "@/features/links/hooks.ts";
+import type { Note } from "@/features/notes/types.ts";
+import type { NoteLink } from "@/features/links/types.ts";
 
 const LinkListItem = ({ note, link }: { note: Note; link: NoteLink }) => {
   const { deleteLink } = useDeleteLink();

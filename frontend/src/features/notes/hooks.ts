@@ -1,12 +1,16 @@
-import {
-  getNotes,
-  createNote,
-  updateNote,
-  deleteNote,
-  getNoteById,
-} from "../api/notes.ts";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import {
+  createNote,
+  deleteNote,
+  getNoteById,
+  getNotes,
+  getNoteTags,
+  getNoteTypes,
+  updateNote,
+} from "@/features/notes/api.ts";
+import type { Note } from "@/features/notes/types.ts";
 
 export function useGetNotes() {
   const { data, isLoading, error } = useQuery({
@@ -29,6 +33,32 @@ export function useGetNoteById(noteId: number) {
 
   return {
     note: data,
+    isLoading,
+    error: error ? error.message : null,
+  };
+}
+
+export function useGetNoteTypes() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["note-types"],
+    queryFn: getNoteTypes,
+  });
+
+  return {
+    types: data || [],
+    isLoading,
+    error: error ? error.message : null,
+  };
+}
+
+export function useGetTags() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["note-tags"],
+    queryFn: getNoteTags,
+  });
+
+  return {
+    tags: data || [],
     isLoading,
     error: error ? error.message : null,
   };
@@ -91,5 +121,53 @@ export function useDeleteNote() {
     deleteNote: remove,
     loading: isPending,
     error: error ? error.message : null,
+  };
+}
+
+export function useNoteEditorLogic(note: Note) {
+  const { updateNote } = useUpdateNote();
+  const [title, setTitle] = useState(note.title);
+  const [content, setContent] = useState(note.content);
+
+  // Auto-Save Debounce
+  useEffect(() => {
+    if (title === note.title && content === note.content) return;
+
+    const timer = setTimeout(() => {
+      updateNote({ id: note.id, title, content });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [title, content, note.id, note.title, note.content, updateNote]);
+
+  const handleStatusChange = (newStatus: string) => {
+    updateNote({ id: note.id, status: newStatus });
+  };
+
+  const handleTypeChange = (newType: string) => {
+    updateNote({ id: note.id, note_type_name: newType });
+  };
+
+  const handleAddTag = (name: string) => {
+    const newTags = [...note.tags.map((t) => t.name), name];
+    updateNote({ id: note.id, tag_names: newTags });
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    const newTags = note.tags
+      .filter((t) => t.name !== tagToRemove)
+      .map((t) => t.name);
+
+    updateNote({ id: note.id, tag_names: newTags });
+  };
+
+  return {
+    title,
+    setTitle,
+    content,
+    setContent,
+    handleStatusChange,
+    handleTypeChange,
+    handleAddTag,
+    handleRemoveTag,
   };
 }

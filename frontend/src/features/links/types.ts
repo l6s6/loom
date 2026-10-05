@@ -1,5 +1,4 @@
-import type { Note } from "@/types/note.ts";
-import type { LinkType } from "@/types/linkType.ts";
+import type { Note } from "@/features/notes/types.ts";
 
 export interface NoteLink {
   id: number;
@@ -14,4 +13,9 @@ export interface CreateNoteLink {
   source_id: number;
   target_id: number;
   link_type_name: string;
+}
+
+export interface LinkType {
+  id: number;
+  name: string;
 }

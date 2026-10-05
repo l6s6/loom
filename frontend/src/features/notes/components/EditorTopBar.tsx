@@ -1,7 +1,6 @@
 import { Link, useMatch } from "react-router-dom";
 import { ArrowLeft, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
-import { useDeleteNote } from "@/hooks/useNotes.ts";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,7 +12,8 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog.tsx";
+import { useDeleteNote } from "@/features/notes/hooks.ts";
 
 const EditorTopBar = ({ noteId }: { noteId: number }) => {
   const { deleteNote } = useDeleteNote();

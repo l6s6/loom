@@ -1,14 +1,16 @@
-import TitleInput from "@/components/editor/TitleInput.tsx";
-import StatusSelector from "@/components/editor/StatusSelector.tsx";
-import NoteTypeSelector from "@/components/editor/NoteTypeSelector.tsx";
-import TagSelector from "@/components/editor/TagSelector.tsx";
-import ContentArea from "@/components/editor/ContentArea.tsx";
-import EditorFooter from "@/components/editor/EditorFooter.tsx";
-import type { Note } from "@/types/note.ts";
-import { useNoteEditorLogic } from "@/hooks/useNoteEditorLogic.ts";
-import { useGetNoteTypes } from "@/hooks/useNoteTypes.ts";
-import { useGetTags } from "@/hooks/useTags.ts";
+import TitleInput from "@/features/notes/components/TitleInput.tsx";
+import StatusSelector from "@/features/notes/components/StatusSelector.tsx";
+import NoteTypeSelector from "@/features/notes/components/NoteTypeSelector.tsx";
+import TagSelector from "@/features/notes/components/TagSelector.tsx";
+import ContentArea from "@/features/notes/components/ContentArea.tsx";
+import EditorFooter from "@/features/notes/components/EditorFooter.tsx";
 import { useMemo } from "react";
+import {
+  useGetNoteTypes,
+  useGetTags,
+  useNoteEditorLogic,
+} from "@/features/notes/hooks.ts";
+import type { Note } from "@/features/notes/types.ts";
 
 const NoteEditorCore = ({ initialNote }: { initialNote: Note }) => {
   const editor = useNoteEditorLogic(initialNote);

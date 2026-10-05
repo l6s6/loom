@@ -1,8 +1,8 @@
-import { type Note, NOTE_STATUS_CONFIG } from "../types/note.ts";
 import { Link } from "react-router-dom";
 import { isToday, isYesterday, format } from "date-fns";
 import { MessageCircle } from "lucide-react";
 import { capitalizeFirstLetter, getStringPreview } from "@/lib/utils.ts";
+import { type Note, NOTE_STATUS_CONFIG } from "@/features/notes/types.ts";
 
 interface NoteListItemProps {
   note: Note;

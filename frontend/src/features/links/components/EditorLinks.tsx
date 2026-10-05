@@ -1,6 +1,6 @@
 import { type LucideIcon } from "lucide-react";
-import type { NoteLink } from "@/types/noteLink.ts";
-import LinkListItem from "@/components/editor/LinkListItem.tsx";
+import LinkListItem from "@/features/links/components/LinkListItem.tsx";
+import type { NoteLink } from "@/features/links/types.ts";
 interface EditorLinksProps {
   links: NoteLink[];
   icon: LucideIcon;

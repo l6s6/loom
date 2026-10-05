@@ -8,17 +8,20 @@ import {
   CommandList,
 } from "@/components/ui/command.tsx";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-import { useCreateLink, useGetLinksByNoteId } from "@/hooks/useLinks.ts";
-import type { CreateNoteLink } from "@/types/noteLink.ts";
-import EditorLinks from "@/components/editor/EditorLinks.tsx";
+import EditorLinks from "@/features/links/components/EditorLinks.tsx";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group.tsx";
-import LinkTypeSelector from "@/components/editor/LinkTypeSelector.tsx";
-import { useGetLinkTypes } from "@/hooks/useLinkTypes.ts";
-import { useGetNotes } from "@/hooks/useNotes.ts";
+import LinkTypeSelector from "@/features/links/components/LinkTypeSelector.tsx";
+import { useGetNotes } from "@/features/notes/hooks.ts";
+import {
+  useCreateLink,
+  useGetLinksByNoteId,
+  useGetLinkTypes,
+} from "@/features/links/hooks.ts";
+import type { CreateNoteLink } from "@/features/links/types.ts";
 
 const EditorFooter = ({ noteId }: { noteId: number }) => {
   const { notes } = useGetNotes();

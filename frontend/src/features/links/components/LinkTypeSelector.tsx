@@ -14,7 +14,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command.tsx";
-import type { LinkType } from "@/types/linkType.ts";
+import type { LinkType } from "@/features/links/types.ts";
 
 interface TypeSelectorProps {
   typeName: string;

@@ -1,5 +1,5 @@
-import type { SidebarItemConfig } from "@/components/sidebar/SidebarNavigation.ts";
-import NavItem from "@/components/sidebar/NavItem.tsx";
+import type { SidebarItemConfig } from "@/components/layout/sidebar/SidebarNavigation.ts";
+import NavItem from "@/components/layout/sidebar/NavItem.tsx";
 
 interface SidebarBlockProps {
   label: string;

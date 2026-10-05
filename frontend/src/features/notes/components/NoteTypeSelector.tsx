@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type { NoteTag } from "@/types/noteTag.ts";
 import {
   Popover,
   PopoverContent,
@@ -15,6 +14,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command.tsx";
+import type { NoteTag } from "@/features/notes/types.ts";
 
 interface TypeSelectorProps {
   typeName: string;

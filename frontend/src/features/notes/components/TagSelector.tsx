@@ -1,12 +1,11 @@
-import type { NoteTag } from "@/types/noteTag.ts";
 import { Plus, X, Hash } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button.tsx";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/ui/popover.tsx";
 import {
   Command,
   CommandEmpty,
@@ -14,7 +13,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from "@/components/ui/command.tsx";
+import type { NoteTag } from "@/features/notes/types.ts";
 
 interface TagSelectorProps {
   tags: NoteTag[];

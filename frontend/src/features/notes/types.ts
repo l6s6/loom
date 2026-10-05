@@ -1,6 +1,3 @@
-import type { NoteTag } from "./noteTag.ts";
-import type { NoteType } from "@/types/noteType.ts";
-
 export const NoteStatus = {
   None: "none",
   Open: "open",
@@ -9,7 +6,6 @@ export const NoteStatus = {
 } as const;
 
 export type NoteStatus = (typeof NoteStatus)[keyof typeof NoteStatus];
-
 export const NOTE_STATUS_CONFIG: Record<
   string,
   {
@@ -68,4 +64,14 @@ export interface UpdateNote {
   status?: string;
   note_type_name?: string;
   tag_names?: string[];
+}
+
+export interface NoteTag {
+  name: string;
+  id: number;
+}
+
+export interface NoteType {
+  name: string;
+  id: number;
 }

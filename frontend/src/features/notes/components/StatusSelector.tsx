@@ -9,8 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { NOTE_STATUS_CONFIG, type NoteStatus } from "@/types/note.ts";
 import { ChevronDown } from "lucide-react";
+import { NOTE_STATUS_CONFIG, type NoteStatus } from "@/features/notes/types.ts";
 
 interface StatusSelectorProps {
   status: string;

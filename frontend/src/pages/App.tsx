@@ -1,5 +1,5 @@
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
-import NoteGridItem from "@/components/NoteGridItem.tsx";
+import NoteGridItem from "@/features/notes/components/NoteGridItem.tsx";
 import { useState } from "react";
 import {
   ContextMenu,
@@ -13,11 +13,6 @@ import {
 } from "@/components/ui/context-menu.tsx";
 import { useMatch } from "react-router-dom";
 import {
-  useCreateAndNavigateNote,
-  useDeleteNote,
-  useGetNotes,
-} from "@/hooks/useNotes.ts";
-import {
   Command,
   CommandEmpty,
   CommandGroup,
@@ -30,6 +25,11 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group.tsx";
 import { Search } from "lucide-react";
+import {
+  useCreateAndNavigateNote,
+  useDeleteNote,
+  useGetNotes,
+} from "@/features/notes/hooks.ts";
 
 export function App() {
   const { notes } = useGetNotes();
