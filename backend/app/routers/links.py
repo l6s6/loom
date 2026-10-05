@@ -7,8 +7,8 @@ from app.schemas.note_link import NoteLinkResponse
 from app.models.note_link import NoteLink
 from app.models.link_type import LinkType
 from app.schemas.note_link import NoteLinkCreate
-from models import Note
-from routers.notes import _get_note_or_404
+from app.models import Note
+from app.routers.notes import _get_note_or_404
 
 router = APIRouter(prefix="/links", tags=["links"])
 
