@@ -5,10 +5,12 @@ import { getLinks } from "@/api/noteLinks.ts";
 
 export function useGetLinks(note_id?: number) {
   const [links, setLinks] = useState<NoteLink[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       setLinks(await getLinks(note_id));
     } catch (err) {
@@ -26,33 +28,38 @@ export function useGetLinks(note_id?: number) {
 }
 
 export function useCreateLink() {
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const create = async (link: CreateNoteLink) => {
+    setIsLoading(true);
+    setError(null);
     try {
       return await createLink(link);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-  return { createLink: create, loading, error };
+  return { createLink: create, loading: isLoading, error };
 }
 
 export function useDeleteLink() {
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const remove = async (linkId: number) => {
+    setIsLoading(true);
+    setError(null);
     try {
       return await deleteLink(linkId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
+      throw err;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-  return { deleteLink: remove, loading, error };
+  return { deleteLink: remove, loading: isLoading, error };
 }

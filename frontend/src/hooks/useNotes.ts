@@ -12,10 +12,12 @@ import { useNotesContext } from "@/context/NotesContext.tsx";
 
 export function useGetNotes() {
   const [notes, setNotes] = useState<Note[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       setNotes(await getNotes());
     } catch (err) {
@@ -34,10 +36,12 @@ export function useGetNotes() {
 
 export function useGetNoteById(noteId: number) {
   const [note, setNote] = useState<Note>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = async (id: number) => {
+    setIsLoading(true);
+    setError(null);
     try {
       const data = await getNoteById(id);
       setNote(data);
@@ -56,19 +60,21 @@ export function useGetNoteById(noteId: number) {
   return { refetchNote: load, note, loading: isLoading, error };
 }
 export function useCreateNote() {
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const create = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       return await createNote();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-  return { createNote: create, loading, error };
+  return { createNote: create, loading: isLoading, error };
 }
 
 export function useCreateAndNavigateNote() {
@@ -88,29 +94,33 @@ export function useCreateAndNavigateNote() {
 }
 
 export function useUpdateNote() {
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const update = async (noteUpdates: UpdateNote) => {
+    setIsLoading(true);
+    setError(null);
     try {
       return await updateNote(noteUpdates);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
+      throw err;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-  return { updateNote: update, loading, error };
+  return { updateNote: update, loading: isLoading, error };
 }
 
 export function useDeleteNote() {
   const navigate = useNavigate();
   const { refetchNotes } = useNotesContext();
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const remove = async (noteId: number, currentUrl?: string) => {
-    console.log("delete");
+    setIsLoading(true);
+    setError(null);
     try {
       if (!currentUrl || currentUrl === noteId.toString()) {
         navigate("/");
@@ -120,8 +130,8 @@ export function useDeleteNote() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-  return { deleteNote: remove, loading, error };
+  return { deleteNote: remove, loading: isLoading, error };
 }
