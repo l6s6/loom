@@ -40,7 +40,7 @@ export function useGetNoteById(noteId: number) {
 
 export function useGetNoteTypes() {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["note-types"],
+    queryKey: ["note_types"],
     queryFn: getNoteTypes,
   });
 
@@ -53,7 +53,7 @@ export function useGetNoteTypes() {
 
 export function useGetTags() {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["note-tags"],
+    queryKey: ["tags"],
     queryFn: getTags,
   });
 
@@ -92,6 +92,13 @@ export function useUpdateNote() {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       // Update Cache from single note
       queryClient.setQueryData(["note", variables.id], updatedNoteFromServer);
+      // Update Cache from NoteTypes and Tags if they have been Changed
+      if (variables.note_type_name) {
+        queryClient.invalidateQueries({ queryKey: ["note_types"] });
+      }
+      if (variables.tag_names) {
+        queryClient.invalidateQueries({ queryKey: ["tags"] });
+      }
     },
   });
 
