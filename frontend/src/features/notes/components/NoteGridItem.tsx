@@ -26,7 +26,7 @@ const NoteGridItem = ({ note }: NoteListItemProps) => {
   }
   return (
     <Link to={`/n/${note.id}`}>
-      <div className="w-full border border-border-subtle rounded-md px-4 py-2">
+      <div className="w-full h-full border border-border-subtle rounded-md px-4 py-2">
         <div className="flex flex-row items-center justify-between mb-2">
           <div className="flex flex-row gap-2">
             <div
@@ -54,9 +54,12 @@ const NoteGridItem = ({ note }: NoteListItemProps) => {
         </div>
         <h1 className="font-bold">{titlePreview}</h1>
         <span className="text-content-muted text-sm">{contentPreview}</span>
-        <div className="flex flex-row overflow-clip gap-1 mt-2">
+        <div className="flex flex-row overflow-hidden gap-1 mt-2">
           {note.tags.map((tag) => (
-            <div className="px-2 py-1 border border-border-subtle rounded-sm flex bg-bg-sidebar">
+            <div
+              key={tag.id}
+              className="px-2 py-1 border border-border-subtle rounded-sm flex bg-bg-sidebar"
+            >
               <span className="text-xs text-content-muted">#{tag.name}</span>
             </div>
           ))}

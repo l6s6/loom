@@ -33,7 +33,7 @@ import {
 
 interface NoteMetaBarProps {
   initialNote: Note;
-  onStatusChange: (newStatus: string) => void;
+  onStatusChange: (newStatus: NoteStatus) => void;
   types: NoteType[];
   onTypeChange: (newType: string) => void;
   availableTags: Tag[];
@@ -72,13 +72,13 @@ export default NoteMetaBar;
 
 interface StatusSelectorProps {
   status: NoteStatus;
-  onChange: (newStatus: string) => void;
+  onChange: (newStatus: NoteStatus) => void;
 }
 
 const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {
   const [isStatusOpen, setIsStatusOpen] = useState(false);
 
-  const handleStatusChange = (newStatus: string) => {
+  const handleStatusChange = (newStatus: NoteStatus) => {
     setIsStatusOpen(false);
     onChange(newStatus);
   };
@@ -120,7 +120,7 @@ const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {
                 (typeof NOTE_STATUS_CONFIG)[NoteStatus],
               ][]
             ).map(([key, config]) => (
-              <DropdownMenuRadioItem value={key}>
+              <DropdownMenuRadioItem value={key} key={key}>
                 <span className={`w-2 h-2 rounded-full ${config.dotColor}`} />
                 <span className="flex-1">{config.label}</span>
               </DropdownMenuRadioItem>
@@ -194,36 +194,33 @@ const TagSelector = ({
               onValueChange={setTagSearch}
             />
             <CommandList>
-              {availableTags.length === 0 && (
-                <CommandEmpty>
-                  {tagSearch ? (
-                    <Button
-                      onClick={() => handleAddTag(tagSearch)}
-                      variant="secondary"
-                    >
-                      <Plus size={14} className="mr-2 shrink-0" />
-                      <span className="truncate">Create Tag "{tagSearch}"</span>
-                    </Button>
-                  ) : (
-                    "No tags found."
-                  )}
-                </CommandEmpty>
-              )}
+              <CommandEmpty>
+                {tagSearch ? (
+                  <Button
+                    onClick={() => handleAddTag(tagSearch)}
+                    variant="secondary"
+                  >
+                    <Plus size={14} className="mr-2 shrink-0" />
+                    <span className="truncate">Create Tag "{tagSearch}"</span>
+                  </Button>
+                ) : (
+                  "No tags found."
+                )}
+              </CommandEmpty>
 
-              {availableTags.length > 0 && (
-                <CommandGroup heading="Existing Tags">
-                  {availableTags.map((t) => (
-                    <CommandItem
-                      value={t.name}
-                      onSelect={() => {
-                        handleAddTag(t.name);
-                      }}
-                    >
-                      <span className="flex-1">{t.name}</span>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              )}
+              <CommandGroup heading="Existing Tags">
+                {availableTags.map((t) => (
+                  <CommandItem
+                    value={t.name}
+                    key={t.id}
+                    onSelect={() => {
+                      handleAddTag(t.name);
+                    }}
+                  >
+                    <span className="flex-1">{t.name}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>
@@ -234,7 +231,7 @@ const TagSelector = ({
 
 interface TypeSelectorProps {
   typeName: string;
-  types: Tag[];
+  types: NoteType[];
   onChange: (newType: string) => void;
 }
 
@@ -280,6 +277,7 @@ const NoteTypeSelector = ({ typeName, types, onChange }: TypeSelectorProps) => {
               {types.map((t) => (
                 <CommandItem
                   value={t.name}
+                  key={t.id}
                   onSelect={() => handleTypeChange(t.name)}
                 >
                   <span className="flex-1">{t.name}</span>
