@@ -1,9 +1,5 @@
-import type { NoteType } from "../types/noteType.ts";
+import type { LinkType } from "@/types/linkType.ts";
+import { apiClient } from "@/api/client.ts";
 
-export const getLinkTypes = async (): Promise<NoteType[]> => {
-  const response = await fetch("http://localhost:8000/links/types");
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return (await response.json()) as NoteType[];
-};
+// GET Link Types
+export const getLinkTypes = () => apiClient<LinkType[]>("/links/types");

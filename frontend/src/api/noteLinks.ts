@@ -1,41 +1,22 @@
 import type { CreateNoteLink, NoteLink } from "@/types/noteLink.ts";
+import { apiClient } from "@/api/client.ts";
 
-export const getLinks = async (note_id?: number): Promise<NoteLink[]> => {
-  const response = await fetch(
-    `http://localhost:8000/links${note_id && `?note_id=${note_id}`}`,
-  );
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return (await response.json()) as NoteLink[];
+// GET Links
+export const getLinks = (note_id?: number) => {
+  const params = new URLSearchParams();
+  if (note_id !== undefined) params.append("note_id", note_id.toString());
+
+  const queryString = params.toString() ? `?${params.toString()}` : "";
+  return apiClient<NoteLink[]>(`/links${queryString}`);
 };
 
-export const createLink = async (link: CreateNoteLink): Promise<NoteLink> => {
-  const response = await fetch("http://localhost:8000/links", {
+// POST Create Note
+export const createLink = (link: CreateNoteLink) =>
+  apiClient<NoteLink>(`/links`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(link),
   });
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return (await response.json()) as NoteLink;
-};
 
-export const deleteLink = async (linkId: number): Promise<NoteLink> => {
-  const response = await fetch(
-    "http://localhost:8000/links/" + linkId.toString(),
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return (await response.json()) as NoteLink;
-};
+// DELETE Link by Id
+export const deleteLink = (linkId: number) =>
+  apiClient<void>(`/links/${linkId}`, { method: "DELETE" });

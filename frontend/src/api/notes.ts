@@ -1,65 +1,26 @@
 import type { Note, UpdateNote } from "../types/note.ts";
+import { apiClient } from "@/api/client.ts";
 
-export const getNotes = async (): Promise<Note[]> => {
-  const response = await fetch("http://localhost:8000/notes");
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return (await response.json()) as Note[];
-};
+// GET Notes
+export const getNotes = () => apiClient<Note[]>("/notes");
 
-export const getNoteById = async (noteId: number): Promise<Note> => {
-  const response = await fetch(
-    `http://localhost:8000/notes/${noteId.toString()}`,
-  );
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return (await response.json()) as Note;
-};
+// GET Note by ID
+export const getNoteById = (noteId: number) =>
+  apiClient<Note>(`/notes/${noteId}`);
 
-export const createNote = async (): Promise<Note> => {
-  const response = await fetch("http://localhost:8000/notes", {
+// POST Create Note
+export const createNote = () =>
+  apiClient<Note>(`/notes`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
   });
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return (await response.json()) as Note;
-};
 
-export const updateNote = async (note: UpdateNote): Promise<Note> => {
-  const response = await fetch(
-    "http://localhost:8000/notes/" + note.id.toString(),
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(note),
-    },
-  );
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return (await response.json()) as Note;
-};
+// PUT Update Note
+export const updateNote = (note: UpdateNote) =>
+  apiClient<Note>(`/notes/${note.id}`, {
+    method: "PUT",
+    body: JSON.stringify(note),
+  });
 
-export const deleteNote = async (noteId: number): Promise<Note> => {
-  const response = await fetch(
-    "http://localhost:8000/notes/" + noteId.toString(),
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return (await response.json()) as Note;
-};
+// DELETE Note by ID
+export const deleteNote = (noteId: number) =>
+  apiClient<void>(`/notes/${noteId}`, { method: "DELETE" });

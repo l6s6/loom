@@ -1,5 +1,7 @@
 backend/venv/
 backend/.env
+backend/loom.db
+frontend/.env
 __pycache__/
 *.pyc
 .DS_Store
