@@ -11,6 +11,6 @@ class LinkType(Base):
     __tablename__ = "link_types"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(unique=True)
 
     links: Mapped[list["NoteLink"]] = relationship(back_populates="link_type")

@@ -1,11 +1,7 @@
 from pydantic import BaseModel
-from app.schemas.note import NoteResponse
 from app.schemas.note import NoteSummary
+from schemas.link_type import LinkTypeResponse
 
-
-class LinkTypeResponse(BaseModel):
-    id: int
-    name: str
 
 class NoteLinkResponse(BaseModel):
     id: int

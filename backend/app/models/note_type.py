@@ -12,6 +12,6 @@ class NoteType(Base):
     __tablename__ = "note_types"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(unique=True)
 
     notes: Mapped[list["Note"]] = relationship(back_populates="note_type")

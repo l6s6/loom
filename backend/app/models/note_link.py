@@ -14,13 +14,13 @@ class NoteLink(Base):
     __tablename__ = "note_links"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    source_id: Mapped[int] = mapped_column(ForeignKey("notes.id"), index=True)
-    target_id: Mapped[int] = mapped_column(ForeignKey("notes.id"), index=True)
-    link_type_id: Mapped[int] = mapped_column(ForeignKey("link_types.id"), default="relates to")
+    source_id: Mapped[int] = mapped_column(ForeignKey("notes.id", ondelete="CASCADE"), index=True)
+    target_id: Mapped[int] = mapped_column(ForeignKey("notes.id", ondelete="CASCADE"), index=True)
+    link_type_id: Mapped[int] = mapped_column(ForeignKey("link_types.id"))
     origin: Mapped[str] = mapped_column(default="manual")  # "manual" / "tag" / "ai"
 
     __table_args__ = (
-        UniqueConstraint("source_id", "target_id", "origin", name="uq_note_link"),
+        UniqueConstraint("source_id", "target_id", "origin", "link_type_id", name="uq_note_link"),
     )
 
     link_type: Mapped["LinkType"] = relationship(back_populates="links")

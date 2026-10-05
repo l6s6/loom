@@ -13,7 +13,7 @@ class NoteTag(Base):
     __tablename__ = "note_tags"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(unique=True)
 
     notes: Mapped[list["Note"]] = relationship(
         secondary=note_has_tags, back_populates="tags"
