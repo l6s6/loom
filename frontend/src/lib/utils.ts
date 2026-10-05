@@ -5,11 +5,8 @@ export function getStringPreview(
   str: string,
   placeholder: string,
 ): string {
-  return str.length > 0
-    ? str.length > limit
-      ? str.substring(0, limit) + "..."
-      : str
-    : placeholder;
+  if (!str || str.length == 0) return placeholder;
+  return str.length > limit ? str.substring(0, limit) + "..." : str;
 }
 
 export function capitalizeFirstLetter(str: string): string {
