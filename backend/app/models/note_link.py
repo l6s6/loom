@@ -7,7 +7,7 @@ from app.db.database import Base
 
 if TYPE_CHECKING:
     from app.models.note import Note
-
+    from app.models.link_type import LinkType
 
 
 class NoteLink(Base):
@@ -16,26 +16,17 @@ class NoteLink(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     source_id: Mapped[int] = mapped_column(ForeignKey("notes.id"), index=True)
     target_id: Mapped[int] = mapped_column(ForeignKey("notes.id"), index=True)
-    link_type_id: Mapped[int | None] = mapped_column(ForeignKey("link_types.id"), default="relates to")
+    link_type_id: Mapped[int] = mapped_column(ForeignKey("link_types.id"), default="relates to")
     origin: Mapped[str] = mapped_column(default="manual")  # "manual" / "tag" / "ai"
 
     __table_args__ = (
         UniqueConstraint("source_id", "target_id", "origin", name="uq_note_link"),
     )
 
-    link_type: Mapped["LinkType | None"] = relationship(back_populates="links")
+    link_type: Mapped["LinkType"] = relationship(back_populates="links")
     source: Mapped["Note"] = relationship(
         back_populates="outgoing_links", foreign_keys=[source_id]
     )
     target: Mapped["Note"] = relationship(
         back_populates="incoming_links", foreign_keys=[target_id]
     )
-
-
-class LinkType(Base):
-    __tablename__ = "link_types"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
-
-    links: Mapped[list["NoteLink"]] = relationship(back_populates="link_type")

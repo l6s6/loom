@@ -1,17 +1,16 @@
 from typing import TYPE_CHECKING
-
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
 
 if TYPE_CHECKING:
-    from app.models.note import Note
+    from app.models.note_link import NoteLink
 
 
-class NoteType(Base):
-    __tablename__ = "note_types"
+class LinkType(Base):
+    __tablename__ = "link_types"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
 
-    notes: Mapped[list["Note"]] = relationship(back_populates="note_type")
+    links: Mapped[list["NoteLink"]] = relationship(back_populates="link_type")

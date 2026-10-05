@@ -8,6 +8,7 @@ from app.models.associations import note_has_tags
 if TYPE_CHECKING:
     from app.models.note import Note
 
+
 class NoteTag(Base):
     __tablename__ = "note_tags"
 
