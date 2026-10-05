@@ -2,13 +2,11 @@ import type { CreateNoteLink, NoteLink } from "@/types/noteLink.ts";
 import { apiClient } from "@/api/client.ts";
 
 // GET Links
-export const getLinks = (note_id?: number) => {
-  const params = new URLSearchParams();
-  if (note_id !== undefined) params.append("note_id", note_id.toString());
+export const getLinks = () => apiClient<NoteLink[]>("/links");
 
-  const queryString = params.toString() ? `?${params.toString()}` : "";
-  return apiClient<NoteLink[]>(`/links${queryString}`);
-};
+// GET Link by Note ID
+export const getLinksByNoteId = (noteId: number) =>
+  apiClient<NoteLink>(`/notes?note_id=${noteId}`);
 
 // POST Create Note
 export const createLink = (link: CreateNoteLink) =>
@@ -17,6 +15,6 @@ export const createLink = (link: CreateNoteLink) =>
     body: JSON.stringify(link),
   });
 
-// DELETE Link by Id
+// DELETE Link by ID
 export const deleteLink = (linkId: number) =>
   apiClient<void>(`/links/${linkId}`, { method: "DELETE" });
