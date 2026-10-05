@@ -4,8 +4,17 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from enum import Enum
 
-from app.schemas.note_tag import NoteTagResponse
-from app.schemas.note_type import NoteTypeResponse
+
+class NoteTagResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str
+
+
+class NoteTypeResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str
 
 
 class NoteStatus(str, Enum):
@@ -14,6 +23,7 @@ class NoteStatus(str, Enum):
     ongoing = "ongoing"
     closed = "closed"
 
+
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
@@ -21,9 +31,9 @@ class NoteUpdate(BaseModel):
     tag_names: Optional[list[str]] = None
     status: Optional[NoteStatus] = None
 
+
 class NoteResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: int
     title: str
     content: str
@@ -36,9 +46,12 @@ class NoteResponse(BaseModel):
     created_at: datetime
     modified_at: datetime
 
+
 class NoteSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: int
     title: str
     note_type: NoteTypeResponse
+
+
+

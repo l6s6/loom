@@ -4,13 +4,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 
-from app.main import app
-from app.db.database import Base, get_db
+from core.main import app
+from core.database import Base, get_db
 
 # Important: All models must be imported so that Base.metadata can recognize them
-from app.models.note import Note
-from app.models.note_type import NoteType
-from app.models.note_tag import NoteTag
 
 
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"

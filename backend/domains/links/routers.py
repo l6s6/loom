@@ -2,15 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.operators import or_
 
-from app.db.database import get_db
-from app.schemas.note_link import NoteLinkResponse
-from app.models.note_link import NoteLink
-from app.models.link_type import LinkType
-from app.schemas.note_link import NoteLinkCreate
-from app.models import Note
-from app.routers.notes import _get_note_or_404
+from core.database import get_db
+from domains.links.models import NoteLink, LinkType
+from domains.notes.models import Note
+from domains.notes.routers import _get_note_or_404
+
+from domains.links.schemas import LinkTypeResponse, NoteLinkResponse, NoteLinkCreate
+
 
 router = APIRouter(prefix="/links", tags=["links"])
+
 
 def _get_link_or_404(db: Session, link_id: int) -> NoteLink:
     note = db.query(NoteLink).filter(NoteLink.id == link_id).first()
@@ -18,12 +19,16 @@ def _get_link_or_404(db: Session, link_id: int) -> NoteLink:
         raise HTTPException(status_code=404, detail=f"Link with id {link_id} not found")
     return note
 
+
 def _get_or_create_link_type(db: Session, link_type_name: str) -> LinkType:
     link_type = db.query(LinkType).filter(LinkType.name == link_type_name).first()
     if link_type is None:
         link_type = LinkType(name=link_type_name)
         db.add(link_type)
     return link_type
+
+
+
 
 @router.get("", response_model=list[NoteLinkResponse])
 def get_links(db: Session = Depends(get_db),
@@ -49,11 +54,16 @@ def get_links(db: Session = Depends(get_db),
                                       joinedload(NoteLink.target).joinedload(Note.note_type),
                                       ).filter(*filters).all()
 
+
+@router.get("/types", response_model=list[LinkTypeResponse])
+def get_link_types(db: Session = Depends(get_db)):
+    return db.query(LinkType).all()
+
+
 @router.post("", response_model=NoteLinkResponse)
 def create_link(link: NoteLinkCreate, db: Session = Depends(get_db)):
     if link.link_type_name == "":
         raise HTTPException(status_code=400, detail="Note type must not be empty")
-
 
     # Validating foreign keys
     _get_note_or_404(db, link.source_id)
@@ -72,6 +82,7 @@ def create_link(link: NoteLinkCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_link)
     return new_link
+
 
 @router.delete("/{link_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_note(link_id: int, db: Session = Depends(get_db)):

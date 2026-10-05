@@ -1,16 +1,21 @@
 import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import func, ForeignKey
+from sqlalchemy import func, ForeignKey, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.database import Base
-from app.models.associations import note_has_tags
+from core.database import Base
 
 if TYPE_CHECKING:
-    from app.models.note_type import NoteType
-    from app.models.note_tag  import NoteTag
-    from app.models.note_link  import NoteLink
+    from domains.links.models  import NoteLink
+
+
+note_has_tags = Table(
+    "note_has_tags",
+    Base.metadata,
+    Column("note_id", ForeignKey("notes.id"), primary_key=True),
+    Column("tag_id", ForeignKey("note_tags.id"), primary_key=True),
+)
 
 
 class Note(Base):
@@ -49,3 +54,25 @@ class Note(Base):
         foreign_keys="NoteLink.target_id",
         cascade="all, delete-orphan"
     )
+
+
+class NoteType(Base):
+    __tablename__ = "note_types"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+
+    notes: Mapped[list["Note"]] = relationship(back_populates="note_type")
+
+
+class NoteTag(Base):
+    __tablename__ = "note_tags"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+
+    notes: Mapped[list["Note"]] = relationship(
+        secondary=note_has_tags, back_populates="tags"
+    )
+
+

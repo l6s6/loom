@@ -2,17 +2,20 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy.sql.operators import or_
 
-from app.db.database import get_db
-from app.schemas.note import NoteResponse, NoteStatus, NoteUpdate
-from app.models import Note, NoteType, NoteTag
+from core.database import get_db
+from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, NoteTagResponse
+from domains.notes.models import Note, NoteType, NoteTag
+
 
 router = APIRouter(prefix="/notes", tags=["notes"])
+
 
 def _get_note_or_404(db: Session, note_id: int) -> Note:
     note = db.query(Note).filter(Note.id == note_id).first()
     if note is None:
         raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
     return note
+
 
 def _get_or_create_note_type(db: Session, note_type_name: str) -> NoteType:
     note_type = db.query(NoteType).filter(NoteType.name == note_type_name).first()
@@ -36,6 +39,8 @@ def _apply_tags(db: Session, note: Note, tag_names: list[str]) -> None:
         if tag_name.strip():
             new_tags.append(_get_or_create_tag(db, tag_name.strip()))
     note.tags = new_tags
+
+
 
 
 @router.get("", response_model=list[NoteResponse])
@@ -68,6 +73,16 @@ def get_notes(
 
     # Using selectinload for tags instead of joinedLoad for better performance on N:M relationships
     return db.query(Note).options(joinedload(Note.note_type), selectinload(Note.tags)).filter(*filters).all()
+
+
+@router.get("/types", response_model=list[NoteTypeResponse])
+def get_note_types(db: Session = Depends(get_db)):
+    return db.query(NoteType).all()
+
+
+@router.get("/tags", response_model=list[NoteTagResponse])
+def get_tag_types(db: Session = Depends(get_db)):
+    return db.query(NoteTag).all()
 
 
 @router.post("", response_model=NoteResponse)

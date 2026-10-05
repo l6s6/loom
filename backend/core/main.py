@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import notes, links, note_types, note_tags, link_types
+from domains.notes.routers import router as notes_router
+from domains.links.routers import router as links_router
+
 
 app = FastAPI()
 
@@ -17,12 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(note_types.router)
-app.include_router(note_tags.router)
-app.include_router(link_types.router)
-app.include_router(links.router)
-# This has to come last so that e.g. /notes/types is not interpreted as note_id=types
-app.include_router(notes.router)
+app.include_router(links_router)
+app.include_router(notes_router)
 
 @app.get("/")
 def read_root():

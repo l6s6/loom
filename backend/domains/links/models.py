@@ -3,11 +3,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.database import Base
+from core.database import Base
 
 if TYPE_CHECKING:
-    from app.models.note import Note
-    from app.models.link_type import LinkType
+    from domains.notes.models import Note
 
 
 class NoteLink(Base):
@@ -30,3 +29,12 @@ class NoteLink(Base):
     target: Mapped["Note"] = relationship(
         back_populates="incoming_links", foreign_keys=[target_id]
     )
+
+
+class LinkType(Base):
+    __tablename__ = "link_types"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+
+    links: Mapped[list["NoteLink"]] = relationship(back_populates="link_type")

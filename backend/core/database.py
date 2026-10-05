@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker, declarative_base, DeclarativeBase
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-from app.core.config import settings
+from core.config import settings
 
 # Declaring Naming Conventions
 # ix = Index, uq = Unique, ck = Check, fk = ForeignKey, pk = PrimaryKey
@@ -29,4 +29,3 @@ def get_db():
     finally:
         db.close()
 
-import app.models
