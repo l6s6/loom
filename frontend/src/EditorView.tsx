@@ -20,7 +20,7 @@ export default function EditorView() {
       navbar={<EditorTopBar noteId={note.id} />}
     >
       {/* Render editor only if note is already loaded */}
-      <NoteEditorCore initialNote={note} />
+      <NoteEditorCore key={note.id} initialNote={note} />
     </CenterContainer>
   );
 }
