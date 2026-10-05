@@ -14,7 +14,7 @@ import { ChevronDown } from "lucide-react";
 
 interface StatusSelectorProps {
   status: string;
-  onChange: (newStatus: string) => Promise<void>;
+  onChange: (newStatus: string) => void;
 }
 
 const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {

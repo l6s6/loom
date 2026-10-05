@@ -6,7 +6,7 @@ export const getLinks = () => apiClient<NoteLink[]>("/links");
 
 // GET Link by Note ID
 export const getLinksByNoteId = (noteId: number) =>
-  apiClient<NoteLink>(`/notes?note_id=${noteId}`);
+  apiClient<NoteLink[]>(`/links?note_id=${noteId}`);
 
 // POST Create Note
 export const createLink = (link: CreateNoteLink) =>

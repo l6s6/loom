@@ -1,28 +1,15 @@
-import { useEffect, useState } from "react";
-import type { LinkType } from "../types/linkType.ts";
 import { getLinkTypes } from "@/api/linkTypes.ts";
+import { useQuery } from "@tanstack/react-query";
 
 export function useGetLinkTypes() {
-  const [types, setTypes] = useState<LinkType[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["link-types"],
+    queryFn: getLinkTypes,
+  });
 
-  const load = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      setTypes(await getLinkTypes());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
+  return {
+    types: data || [],
+    isLoading,
+    error: error ? error.message : null,
   };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  return { refetchTypes: load, types, loading: isLoading, error };
 }

@@ -19,7 +19,7 @@ import {
 interface TypeSelectorProps {
   typeName: string;
   types: NoteTag[];
-  onChange: (newType: string) => Promise<void>;
+  onChange: (newType: string) => void;
 }
 
 const NoteTypeSelector = ({ typeName, types, onChange }: TypeSelectorProps) => {

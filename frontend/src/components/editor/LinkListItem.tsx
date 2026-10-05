@@ -6,26 +6,17 @@ import { useDeleteLink } from "@/hooks/useLinks.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { Unlink } from "lucide-react";
 
-const LinkListItem = ({
-  note,
-  link,
-  refetch,
-}: {
-  note: Note;
-  link: NoteLink;
-  refetch: () => Promise<void>;
-}) => {
+const LinkListItem = ({ note, link }: { note: Note; link: NoteLink }) => {
   const { deleteLink } = useDeleteLink();
 
   const handleDeleteLink = async (linkId: number) => {
     await deleteLink(linkId);
-    await refetch();
   };
 
   return (
     <div
       key={link.id}
-      className="flex flex-row items-center justify-between border border-border-subtle rounded-md px-2 py-1 bg w-full rounded-md group bg-bg-editor hover:shadow-sm"
+      className="flex flex-row items-center justify-between border border-border-subtle rounded-md px-2 py-1 bg w-full group bg-bg-editor hover:shadow-sm"
     >
       <Link key={link.id} to={`/n/${note.id}`} className="w-full flex flex-col">
         <div className="flex flex-row items-center justify-between">

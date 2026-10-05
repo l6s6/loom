@@ -6,17 +6,22 @@ import { App } from "./App.tsx";
 import Layout from "./components/layout/Layout.tsx";
 import GraphView from "@/GraphView.tsx";
 import EditorView from "./EditorView.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/graph" element={<GraphView />} />
-          <Route path="/n/:noteId" element={<EditorView />} />;
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/graph" element={<GraphView />} />
+            <Route path="/n/:noteId" element={<EditorView />} />;
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </QueryClientProvider>
   </StrictMode>,
 );

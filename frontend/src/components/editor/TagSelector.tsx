@@ -19,8 +19,8 @@ import {
 interface TagSelectorProps {
   tags: NoteTag[];
   availableTags: NoteTag[];
-  onAdd: (name: string) => Promise<void>;
-  onRemove: (tagToRemove: string) => Promise<void>;
+  onAdd: (name: string) => void;
+  onRemove: (tagToRemove: string) => void;
 }
 
 const TagSelector = ({

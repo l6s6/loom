@@ -1,28 +1,15 @@
-import { useEffect, useState } from "react";
-import type { NoteType } from "../types/noteType.ts";
 import { getNoteTypes } from "../api/noteTypes.ts";
+import { useQuery } from "@tanstack/react-query";
 
 export function useGetNoteTypes() {
-  const [types, setTypes] = useState<NoteType[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["note-types"],
+    queryFn: getNoteTypes,
+  });
 
-  const load = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      setTypes(await getNoteTypes());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
+  return {
+    types: data || [],
+    isLoading,
+    error: error ? error.message : null,
   };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  return { refetchTypes: load, types, loading: isLoading, error };
 }

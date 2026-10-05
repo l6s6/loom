@@ -1,7 +1,6 @@
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
 import NoteGridItem from "@/components/NoteGridItem.tsx";
 import { useState } from "react";
-import { useNotesContext } from "@/context/NotesContext.tsx";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -13,7 +12,11 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu.tsx";
 import { useMatch } from "react-router-dom";
-import { useCreateAndNavigateNote, useDeleteNote } from "@/hooks/useNotes.ts";
+import {
+  useCreateAndNavigateNote,
+  useDeleteNote,
+  useGetNotes,
+} from "@/hooks/useNotes.ts";
 import {
   Command,
   CommandEmpty,
@@ -29,7 +32,7 @@ import {
 import { Search } from "lucide-react";
 
 export function App() {
-  const { notes } = useNotesContext();
+  const { notes } = useGetNotes();
   const { createAndNavigate } = useCreateAndNavigateNote();
   const { deleteNote } = useDeleteNote();
 
@@ -88,7 +91,7 @@ export function App() {
                   <ContextMenuContent>
                     <ContextMenuGroup>
                       <ContextMenuLabel>File</ContextMenuLabel>
-                      <ContextMenuItem onClick={createAndNavigate}>
+                      <ContextMenuItem onClick={() => createAndNavigate()}>
                         New File
                         <ContextMenuShortcut>Ctrl + N</ContextMenuShortcut>
                       </ContextMenuItem>

@@ -1,28 +1,15 @@
-import { useEffect, useState } from "react";
-import type { NoteTag } from "../types/noteTag.ts";
 import { getNoteTags } from "../api/noteTags.ts";
+import { useQuery } from "@tanstack/react-query";
 
 export function useGetTags() {
-  const [tags, setTags] = useState<NoteTag[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["note-tags"],
+    queryFn: getNoteTags,
+  });
 
-  const load = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      setTags(await getNoteTags());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
+  return {
+    tags: data || [],
+    isLoading,
+    error: error ? error.message : null,
   };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  return { refetchTags: load, tags, loading: isLoading, error };
 }

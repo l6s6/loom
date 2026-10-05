@@ -1,6 +1,5 @@
 import { MoveDownLeft, MoveUpRight, Network, Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useNotesContext } from "@/context/NotesContext.tsx";
 import {
   Command,
   CommandEmpty,
@@ -9,7 +8,7 @@ import {
   CommandList,
 } from "@/components/ui/command.tsx";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-import { useCreateLink, useGetLinks } from "@/hooks/useLinks.ts";
+import { useCreateLink, useGetLinksByNoteId } from "@/hooks/useLinks.ts";
 import type { CreateNoteLink } from "@/types/noteLink.ts";
 import EditorLinks from "@/components/editor/EditorLinks.tsx";
 import {
@@ -19,10 +18,11 @@ import {
 } from "@/components/ui/input-group.tsx";
 import LinkTypeSelector from "@/components/editor/LinkTypeSelector.tsx";
 import { useGetLinkTypes } from "@/hooks/useLinkTypes.ts";
+import { useGetNotes } from "@/hooks/useNotes.ts";
 
 const EditorFooter = ({ noteId }: { noteId: number }) => {
-  const { notes } = useNotesContext();
-  const { links, refetchLinks } = useGetLinks(noteId);
+  const { notes } = useGetNotes();
+  const { links } = useGetLinksByNoteId(noteId);
   const { types } = useGetLinkTypes();
   const { createLink } = useCreateLink();
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,7 +63,6 @@ const EditorFooter = ({ noteId }: { noteId: number }) => {
     };
     setSearchQuery("");
     await createLink(link);
-    await refetchLinks();
   };
 
   return (
@@ -118,16 +117,10 @@ const EditorFooter = ({ noteId }: { noteId: number }) => {
       <div className="flex flex-row w-full gap-2 mt-2">
         <EditorLinks
           links={incomingLinks}
-          refetch={refetchLinks}
           icon={MoveDownLeft}
           type="incoming"
         />
-        <EditorLinks
-          links={outgoingLinks}
-          refetch={refetchLinks}
-          icon={MoveUpRight}
-          type="outgoing"
-        />
+        <EditorLinks links={outgoingLinks} icon={MoveUpRight} type="outgoing" />
       </div>
     </div>
   );

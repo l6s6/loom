@@ -1,65 +1,65 @@
-import { useEffect, useState } from "react";
-import { createLink, deleteLink } from "@/api/noteLinks.ts";
-import type { CreateNoteLink, NoteLink } from "@/types/noteLink.ts";
+import { createLink, deleteLink, getLinksByNoteId } from "@/api/noteLinks.ts";
 import { getLinks } from "@/api/noteLinks.ts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export function useGetLinks(note_id?: number) {
-  const [links, setLinks] = useState<NoteLink[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function useGetLinks() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["links"],
+    queryFn: getLinks,
+  });
 
-  const load = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      setLinks(await getLinks(note_id));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+  return {
+    notes: data || [],
+    isLoading,
+    error: error ? error.message : null,
   };
+}
 
-  useEffect(() => {
-    load();
-  }, []);
+export function useGetLinksByNoteId(noteId: number) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["links", noteId],
+    queryFn: () => getLinksByNoteId(noteId),
+  });
 
-  return { refetchLinks: load, links, loading: isLoading, error, setLinks };
+  return {
+    links: data || [],
+    isLoading,
+    error: error ? error.message : null,
+  };
 }
 
 export function useCreateLink() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const create = async (link: CreateNoteLink) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      return await createLink(link);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: createLink,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["links"] });
+    },
+  });
+
+  return {
+    createLink: mutateAsync,
+    loading: isPending,
+    error: error ? error.message : null,
   };
-  return { createLink: create, loading: isLoading, error };
 }
 
 export function useDeleteLink() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const remove = async (linkId: number) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      return await deleteLink(linkId);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: deleteLink,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["links"] });
+    },
+  });
+
+  return {
+    deleteLink: mutateAsync,
+    loading: isPending,
+    error: error ? error.message : null,
   };
-  return { deleteLink: remove, loading: isLoading, error };
 }

@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import Sidebar from "../sidebar/Sidebar.tsx";
-import { NotesProvider } from "@/context/NotesContext.tsx";
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,10 +9,8 @@ export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="h-screen flex flex-col bg-bg-editor overflow-hidden">
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        <NotesProvider>
-          <Sidebar />
-          <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
-        </NotesProvider>
+        <Sidebar />
+        <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

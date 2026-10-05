@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-import { type Note, type UpdateNote } from "../types/note.ts";
 import {
   getNotes,
   createNote,
@@ -8,130 +6,90 @@ import {
   getNoteById,
 } from "../api/notes.ts";
 import { useNavigate } from "react-router-dom";
-import { useNotesContext } from "@/context/NotesContext.tsx";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useGetNotes() {
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["notes"],
+    queryFn: getNotes,
+  });
 
-  const load = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      setNotes(await getNotes());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+  return {
+    notes: data || [],
+    isLoading,
+    error: error ? error.message : null,
   };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  return { refetchNotes: load, notes, loading: isLoading, error, setNotes };
 }
 
 export function useGetNoteById(noteId: number) {
-  const [note, setNote] = useState<Note>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["note", noteId],
+    queryFn: () => getNoteById(noteId),
+  });
 
-  const load = async (id: number) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await getNoteById(id);
-      setNote(data);
-      return data;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+  return {
+    note: data,
+    isLoading,
+    error: error ? error.message : null,
   };
-
-  useEffect(() => {
-    load(noteId);
-  }, [noteId]);
-
-  return { refetchNote: load, note, loading: isLoading, error };
-}
-export function useCreateNote() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const create = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      return await createNote();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  return { createNote: create, loading: isLoading, error };
 }
 
 export function useCreateAndNavigateNote() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { refetchNotes } = useNotesContext();
-  const { createNote } = useCreateNote();
 
-  const createAndNavigate = async () => {
-    const newNote = await createNote();
-    if (newNote) {
-      await refetchNotes();
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: createNote,
+    onSuccess: (newNote) => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
       navigate(`/n/${newNote.id}`);
-    }
-  };
+    },
+  });
 
-  return { createAndNavigate };
+  return {
+    createAndNavigate: mutateAsync,
+    isLoading: isPending,
+    error: error ? error.message : null,
+  };
 }
 
 export function useUpdateNote() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const update = async (noteUpdates: UpdateNote) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      return await updateNote(noteUpdates);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  return { updateNote: update, loading: isLoading, error };
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: updateNote,
+    onSuccess: (updatedNoteFromServer, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      // Update Cache from single note
+      queryClient.setQueryData(["note", variables.id], updatedNoteFromServer);
+    },
+  });
+
+  return { updateNote: mutateAsync, isLoading: isPending, error };
 }
 
 export function useDeleteNote() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { refetchNotes } = useNotesContext();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: deleteNote,
+    onSuccess: (_, noteId) => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.removeQueries({ queryKey: ["note", noteId] });
+    },
+  });
 
   const remove = async (noteId: number, currentUrl?: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      if (!currentUrl || currentUrl === noteId.toString()) {
-        navigate("/");
-      }
-      await deleteNote(noteId);
-      await refetchNotes();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
+    await mutateAsync(noteId);
+    if (!currentUrl || currentUrl === noteId.toString()) {
+      navigate("/");
     }
   };
-  return { deleteNote: remove, loading: isLoading, error };
+
+  return {
+    deleteNote: remove,
+    loading: isPending,
+    error: error ? error.message : null,
+  };
 }

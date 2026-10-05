@@ -3,12 +3,11 @@ import type { NoteLink } from "@/types/noteLink.ts";
 import LinkListItem from "@/components/editor/LinkListItem.tsx";
 interface EditorLinksProps {
   links: NoteLink[];
-  refetch: () => Promise<void>;
   icon: LucideIcon;
   type: "incoming" | "outgoing";
 }
 
-const EditorLinks = ({ links, refetch, icon, type }: EditorLinksProps) => {
+const EditorLinks = ({ links, icon, type }: EditorLinksProps) => {
   const Icon = icon;
   const isIncoming = type === "incoming";
   const label = isIncoming ? "Incoming Links" : "Outgoing Links";
@@ -21,14 +20,7 @@ const EditorLinks = ({ links, refetch, icon, type }: EditorLinksProps) => {
       </div>
       {links.map((link) => {
         const otherNote = isIncoming ? link.source : link.target;
-        return (
-          <LinkListItem
-            key={link.id}
-            note={otherNote}
-            link={link}
-            refetch={refetch}
-          />
-        );
+        return <LinkListItem key={link.id} note={otherNote} link={link} />;
       })}
     </div>
   );
