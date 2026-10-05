@@ -3,7 +3,7 @@ import {
   type Note,
   NOTE_STATUS_CONFIG,
   type NoteStatus,
-  type NoteTag,
+  type Tag,
   type NoteType,
 } from "@/features/notes/types.ts";
 import {
@@ -36,7 +36,7 @@ interface NoteMetaBarProps {
   onStatusChange: (newStatus: string) => void;
   types: NoteType[];
   onTypeChange: (newType: string) => void;
-  availableTags: NoteTag[];
+  availableTags: Tag[];
   onAddTag: (name: string) => void;
   onRemoveTag: (tagToRemove: string) => void;
 }
@@ -133,8 +133,8 @@ const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {
 };
 
 interface TagSelectorProps {
-  tags: NoteTag[];
-  availableTags: NoteTag[];
+  tags: Tag[];
+  availableTags: Tag[];
   onAdd: (name: string) => void;
   onRemove: (tagToRemove: string) => void;
 }
@@ -234,7 +234,7 @@ const TagSelector = ({
 
 interface TypeSelectorProps {
   typeName: string;
-  types: NoteTag[];
+  types: Tag[];
   onChange: (newType: string) => void;
 }
 

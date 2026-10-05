@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy.sql.operators import or_
 
 from core.database import get_db
-from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, NoteTagResponse
-from domains.notes.models import Note, NoteType, NoteTag
+from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse
+from domains.notes.models import Note, NoteType, Tag
 
 
 router = APIRouter(prefix="/notes", tags=["notes"])
@@ -25,10 +25,10 @@ def _get_or_create_note_type(db: Session, note_type_name: str) -> NoteType:
     return note_type
 
 
-def _get_or_create_tag(db: Session, tag_name: str) -> NoteTag:
-    tag = db.query(NoteTag).filter(NoteTag.name == tag_name).first()
+def _get_or_create_tag(db: Session, tag_name: str) -> Tag:
+    tag = db.query(Tag).filter(Tag.name == tag_name).first()
     if tag is None:
-        tag = NoteTag(name=tag_name)
+        tag = Tag(name=tag_name)
         db.add(tag)
     return tag
 
@@ -67,7 +67,7 @@ def get_notes(
     if is_private is not None:
         filters.append(Note.is_private == is_private)
     if tag is not None:
-        filters.append(Note.tags.any(NoteTag.name == tag))
+        filters.append(Note.tags.any(Tag.name == tag))
     if search is not None:
         filters.append(or_(Note.title.ilike(f"%{search}%"), Note.content.ilike(f"%{search}%")))
 
@@ -80,9 +80,9 @@ def get_note_types(db: Session = Depends(get_db)):
     return db.query(NoteType).all()
 
 
-@router.get("/tags", response_model=list[NoteTagResponse])
+@router.get("/tags", response_model=list[TagResponse])
 def get_tag_types(db: Session = Depends(get_db)):
-    return db.query(NoteTag).all()
+    return db.query(Tag).all()
 
 
 @router.post("", response_model=NoteResponse)

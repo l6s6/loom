@@ -5,7 +5,7 @@ from typing import Optional
 from enum import Enum
 
 
-class NoteTagResponse(BaseModel):
+class TagResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
@@ -42,7 +42,7 @@ class NoteResponse(BaseModel):
     is_pinned: bool
     is_private: bool
     note_type: NoteTypeResponse
-    tags: list[NoteTagResponse]
+    tags: list[TagResponse]
     created_at: datetime
     modified_at: datetime
 

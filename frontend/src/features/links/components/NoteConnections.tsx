@@ -32,9 +32,9 @@ import {
   useGetLinkTypes,
 } from "@/features/links/hooks.ts";
 import type {
-  CreateNoteLink,
+  CreateLink,
   LinkType,
-  NoteLink,
+  Link as NoteLink,
 } from "@/features/links/types.ts";
 import {
   Popover,
@@ -80,7 +80,7 @@ const NoteConnections = ({ noteId }: { noteId: number }) => {
     );
 
   const handleAddLink = async (target_id: number) => {
-    const link: CreateNoteLink = {
+    const link: CreateLink = {
       origin: "manual",
       target_id: target_id,
       source_id: noteId,
@@ -217,13 +217,13 @@ const LinkTypeSelector = ({
   );
 };
 
-interface EditorLinksProps {
+interface NoteLinksProps {
   links: NoteLink[];
   icon: LucideIcon;
   type: "incoming" | "outgoing";
 }
 
-const NoteLinks = ({ links, icon, type }: EditorLinksProps) => {
+const NoteLinks = ({ links, icon, type }: NoteLinksProps) => {
   const { deleteLink } = useDeleteLink();
 
   const Icon = icon;

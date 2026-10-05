@@ -9,8 +9,8 @@ if TYPE_CHECKING:
     from domains.notes.models import Note
 
 
-class NoteLink(Base):
-    __tablename__ = "note_links"
+class Link(Base):
+    __tablename__ = "links"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     source_id: Mapped[int] = mapped_column(ForeignKey("notes.id", ondelete="CASCADE"), index=True)
@@ -39,4 +39,4 @@ class LinkType(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
 
-    links: Mapped[list["NoteLink"]] = relationship(back_populates="link_type")
+    links: Mapped[list["Link"]] = relationship(back_populates="link_type")

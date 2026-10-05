@@ -77,10 +77,7 @@ export function App() {
             <span className="text-content-muted">No Notes found.</span>
           </CommandEmpty>
 
-          <CommandGroup
-            heading="Notes"
-            className="**:[[cmdk-group-items]]:grid **:[[cmdk-group-items]]:grid-cols-1 md:**:[[cmdk-group-items]]:grid-cols-2 **:[[cmdk-group-items]]:gap-2"
-          >
+          <CommandGroup className="**:[[cmdk-group-items]]:grid **:[[cmdk-group-items]]:grid-cols-1 md:**:[[cmdk-group-items]]:grid-cols-2 **:[[cmdk-group-items]]:gap-2">
             {/* Use [&>svg]:hidden on CommandItem to hide Check Mark placeholder  */}
             {filteredNotes.map((note) => (
               <CommandItem key={note.id} className="p-0 w-full [&>svg]:hidden">

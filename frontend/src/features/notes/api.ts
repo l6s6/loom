@@ -1,6 +1,6 @@
 import { apiClient } from "@/api/apiClient.ts";
 import type {
-  NoteTag,
+  Tag,
   Note,
   UpdateNote,
   NoteType,
@@ -14,7 +14,7 @@ export const getNoteById = (noteId: number) =>
   apiClient<Note>(`/notes/${noteId}`);
 
 // GET Note Tags
-export const getNoteTags = () => apiClient<NoteTag[]>("/notes/tags");
+export const getTags = () => apiClient<Tag[]>("/notes/tags");
 
 // GET Note Types
 export const getNoteTypes = () => apiClient<NoteType[]>("/notes/types");

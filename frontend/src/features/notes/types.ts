@@ -4,16 +4,16 @@ export const NoteStatus = {
   Ongoing: "ongoing",
   Closed: "closed",
 } as const;
+export type NoteStatus = (typeof NoteStatus)[keyof typeof NoteStatus];
 
-export interface StatusConfig {
+export interface NoteStatusConfigProps {
   label: string;
   bgColor: string;
   hoverColor: string;
   dotColor: string;
   textColor: string;
 }
-export type NoteStatus = (typeof NoteStatus)[keyof typeof NoteStatus];
-export const NOTE_STATUS_CONFIG: Record<NoteStatus, StatusConfig> = {
+export const NOTE_STATUS_CONFIG: Record<NoteStatus, NoteStatusConfigProps> = {
   none: {
     label: "None",
     bgColor: "bg-zinc-100",
@@ -50,7 +50,7 @@ export interface Note {
   content: string;
   status: NoteStatus;
   note_type: NoteType;
-  tags: NoteTag[];
+  tags: Tag[];
   created_at: string;
   modified_at: string;
 }
@@ -64,7 +64,7 @@ export interface UpdateNote {
   tag_names?: string[];
 }
 
-export interface NoteTag {
+export interface Tag {
   name: string;
   id: number;
 }

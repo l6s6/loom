@@ -7,14 +7,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from core.database import Base
 
 if TYPE_CHECKING:
-    from domains.links.models  import NoteLink
+    from domains.links.models  import Link
 
 
 note_has_tags = Table(
     "note_has_tags",
     Base.metadata,
     Column("note_id", ForeignKey("notes.id"), primary_key=True),
-    Column("tag_id", ForeignKey("note_tags.id"), primary_key=True),
+    Column("tag_id", ForeignKey("tags.id"), primary_key=True),
 )
 
 
@@ -38,19 +38,19 @@ class Note(Base):
     note_type: Mapped["NoteType"] = relationship(back_populates="notes")
 
     # N:M relationship with NoteTag
-    tags: Mapped[list["NoteTag"]] = relationship(
+    tags: Mapped[list["Tag"]] = relationship(
         secondary=note_has_tags, back_populates="notes"
     )
 
     # N:M relationship with self, via the NoteLink association object
-    outgoing_links: Mapped[list["NoteLink"]] = relationship(
+    outgoing_links: Mapped[list["Link"]] = relationship(
         back_populates="source",
-        foreign_keys="NoteLink.source_id",
+        foreign_keys="Link.source_id",
         cascade="all, delete-orphan"
     )
-    incoming_links: Mapped[list["NoteLink"]] = relationship(
+    incoming_links: Mapped[list["Link"]] = relationship(
         back_populates="target",
-        foreign_keys="NoteLink.target_id",
+        foreign_keys="Link.target_id",
         cascade="all, delete-orphan"
     )
 
@@ -64,8 +64,8 @@ class NoteType(Base):
     notes: Mapped[list["Note"]] = relationship(back_populates="note_type")
 
 
-class NoteTag(Base):
-    __tablename__ = "note_tags"
+class Tag(Base):
+    __tablename__ = "tags"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)

@@ -9,7 +9,7 @@ class LinkTypeResponse(BaseModel):
     name: str
 
 
-class NoteLinkResponse(BaseModel):
+class LinkResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     origin: str
@@ -17,7 +17,7 @@ class NoteLinkResponse(BaseModel):
     source: NoteSummary
     target: NoteSummary
 
-class NoteLinkCreate(BaseModel):
+class LinkCreate(BaseModel):
     origin: str
     link_type_name: str
     source_id: int

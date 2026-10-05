@@ -6,11 +6,11 @@ import {
   deleteNote,
   getNoteById,
   getNotes,
-  getNoteTags,
+  getTags,
   getNoteTypes,
   updateNote,
 } from "@/features/notes/api.ts";
-import type { Note } from "@/features/notes/types.ts";
+import type { Note, NoteStatus } from "@/features/notes/types.ts";
 
 export function useGetNotes() {
   const { data, isLoading, error } = useQuery({
@@ -54,7 +54,7 @@ export function useGetNoteTypes() {
 export function useGetTags() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["note-tags"],
-    queryFn: getNoteTags,
+    queryFn: getTags,
   });
 
   return {
@@ -139,7 +139,7 @@ export function useNoteEditorLogic(note: Note) {
     return () => clearTimeout(timer);
   }, [title, content, note.id, note.title, note.content, updateNote]);
 
-  const handleStatusChange = (newStatus: string) => {
+  const handleStatusChange = (newStatus: NoteStatus) => {
     updateNote({ id: note.id, status: newStatus });
   };
 

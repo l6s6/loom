@@ -1,6 +1,6 @@
 import type { Note } from "@/features/notes/types.ts";
 
-export interface NoteLink {
+export interface Link {
   id: number;
   origin: string;
   source: Note;
@@ -8,7 +8,7 @@ export interface NoteLink {
   link_type: LinkType;
 }
 
-export interface CreateNoteLink {
+export interface CreateLink {
   origin: string;
   source_id: number;
   target_id: number;
