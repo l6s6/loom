@@ -1,7 +1,5 @@
-from datetime import datetime
-
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session, joinedload
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy.sql.operators import or_
 
 from app.db.database import get_db
@@ -33,13 +31,11 @@ def _get_or_create_tag(db: Session, tag_name: str) -> NoteTag:
 
 
 def _apply_tags(db: Session, note: Note, tag_names: list[str]) -> None:
-    note.tags = []
+    new_tags = []
     for tag_name in tag_names:
-        if tag_name == "":
-            continue
-        tag = _get_or_create_tag(db, tag_name)
-        if tag not in note.tags:
-            note.tags.append(tag)
+        if tag_name.strip():
+            new_tags.append(_get_or_create_tag(db, tag_name.strip()))
+    note.tags = new_tags
 
 
 @router.get("", response_model=list[NoteResponse])
@@ -70,7 +66,8 @@ def get_notes(
     if search is not None:
         filters.append(or_(Note.title.ilike(f"%{search}%"), Note.content.ilike(f"%{search}%")))
 
-    return db.query(Note).options(joinedload(Note.note_type)).filter(*filters).all()
+    # Using selectinload for tags instead of joinedLoad for better performance on N:M relationships
+    return db.query(Note).options(joinedload(Note.note_type), selectinload(Note.tags)).filter(*filters).all()
 
 
 @router.post("", response_model=NoteResponse)
@@ -111,14 +108,12 @@ def update_note(note_id: int, note_update: NoteUpdate, db: Session = Depends(get
     for key, value in update_data.items():
         setattr(note, key, value)
 
-    note.modified_at = datetime.now()
-
     db.commit()
     db.refresh(note)
     return note
 
 
-@router.delete("/{note_id}")
+@router.delete("/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_note(note_id: int, db: Session = Depends(get_db)):
     note =  _get_note_or_404(db, note_id)
 
