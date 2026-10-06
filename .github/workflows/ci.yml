@@ -28,6 +28,7 @@ jobs:
       - name: Run backend tests
         env:
           PYTHONPATH: .
+          DATABASE_URL: sqlite:///./test_ci.db
         run: pytest
 
   frontend-build:
