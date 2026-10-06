@@ -85,7 +85,7 @@ def get_tag_types(db: Session = Depends(get_db)):
     return db.query(Tag).all()
 
 
-@router.post("", response_model=NoteResponse)
+@router.post("", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)
 def create_note(db: Session = Depends(get_db)):
     note_type = _get_or_create_note_type(db, "None")
 

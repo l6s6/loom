@@ -60,7 +60,7 @@ def get_link_types(db: Session = Depends(get_db)):
     return db.query(LinkType).all()
 
 
-@router.post("", response_model=LinkResponse)
+@router.post("", response_model=LinkResponse, status_code=status.HTTP_201_CREATED)
 def create_link(link: LinkCreate, db: Session = Depends(get_db)):
     if link.link_type_name == "":
         raise HTTPException(status_code=400, detail="Note type must not be empty")
