@@ -17,9 +17,11 @@ def test_get_notes_returns_notes(client, db_session):
 
 
 def test_get_note_returns_note(client, db_session):
-    note = make_note(db_session)
+    note = make_note(db_session, title="Title1")
+    make_note(db_session, title="Title2")
     response = client.get(f"/notes/{note.id}")
     body = response.json()
+    print(body)
 
     assert response.status_code == 200
     assert body["title"] == note.title
@@ -29,7 +31,7 @@ def test_get_note_returns_note(client, db_session):
     assert body["is_pinned"] == note.is_pinned
     assert body["is_private"] == note.is_private
     assert body["tags"][0]["id"] == note.tags[0].id
-    assert body["note_type"]["id"] == note.note_type_id
+    assert body["note_type"]["id"] == note.note_type.id
 
 
 def test_create_note(client, db_session):
@@ -48,8 +50,8 @@ def test_create_note(client, db_session):
     note = db_session.get(Note, body["id"])
     note_type = db_session.get(NoteType, body["id"])
     assert note is not None
-    assert note.note_type_id == note_type.id
     assert note_type is not None
+    assert note.note_type_id == note_type.id
     assert note_type.name == "None"
 
 def test_update_title_only(client, db_session):
