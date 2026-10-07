@@ -32,4 +32,4 @@ class LinkCreate(BaseModel):
 
 
 class LinkUpdate(BaseModel):
-    link_type_name: Optional[str]
+    link_type_name: Optional[str] = None
