@@ -1,5 +1,10 @@
-from domains.links.models import Link
-from domains.notes.models import Note
+from domains.links.models import Link, LinkType
+from domains.notes.models import Note, NoteType, Tag
+
+
+def assert_type_or_tag_response(actual: dict, expected: NoteType | LinkType | Tag):
+    assert actual["id"] == expected.id
+    assert actual["name"] == expected.name
 
 
 def assert_link_response(actual: dict, expected: Link):
