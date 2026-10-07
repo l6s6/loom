@@ -1,5 +1,8 @@
+from time import sleep
+
 import pytest
 
+from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
 from tests.factories import make_note, make_note_type, make_tag
 from domains.notes.models import Note, NoteType, Tag
 from tests.helpers import assert_note_response, assert_type_or_tag_response
@@ -14,8 +17,8 @@ def test_get_notes_empty(client, db_session):
 
 
 def test_get_notes_returns_notes(client, db_session):
-    note1 = make_note(db_session, title="Title1")
-    note2 = make_note(db_session, title="Title2")
+    note1 = make_note(db_session)
+    note2 = make_note(db_session)
 
     response = client.get("/notes")
     body = response.json()
@@ -135,8 +138,8 @@ def test_get_note_types_empty(client, db_session):
 
 
 def test_get_note_types_returns_note_types(client, db_session):
-    note_type1 = make_note_type(db=db_session, name="NoteType1")
-    note_type2 = make_note_type(db=db_session, name="NoteType2")
+    note_type1 = make_note_type(db=db_session)
+    note_type2 = make_note_type(db=db_session)
 
     response = client.get("/notes/types")
     body = response.json()
@@ -161,8 +164,8 @@ def test_get_tags_empty(client, db_session):
 
 
 def test_get_tags_returns_tags(client, db_session):
-    tag1 = make_tag(db=db_session, name="Tag1")
-    tag2 = make_tag(db=db_session, name="Tag2")
+    tag1 = make_tag(db=db_session)
+    tag2 = make_tag(db=db_session)
 
     response = client.get("/notes/tags")
     body = response.json()
@@ -178,8 +181,8 @@ def test_get_tags_returns_tags(client, db_session):
 
 # --- GET /notes/{id} ---
 def test_get_note_returns_note(client, db_session):
-    note = make_note(db_session, title="Title1")
-    make_note(db_session, title="Title2")
+    note = make_note(db_session)
+    make_note(db_session)
 
     response = client.get(f"/notes/{note.id}")
     body = response.json()
@@ -219,6 +222,8 @@ def test_create_note(client, db_session):
 def test_update_note_title_only(client, db_session):
     note = make_note(db_session)
     new_title = "New Title"
+    original = note.modified_at
+    sleep(1)
 
     response = client.put(f"/notes/{note.id}", json={"title": new_title})
     body = response.json()
@@ -228,6 +233,7 @@ def test_update_note_title_only(client, db_session):
     db_session.refresh(note)
     assert note.title == new_title
     assert_note_response(body, note)
+    assert note.modified_at > original
 
 
 def test_update_note_no_changes(client, db_session):
@@ -251,6 +257,19 @@ def test_update_note_create_new_note_type(client, db_session):
     db_session.refresh(note)
     assert db_session.get(NoteType, note.note_type_id) is not None
     assert note.note_type.name == new_note_type_name
+    assert_note_response(body, note)
+
+
+def test_update_note_empty_note_type(client, db_session):
+    note = make_note(db_session)
+    response = client.put(f"/notes/{note.id}", json={"note_type_name": ""})
+    body = response.json()
+
+    assert response.status_code == 200
+
+    db_session.refresh(note)
+    assert db_session.get(NoteType, note.note_type_id) is not None
+    assert note.note_type.name == DEFAULT_NOTE_TYPE_NAME
     assert_note_response(body, note)
 
 

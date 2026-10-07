@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-from tests.factories import make_note, make_note_type, make_tag
+from tests.factories import make_note, make_note_type, make_tag, make_link_type, make_link
 
 from fastapi.testclient import TestClient
 
@@ -104,3 +104,28 @@ def seeded_notes(db_session):
         ),
     }
     return notes
+
+
+@pytest.fixture
+def seeded_links(db_session):
+    """
+    Links:
+      - l1: n1 -> n2 | type='relates to' | origin='manual'
+      - l2: n2 -> n3 | type='references' | origin='auto'
+      - l3: n1 -> n3 | type='relates to' | origin='auto'
+    """
+    n1 = make_note(db_session, title="Node 1")
+    n2 = make_note(db_session, title="Node 2")
+    n3 = make_note(db_session, title="Node 3")
+    n4 = make_note(db_session, title="Node 4 (Isolated)")
+
+    type_relates = make_link_type(db_session, name="relates to")
+    type_refs = make_link_type(db_session, name="references")
+
+    links = {
+        "l1": make_link(db_session, source=n1, target=n2, link_type=type_relates, origin="manual"),
+        "l2": make_link(db_session, source=n2, target=n3, link_type=type_refs, origin="auto"),
+        "l3": make_link(db_session, source=n1, target=n3, link_type=type_relates, origin="auto"),
+    }
+
+    return {"notes": {"n1": n1, "n2": n2, "n3": n3, "n4": n4}, "links": links}
