@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy.sql.operators import or_
 
 from core.database import get_db
+from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
 from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse
 from domains.notes.models import Note, NoteType, Tag
 
@@ -87,7 +88,7 @@ def get_tag_types(db: Session = Depends(get_db)):
 
 @router.post("", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)
 def create_note(db: Session = Depends(get_db)):
-    note_type = _get_or_create_note_type(db, "None")
+    note_type = _get_or_create_note_type(db, DEFAULT_NOTE_TYPE_NAME)
 
     new_note = Note(note_type=note_type)
 
@@ -111,7 +112,7 @@ def update_note(note_id: int, note_update: NoteUpdate, db: Session = Depends(get
     if "note_type_name" in update_data:
         note_type_name = update_data["note_type_name"]
         if note_type_name == "":
-            raise HTTPException(status_code=400, detail="Note type must not be empty")
+            note_type_name = DEFAULT_NOTE_TYPE_NAME
 
         note.note_type = _get_or_create_note_type(db, note_type_name)
         del update_data["note_type_name"]

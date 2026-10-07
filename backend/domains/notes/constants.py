@@ -1,0 +1,3 @@
+DEFAULT_NOTE_TITLE: str = "Untitled"
+DEFAULT_NOTE_TYPE_NAME: str = "None"
+DEFAULT_NOTE_STATUS: str = "none"

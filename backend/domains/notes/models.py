@@ -5,6 +5,7 @@ from sqlalchemy import func, ForeignKey, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.database import Base
+from domains.notes.constants import DEFAULT_NOTE_STATUS, DEFAULT_NOTE_TITLE
 
 if TYPE_CHECKING:
     from domains.links.models  import Link
@@ -22,9 +23,9 @@ class Note(Base):
     __tablename__ = "notes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(default="Untitled")
+    title: Mapped[str] = mapped_column(default=DEFAULT_NOTE_TITLE)
     content: Mapped[str] = mapped_column(default="")
-    status: Mapped[str] = mapped_column(default="none")
+    status: Mapped[str] = mapped_column(default=DEFAULT_NOTE_STATUS)
     is_archived: Mapped[bool] = mapped_column(default=False)
     is_pinned: Mapped[bool] = mapped_column(default=False)
     is_private: Mapped[bool] = mapped_column(default=False)

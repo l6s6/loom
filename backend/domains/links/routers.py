@@ -3,12 +3,12 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.operators import or_
 
 from core.database import get_db
+from domains.links.constants import DEFAULT_LINK_TYPE_NAME
 from domains.links.models import Link, LinkType
 from domains.notes.models import Note
 from domains.notes.routers import get_note_or_404
 
-from domains.links.schemas import LinkTypeResponse, LinkResponse, LinkCreate
-
+from domains.links.schemas import LinkTypeResponse, LinkResponse, LinkCreate, LinkUpdate
 
 router = APIRouter(prefix="/links", tags=["links"])
 
@@ -62,14 +62,15 @@ def get_link_types(db: Session = Depends(get_db)):
 
 @router.post("", response_model=LinkResponse, status_code=status.HTTP_201_CREATED)
 def create_link(link: LinkCreate, db: Session = Depends(get_db)):
-    if link.link_type_name == "":
-        raise HTTPException(status_code=400, detail="Note type must not be empty")
-
     # Validating foreign keys
     get_note_or_404(db, link.source_id)
     get_note_or_404(db, link.target_id)
 
-    link_type = _get_or_create_link_type(db, link.link_type_name)
+    link_type_name = link.link_type_name
+    if link_type_name == "":
+        link_type_name = DEFAULT_LINK_TYPE_NAME
+
+    link_type = _get_or_create_link_type(db, link_type_name)
 
     new_link = Link(
         origin=link.origin,
@@ -82,6 +83,26 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_link)
     return new_link
+
+
+@router.put("/{link_id}", response_model=LinkResponse)
+def update_note(link_id: int, link_update: LinkUpdate, db: Session = Depends(get_db)):
+    link =  _get_link_or_404(db, link_id)
+
+    update_data = link_update.model_dump(exclude_unset=True)
+
+    if "link_type_name" in update_data:
+        link_type_name = update_data["link_type_name"]
+        if link_type_name == "":
+            link_type_name = DEFAULT_LINK_TYPE_NAME
+
+        link.link_type = _get_or_create_link_type(db, link_type_name)
+        del update_data["link_type_name"]
+
+    db.commit()
+    db.refresh(link)
+    return link
+
 
 
 @router.delete("/{link_id}", status_code=status.HTTP_204_NO_CONTENT)

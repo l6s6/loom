@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.database import Base
+from domains.links.constants import DEFAULT_LINK_ORIGIN
 
 if TYPE_CHECKING:
     from domains.notes.models import Note
@@ -15,7 +16,7 @@ class Link(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     source_id: Mapped[int] = mapped_column(ForeignKey("notes.id", ondelete="CASCADE"), index=True)
     target_id: Mapped[int] = mapped_column(ForeignKey("notes.id", ondelete="CASCADE"), index=True)
-    origin: Mapped[str] = mapped_column(default="manual")  # "manual" / "tag" / "ai"
+    origin: Mapped[str] = mapped_column(default=DEFAULT_LINK_ORIGIN)
 
     __table_args__ = (
         UniqueConstraint("source_id", "target_id", "origin", "link_type_id", name="uq_note_link"),
