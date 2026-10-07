@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 from enum import Enum
 
@@ -30,4 +32,4 @@ class LinkCreate(BaseModel):
 
 
 class LinkUpdate(BaseModel):
-    link_type_name: str
+    link_type_name: Optional[str]
