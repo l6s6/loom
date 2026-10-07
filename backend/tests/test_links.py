@@ -44,8 +44,8 @@ def test_get_links_returns_links(client, db_session):
 
         # --- origin ---
         (lambda n: "?origin=manual", ["l1"]),
-        (lambda n: "?origin=auto", ["l2", "l3"]),
-        (lambda n: "?origin=unknown", []),
+        (lambda n: "?origin=ai", ["l2", "l3"]),
+        (lambda n: "?origin=tag", []),
 
         # --- link_type ---
         (lambda n: "?type=relates to", ["l1", "l3"]),
@@ -56,7 +56,7 @@ def test_get_links_returns_links(client, db_session):
         (lambda n: f"?note_id={n['n1'].id}&origin=manual", ["l1"]),
         (lambda n: f"?source_id={n['n1'].id}&type=relates to", ["l1", "l3"]),
         (lambda n: f"?target_id={n['n3'].id}&type=references", ["l2"]),
-        (lambda n: f"?source_id={n['n1'].id}&origin=non_matching", []),
+        (lambda n: f"?source_id={n['n1'].id}&origin=tag", []),
     ],
     ids=[
         "all_links",

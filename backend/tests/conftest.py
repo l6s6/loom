@@ -124,8 +124,8 @@ def seeded_links(db_session):
 
     links = {
         "l1": make_link(db_session, source=n1, target=n2, link_type=type_relates, origin="manual"),
-        "l2": make_link(db_session, source=n2, target=n3, link_type=type_refs, origin="auto"),
-        "l3": make_link(db_session, source=n1, target=n3, link_type=type_relates, origin="auto"),
+        "l2": make_link(db_session, source=n2, target=n3, link_type=type_refs, origin="ai"),
+        "l3": make_link(db_session, source=n1, target=n3, link_type=type_relates, origin="ai"),
     }
 
     return {"notes": {"n1": n1, "n2": n2, "n3": n3, "n4": n4}, "links": links}
