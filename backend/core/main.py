@@ -9,6 +9,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",
+    "https://loom-nu-three.vercel.app",
 ]
 
 app.add_middleware(

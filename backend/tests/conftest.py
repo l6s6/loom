@@ -1,24 +1,24 @@
 import pytest
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 from tests.factories import make_note, make_note_type, make_tag, make_link_type, make_link
 
 from fastapi.testclient import TestClient
 
 from core.main import app
 from core.database import Base, get_db
+from core.config import settings
 
 # Important: All models must be imported so that Base.metadata can recognize them
+from domains import *
 
+TEST_DB_URL = settings.test_database_url or os.getenv("TEST_DATABASE_URL")
+if not TEST_DB_URL:
+    raise ValueError("Failed to load TEST_DATABASE_URL!")
 
-SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"
+engine = create_engine(TEST_DB_URL)
 
-engine = create_engine(
-    SQLALCHEMY_TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
