@@ -48,7 +48,7 @@ const EditorTopBar = ({ noteId }: { noteId: number }) => {
               <AlertDialogMedia className="bg-destructive/10 dark:text-destructive">
                 <Trash />
               </AlertDialogMedia>
-              <AlertDialogTitle>Delete chat?</AlertDialogTitle>
+              <AlertDialogTitle>Delete note?</AlertDialogTitle>
               <AlertDialogDescription>
                 This will permanently delete this note.
               </AlertDialogDescription>

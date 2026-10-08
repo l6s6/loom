@@ -1,3 +1,5 @@
+import type { Note } from "@/features/notes/types.ts";
+
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export async function apiClient<T>(
@@ -22,3 +24,8 @@ export async function apiClient<T>(
 
   return (await response.json()) as T;
 }
+
+export const resetDemoData = () =>
+  apiClient<Note[]>("/reset-demo", {
+    method: "POST",
+  });

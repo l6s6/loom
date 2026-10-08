@@ -4,6 +4,14 @@ Personal note-taking and knowledge-management app. Capture short notes (thoughts
 
 This is also a learning project: a full-stack app built to practice backend architecture, frontend development, and database design, without using AI to write the code. See [`docs/learnings.md`](docs/learnings.md) for what came out of that.
 
+## Live Demo
+
+You can try out a live version of the application here:  
+👉 **[Link to Live Demo](https://loom-loom19.vercel.app/)**
+
+*Note: The backend is hosted on a free Render instance, which spins down after a period of inactivity. If you are the first visitor in a while, it may take **up to 60 seconds** for the initial page load while the server wakes up.*
+
+
 ## Status
 
 In development. Implemented so far:
