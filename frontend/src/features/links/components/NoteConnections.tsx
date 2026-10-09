@@ -240,44 +240,46 @@ const NoteLinks = ({ links, icon, type }: NoteLinksProps) => {
         <Icon className="text-content-muted" size={12} />
         <span className="text-sm text-content-muted">{label}</span>
       </div>
-      {links.map((link) => {
-        const otherNote = isIncoming ? link.source : link.target;
-        return (
-          <div
-            key={link.id}
-            className="flex flex-row items-center justify-between border border-border-subtle rounded-md px-2 py-1 bg w-full group bg-bg-editor hover:shadow-sm"
-          >
-            <Link
+      <div className="flex flex-col gap-2">
+        {links.map((link) => {
+          const otherNote = isIncoming ? link.source : link.target;
+          return (
+            <div
               key={link.id}
-              to={`/n/${otherNote.id}`}
-              className="w-full flex flex-col"
+              className="flex flex-row items-center justify-between border border-border-subtle rounded-md px-2 py-1 bg w-full group bg-bg-editor hover:shadow-sm"
             >
-              <div className="flex flex-row items-center justify-between">
-                <h1 className="font-bold text-base/6">
-                  {getStringPreview(25, otherNote.title, "Untitled")}
-                </h1>
+              <Link
+                key={link.id}
+                to={`/n/${otherNote.id}`}
+                className="w-full flex flex-col"
+              >
+                <div className="flex flex-row items-center justify-between">
+                  <h1 className="font-bold text-base/6">
+                    {getStringPreview(25, otherNote.title, "Untitled")}
+                  </h1>
 
-                <div className="px-2 py-0.5 rounded-sm flex bg-primary-bg">
-                  <span className="text-xs text-primary">
-                    {link.link_type.name}
-                  </span>
+                  <div className="px-2 py-0.5 rounded-sm flex bg-primary-bg">
+                    <span className="text-xs text-primary">
+                      {link.link_type.name}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <span className="text-content-muted text-sm">
-                {getStringPreview(35, otherNote.content, "No content yet...")}
-              </span>
-            </Link>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="[&_svg:not([class*='size-'])]:size-3.5 opacity-0 group-hover:opacity-100 hover:text-destructive"
-              onClick={() => handleDeleteLink(link.id)}
-            >
-              <Unlink size={10} />
-            </Button>
-          </div>
-        );
-      })}
+                <span className="text-content-muted text-sm">
+                  {getStringPreview(35, otherNote.content, "No content yet...")}
+                </span>
+              </Link>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="[&_svg:not([class*='size-'])]:size-3.5 opacity-0 group-hover:opacity-100 hover:text-destructive"
+                onClick={() => handleDeleteLink(link.id)}
+              >
+                <Unlink size={10} />
+              </Button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
