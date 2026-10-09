@@ -1,13 +1,15 @@
 import NoteConnections from "@/features/links/components/NoteConnections.tsx";
-import { useMemo } from "react";
+import { type Dispatch, type SetStateAction, useMemo } from "react";
 import {
   useGetNoteTypes,
   useGetTags,
   useNoteEditorLogic,
 } from "@/features/notes/hooks.ts";
 import type { Note } from "@/features/notes/types.ts";
-import { AlignLeft } from "lucide-react";
 import NoteMetaBar from "@/features/notes/components/NoteMetaBar.tsx";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { Markdown } from "tiptap-markdown";
 
 const NoteEditorCore = ({ initialNote }: { initialNote: Note }) => {
   const editor = useNoteEditorLogic(initialNote);
@@ -41,24 +43,41 @@ const NoteEditorCore = ({ initialNote }: { initialNote: Note }) => {
           onRemoveTag={editor.handleRemoveTag}
         />
         {/* Note Content Editor */}
-        <div className="relative group mt-8">
-          <div className="absolute -left-8 top-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-            <AlignLeft
-              size={20}
-              className="text-slate-300 hover:text-slate-500"
-            />
-          </div>
-          <textarea
-            value={editor.content}
-            onChange={(e) => editor.setContent(e.target.value)}
-            placeholder="Start writing..."
-            className="w-full bg-transparent border-none outline-none focus:ring-0 placeholder-slate-300 p-0 text-lg min-h-100 resize-none leading-relaxed"
-          />
-        </div>
+        <ContentEditor content={editor.content} onChange={editor.setContent} />
+        <NoteConnections noteId={initialNote.id} />
       </div>
-      <NoteConnections noteId={initialNote.id} />
     </div>
   );
 };
 
 export default NoteEditorCore;
+
+interface ContentEditorProps {
+  content: string;
+  onChange: Dispatch<SetStateAction<string>>;
+}
+
+export function ContentEditor({ content, onChange }: ContentEditorProps) {
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Markdown.configure({
+        html: false,
+        transformPastedText: true,
+      }),
+    ],
+    content,
+    editorProps: {
+      attributes: {
+        class:
+          "w-full outline-none text-lg min-h-[400px] leading-relaxed focus:outline-none prose prose-slate max-w-none",
+      },
+    },
+    onUpdate: ({ editor }) => {
+      const md = (editor.storage as any).markdown.getMarkdown();
+      onChange(md);
+    },
+  });
+
+  return <EditorContent editor={editor} />;
+}
