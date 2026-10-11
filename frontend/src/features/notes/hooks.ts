@@ -12,10 +12,10 @@ import {
 } from "@/features/notes/api.ts";
 import type { Note, NoteStatus } from "@/features/notes/types.ts";
 
-export function useGetNotes() {
+export function useGetNotes(queryString?: string) {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["notes"],
-    queryFn: getNotes,
+    queryKey: ["notes", queryString],
+    queryFn: () => getNotes(queryString),
   });
 
   return {

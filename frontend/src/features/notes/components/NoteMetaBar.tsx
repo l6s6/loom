@@ -75,7 +75,7 @@ interface StatusSelectorProps {
   onChange: (newStatus: NoteStatus) => void;
 }
 
-const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {
+export const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {
   const [isStatusOpen, setIsStatusOpen] = useState(false);
 
   const handleStatusChange = (newStatus: NoteStatus) => {
@@ -139,7 +139,7 @@ interface TagSelectorProps {
   onRemove: (tagToRemove: string) => void;
 }
 
-const TagSelector = ({
+export const TagSelector = ({
   tags,
   availableTags,
   onAdd,
@@ -235,7 +235,11 @@ interface TypeSelectorProps {
   onChange: (newType: string) => void;
 }
 
-const NoteTypeSelector = ({ typeName, types, onChange }: TypeSelectorProps) => {
+export const NoteTypeSelector = ({
+  typeName,
+  types,
+  onChange,
+}: TypeSelectorProps) => {
   const [typeSearch, setTypeSearch] = useState("");
   const [isTypeOpen, setIsTypeOpen] = useState(false);
 
