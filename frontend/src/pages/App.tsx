@@ -19,16 +19,11 @@ import {
   CommandList,
 } from "@/components/ui/command.tsx";
 import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group.tsx";
-import { Search } from "lucide-react";
-import {
   useCreateAndNavigateNote,
   useDeleteNote,
   useGetNotes,
 } from "@/features/notes/hooks.ts";
+import NoteSearchBar from "@/features/notes/components/NoteSearchBar.tsx";
 
 export function App() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,10 +50,7 @@ export function App() {
   const { createAndNavigate } = useCreateAndNavigateNote();
   const { deleteNote } = useDeleteNote();
 
-  const handleFilterChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
+  const handleFilterChange = (name: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
 
     if (value) {
@@ -79,18 +71,10 @@ export function App() {
         Your Notes
       </h1>
       <Command>
-        <InputGroup className="w-full">
-          <InputGroupInput
-            value={feedFilters.search}
-            name="search"
-            onChange={handleFilterChange}
-            placeholder="Search Notes to add Connections"
-            autoComplete="off"
-          />
-          <InputGroupAddon>
-            <Search />
-          </InputGroupAddon>
-        </InputGroup>
+        <NoteSearchBar
+          feedFilters={feedFilters}
+          handleFilterChange={handleFilterChange}
+        />
         <CommandList className="max-h-full mt-4">
           <CommandEmpty>
             <span className="text-content-muted">No Notes found.</span>

@@ -6,7 +6,7 @@ import {
   useNoteEditorLogic,
 } from "@/features/notes/hooks.ts";
 import type { Note } from "@/features/notes/types.ts";
-import NoteMetaBar from "@/features/notes/components/NoteMetaBar.tsx";
+import NoteMetaBar from "@/features/notes/components/editor/NoteMetaBar.tsx";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "tiptap-markdown";
