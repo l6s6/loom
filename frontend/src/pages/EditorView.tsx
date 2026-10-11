@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
-import NoteEditorCore from "@/features/notes/components/NoteEditorCore.tsx";
-import EditorTopBar from "@/features/notes/components/EditorTopBar.tsx";
+import NoteEditorCore from "@/features/notes/components/editor/NoteEditorCore.tsx";
+import EditorTopBar from "@/features/notes/components/editor/EditorTopBar.tsx";
 import { useGetNoteById } from "@/features/notes/hooks.ts";
 
 export default function EditorView() {

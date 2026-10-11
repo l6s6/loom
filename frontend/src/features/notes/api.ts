@@ -7,7 +7,10 @@ import type {
 } from "@/features/notes/types.ts";
 
 // GET Notes
-export const getNotes = () => apiClient<Note[]>("/notes");
+export const getNotes = (queryString?: string) => {
+  const url = queryString ? `/notes?${queryString}` : "/notes";
+  return apiClient<Note[]>(url);
+};
 
 // GET Note by ID
 export const getNoteById = (noteId: number) =>

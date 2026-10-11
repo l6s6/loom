@@ -1,6 +1,5 @@
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
 import NoteGridItem from "@/features/notes/components/NoteGridItem.tsx";
-import { useState } from "react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -11,7 +10,7 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu.tsx";
-import { useMatch } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
   Command,
   CommandEmpty,
@@ -20,38 +19,51 @@ import {
   CommandList,
 } from "@/components/ui/command.tsx";
 import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group.tsx";
-import { Search } from "lucide-react";
-import {
   useCreateAndNavigateNote,
   useDeleteNote,
   useGetNotes,
 } from "@/features/notes/hooks.ts";
+import NoteSearchBar from "@/features/notes/components/NoteSearchBar.tsx";
 
 export function App() {
-  const { notes } = useGetNotes();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const feedFilters = {
+    search: searchParams.get("search") || "",
+    type: searchParams.get("type") || "",
+    status: searchParams.get("status") || "",
+    tag: searchParams.get("tag") || "",
+  };
+
+  const buildQueryString = () => {
+    const paramsForBackend = new URLSearchParams();
+    Object.entries(feedFilters).forEach(([key, value]) => {
+      if (value) {
+        paramsForBackend.append(key, value);
+      }
+    });
+    return paramsForBackend.toString();
+  };
+
+  const queryString = buildQueryString();
+
+  const { notes } = useGetNotes(queryString);
   const { createAndNavigate } = useCreateAndNavigateNote();
   const { deleteNote } = useDeleteNote();
 
-  const match = useMatch("/n/:noteId");
-  const urlNoteId = match?.params.noteId;
+  const handleFilterChange = (name: string, value: string) => {
+    const newParams = new URLSearchParams(searchParams);
 
-  const [searchQuery, setSearchQuery] = useState("");
+    if (value) {
+      newParams.set(name, value);
+    } else {
+      newParams.delete(name);
+    }
+    setSearchParams(newParams);
+  };
 
-  const filteredNotes = [...notes]
+  const sortedNotes = [...notes]
     .sort((a, b) => a.modified_at.localeCompare(b.modified_at))
-    .reverse()
-    .filter(
-      (note) =>
-        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.tags.some((tag) =>
-          `#${tag.name.toLowerCase()}`.includes(searchQuery.toLowerCase()),
-        ),
-    );
+    .reverse();
 
   return (
     <CenterContainer>
@@ -59,19 +71,10 @@ export function App() {
         Your Notes
       </h1>
       <Command>
-        <InputGroup className="w-full">
-          <InputGroupInput
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-          />
-          <InputGroupAddon>
-            <Search />
-          </InputGroupAddon>
-          <InputGroupAddon align="inline-end">
-            {filteredNotes.length} results
-          </InputGroupAddon>
-        </InputGroup>
+        <NoteSearchBar
+          feedFilters={feedFilters}
+          handleFilterChange={handleFilterChange}
+        />
         <CommandList className="max-h-full mt-4">
           <CommandEmpty>
             <span className="text-content-muted">No Notes found.</span>
@@ -79,7 +82,7 @@ export function App() {
 
           <CommandGroup className="**:[[cmdk-group-items]]:grid **:[[cmdk-group-items]]:grid-cols-1 md:**:[[cmdk-group-items]]:grid-cols-2 **:[[cmdk-group-items]]:gap-2">
             {/* Use [&>svg]:hidden on CommandItem to hide Check Mark placeholder  */}
-            {filteredNotes.map((note) => (
+            {sortedNotes.map((note) => (
               <CommandItem key={note.id} className="p-0 w-full [&>svg]:hidden">
                 <ContextMenu key={note.id}>
                   <ContextMenuTrigger className="w-full h-full">
@@ -113,7 +116,7 @@ export function App() {
                       <ContextMenuItem
                         variant="destructive"
                         onClick={() => {
-                          deleteNote(note.id, urlNoteId);
+                          deleteNote(note.id);
                         }}
                       >
                         Delete
