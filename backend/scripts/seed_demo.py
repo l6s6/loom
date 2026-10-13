@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.database import SessionLocal
-from domains.notes.models import Note, NoteType
+from domains.notes.models import Note, NoteType, note_has_tags, Tag
 from domains.links.models import Link, LinkType
 from textwrap import dedent
 
@@ -13,8 +13,10 @@ def seed_demo_data():
     db = SessionLocal()
     try:
         # Empty data
+        db.query(note_has_tags).delete()
         db.query(Link).delete()
         db.query(Note).delete()
+        db.query(Tag).delete()
         db.query(LinkType).delete()
         db.query(NoteType).delete()
         db.commit()
@@ -25,7 +27,10 @@ def seed_demo_data():
         db.add_all([type_concept, type_resource])
         db.flush()
 
-        link_relates = LinkType(name="relates_to")
+        tag_postgre = Tag(name="PostgreSQL")
+        tag_architecture = Tag(name="Architecture")
+
+        link_relates = LinkType(name="Relates To")
         db.add(link_relates)
         db.flush()
 
@@ -70,19 +75,21 @@ def seed_demo_data():
         note_1 = Note(
             title="Loom Architecture Overview",
             content=md_loom_arch,
-            note_type_id=type_concept.id,
+            note_type=type_concept,
+            tags=[tag_architecture],
             status="ongoing"
         )
         note_2 = Note(
             title="PostgreSQL Full-Text Search",
             content=md_postgres_search,
-            note_type_id=type_resource.id,
+            note_type=type_resource,
+            tags=[tag_postgre],
             status="open"
         )
         note_3 = Note(
             title="Bi-directional Graph Linking",
             content=md_graph_links,
-            note_type_id=type_concept.id,
+            note_type=type_concept,
             status="closed"
         )
         db.add_all([note_1, note_2, note_3])
