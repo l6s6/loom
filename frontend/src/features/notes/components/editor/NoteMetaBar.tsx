@@ -162,7 +162,7 @@ export const TagSelector = ({
         .map((tag) => (
           <span
             key={tag.id}
-            className="px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-1 group"
+            className="px-2 py-1 rounded-md border border-slate-200 bg-slate-50 text-sm font-medium text-slate-700 flex items-center gap-1 group"
           >
             <Hash
               size={12}

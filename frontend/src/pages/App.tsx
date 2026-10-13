@@ -1,15 +1,6 @@
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
 import NoteGridItem from "@/features/notes/components/NoteGridItem.tsx";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuGroup,
-  ContextMenuItem,
-  ContextMenuLabel,
-  ContextMenuSeparator,
-  ContextMenuShortcut,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu.tsx";
+
 import { useSearchParams } from "react-router-dom";
 import {
   Command,
@@ -83,48 +74,15 @@ export function App() {
           <CommandGroup className="**:[[cmdk-group-items]]:grid **:[[cmdk-group-items]]:grid-cols-1 md:**:[[cmdk-group-items]]:grid-cols-2 **:[[cmdk-group-items]]:gap-2">
             {/* Use [&>svg]:hidden on CommandItem to hide Check Mark placeholder  */}
             {sortedNotes.map((note) => (
-              <CommandItem key={note.id} className="p-0 w-full [&>svg]:hidden">
-                <ContextMenu key={note.id}>
-                  <ContextMenuTrigger className="w-full h-full">
-                    <NoteGridItem note={note} key={note.id} />
-                  </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuGroup>
-                      <ContextMenuLabel>File</ContextMenuLabel>
-                      <ContextMenuItem onClick={() => createAndNavigate()}>
-                        New File
-                        <ContextMenuShortcut>Ctrl + N</ContextMenuShortcut>
-                      </ContextMenuItem>
-                    </ContextMenuGroup>
-                    <ContextMenuSeparator />
-                    <ContextMenuGroup>
-                      <ContextMenuItem>
-                        Cut
-                        <ContextMenuShortcut>Ctrl + X</ContextMenuShortcut>
-                      </ContextMenuItem>
-                      <ContextMenuItem>
-                        Copy
-                        <ContextMenuShortcut>Ctrl + C</ContextMenuShortcut>
-                      </ContextMenuItem>
-                      <ContextMenuItem>
-                        Paste
-                        <ContextMenuShortcut>Ctrl + V</ContextMenuShortcut>
-                      </ContextMenuItem>
-                    </ContextMenuGroup>
-                    <ContextMenuSeparator />
-                    <ContextMenuGroup>
-                      <ContextMenuItem
-                        variant="destructive"
-                        onClick={() => {
-                          deleteNote(note.id);
-                        }}
-                      >
-                        Delete
-                        <ContextMenuShortcut>⌫</ContextMenuShortcut>
-                      </ContextMenuItem>
-                    </ContextMenuGroup>
-                  </ContextMenuContent>
-                </ContextMenu>
+              <CommandItem
+                key={note.id}
+                className="p-0 w-full [&>svg]:hidden data-selected:bg-transparent"
+              >
+                <NoteGridItem
+                  note={note}
+                  onCreate={createAndNavigate}
+                  onDelete={deleteNote}
+                />
               </CommandItem>
             ))}
           </CommandGroup>
