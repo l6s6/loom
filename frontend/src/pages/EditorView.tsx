@@ -3,6 +3,7 @@ import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
 import NoteEditorCore from "@/features/notes/components/editor/NoteEditorCore.tsx";
 import EditorTopBar from "@/features/notes/components/editor/EditorTopBar.tsx";
 import { useGetNoteById } from "@/features/notes/hooks.ts";
+import { HashLoader } from "react-spinners";
 
 export default function EditorView() {
   const { noteId } = useParams();
@@ -10,9 +11,24 @@ export default function EditorView() {
 
   const { note, isLoading, error } = useGetNoteById(id);
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
-  if (!note) return <p>Note not found.</p>;
+  if (isLoading)
+    return (
+      <div className="w-full h-full flex justify-center items-center flex-col">
+        <HashLoader />
+      </div>
+    );
+  if (error)
+    return (
+      <div className="w-full h-full flex justify-center items-center">
+        <p className="text-xl font-bold text-content-muted">{error}</p>
+      </div>
+    );
+  if (!note)
+    return (
+      <div className="w-full h-full flex justify-center items-center">
+        <p className="text-xl font-bold text-content-muted">Note not found.</p>
+      </div>
+    );
 
   return (
     <CenterContainer
