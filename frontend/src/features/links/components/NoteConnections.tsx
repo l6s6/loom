@@ -44,6 +44,7 @@ import {
 import { Button } from "@/components/ui/button.tsx";
 import { Link } from "react-router-dom";
 import { getStringPreview } from "@/lib/utils.ts";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 
 const NoteConnections = ({ noteId }: { noteId: number }) => {
   const { notes } = useGetNotes();
@@ -244,39 +245,38 @@ const NoteLinks = ({ links, icon, type }: NoteLinksProps) => {
         {links.map((link) => {
           const otherNote = isIncoming ? link.source : link.target;
           return (
-            <div
-              key={link.id}
-              className="flex flex-row items-center justify-between border border-border-subtle rounded-md px-2 py-1 bg w-full group bg-bg-editor hover:shadow-sm"
-            >
-              <Link
-                key={link.id}
-                to={`/n/${otherNote.id}`}
-                className="w-full flex flex-col"
-              >
-                <div className="flex flex-row items-center justify-between">
-                  <h1 className="font-bold text-base/6">
-                    {getStringPreview(25, otherNote.title, "Untitled")}
-                  </h1>
-
-                  <div className="px-2 py-0.5 rounded-sm flex bg-primary-bg">
-                    <span className="text-xs text-primary">
-                      {link.link_type.name}
-                    </span>
+            <Card size="sm" className="group">
+              <CardHeader>
+                <CardTitle>
+                  <div className="flex flex-row items-center">
+                    <Link
+                      key={link.id}
+                      to={`/n/${otherNote.id}`}
+                      className="w-full flex flex-row justify-between pr-2"
+                    >
+                      <span>
+                        {getStringPreview(30, otherNote.title, "Untitled")}
+                      </span>
+                      <div className="px-2 py-0.5 w-fit h-fit rounded-sm flex bg-primary-bg">
+                        <span className="text-xs text-primary">
+                          {link.link_type.name}
+                        </span>
+                      </div>
+                    </Link>
+                    <div className="flex flex-row items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="[&_svg:not([class*='size-'])]:size-3.5 opacity-0 group-hover:opacity-100 hover:text-destructive"
+                        onClick={() => handleDeleteLink(link.id)}
+                      >
+                        <Unlink size={10} />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <span className="text-content-muted text-sm">
-                  {getStringPreview(35, otherNote.content, "No content yet...")}
-                </span>
-              </Link>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="[&_svg:not([class*='size-'])]:size-3.5 opacity-0 group-hover:opacity-100 hover:text-destructive"
-                onClick={() => handleDeleteLink(link.id)}
-              >
-                <Unlink size={10} />
-              </Button>
-            </div>
+                </CardTitle>
+              </CardHeader>
+            </Card>
           );
         })}
       </div>
