@@ -93,8 +93,11 @@ def get_tags(db: Session = Depends(get_db)):
     return db.query(Tag).all()
 
 
-@router.post("/tags", response_model=list[TagResponse])
+@router.post("/tags", response_model=TagResponse)
 def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
+    if db.query(Tag).filter(Tag.name == tag.name).first():
+        raise HTTPException(status_code=409, detail=f"Tag with name {tag.name} already exists")
+
     new_tag = Tag(name=tag.name)
     db.add(new_tag)
 

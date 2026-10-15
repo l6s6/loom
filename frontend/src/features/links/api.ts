@@ -1,5 +1,5 @@
 import { apiClient } from "@/api/apiClient.ts";
-import type { CreateLink, LinkType, Link } from "@/features/links/types.ts";
+import type { LinkCreate, LinkType, Link } from "@/features/links/types.ts";
 
 // GET Links
 export const getLinks = () => apiClient<Link[]>("/links");
@@ -12,7 +12,7 @@ export const getLinksByNoteId = (noteId: number) =>
 export const getLinkTypes = () => apiClient<LinkType[]>("/links/types");
 
 // POST Create Note
-export const createLink = (link: CreateLink) =>
+export const createLink = (link: LinkCreate) =>
   apiClient<Link>(`/links`, {
     method: "POST",
     body: JSON.stringify(link),

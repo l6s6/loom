@@ -8,7 +8,7 @@ export interface Link {
   link_type: LinkType;
 }
 
-export interface CreateLink {
+export interface LinkCreate {
   origin: string;
   source_id: number;
   target_id: number;

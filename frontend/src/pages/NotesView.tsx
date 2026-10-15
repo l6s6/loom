@@ -16,7 +16,7 @@ import {
 } from "@/features/notes/hooks.ts";
 import NoteSearchBar from "@/features/notes/components/NoteSearchBar.tsx";
 
-export function App() {
+export function NotesView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const feedFilters = {
     search: searchParams.get("search") || "",
