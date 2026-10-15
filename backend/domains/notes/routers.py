@@ -4,7 +4,7 @@ from sqlalchemy.sql.operators import or_
 
 from core.database import get_db
 from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
-from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse
+from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse, TagCreate
 from domains.notes.models import Note, NoteType, Tag
 
 
@@ -16,6 +16,13 @@ def get_note_or_404(db: Session, note_id: int) -> Note:
     if note is None:
         raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
     return note
+
+
+def get_tag_or_404(db: Session, tag_id: int) -> Note:
+    tag = db.query(Tag).filter(Tag.id == tag_id).first()
+    if tag is None:
+        raise HTTPException(status_code=404, detail=f"Tag with id {tag_id} not found")
+    return tag
 
 
 def _get_or_create_note_type(db: Session, note_type_name: str) -> NoteType:
@@ -82,8 +89,27 @@ def get_note_types(db: Session = Depends(get_db)):
 
 
 @router.get("/tags", response_model=list[TagResponse])
-def get_tag_types(db: Session = Depends(get_db)):
+def get_tags(db: Session = Depends(get_db)):
     return db.query(Tag).all()
+
+
+@router.post("/tags", response_model=list[TagResponse])
+def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
+    new_tag = Tag(name=tag.name)
+    db.add(new_tag)
+
+    db.commit()
+    db.refresh(new_tag)
+    return new_tag
+
+
+@router.delete("/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_note(tag_id: int, db: Session = Depends(get_db)):
+    tag = get_tag_or_404(db, tag_id)
+
+    db.delete(tag)
+    db.commit()
+    return {"message": "Tag deleted"}
 
 
 @router.post("", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)

@@ -3,11 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
   createNote,
+  createTag,
   deleteNote,
+  deleteTag,
   getNoteById,
   getNotes,
-  getTags,
   getNoteTypes,
+  getTags,
   updateNote,
 } from "@/features/notes/api.ts";
 import type { Note, NoteStatus } from "@/features/notes/types.ts";
@@ -64,6 +66,21 @@ export function useGetTags() {
   };
 }
 
+export function useDeleteTag() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: deleteTag,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tags"] }),
+  });
+
+  return {
+    deleteTag: mutateAsync,
+    isLoading: isPending,
+    error: error ? error.message : null,
+  };
+}
+
 export function useCreateAndNavigateNote() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -78,6 +95,21 @@ export function useCreateAndNavigateNote() {
 
   return {
     createAndNavigate: mutateAsync,
+    isLoading: isPending,
+    error: error ? error.message : null,
+  };
+}
+
+export function useCreateTag() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: createTag,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tags"] }),
+  });
+
+  return {
+    create: mutateAsync,
     isLoading: isPending,
     error: error ? error.message : null,
   };
@@ -126,7 +158,7 @@ export function useDeleteNote() {
 
   return {
     deleteNote: remove,
-    loading: isPending,
+    isLoading: isPending,
     error: error ? error.message : null,
   };
 }

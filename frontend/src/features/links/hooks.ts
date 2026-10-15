@@ -46,7 +46,7 @@ export function useCreateLink() {
 
   return {
     createLink: mutateAsync,
-    loading: isPending,
+    isLoading: isPending,
     error: error ? error.message : null,
   };
 }
@@ -56,15 +56,12 @@ export function useDeleteLink() {
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: deleteLink,
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["links"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["links"] }),
   });
 
   return {
     deleteLink: mutateAsync,
-    loading: isPending,
+    isLoading: isPending,
     error: error ? error.message : null,
   };
 }

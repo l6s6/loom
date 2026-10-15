@@ -11,6 +11,10 @@ class TagResponse(BaseModel):
     name: str
 
 
+class TagCreate(BaseModel):
+    name: str
+
+
 class NoteTypeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
