@@ -64,32 +64,29 @@ export interface NoteUpdate {
   tag_names?: string[];
 }
 
-export interface Tag {
-  name: string;
+export interface BaseEntity {
   id: number;
+  name: string;
   note_count: number;
 }
 
-export interface TagCreate {
+export interface BaseEntityCreate {
   name: string;
 }
 
-export interface TagUpdate {
+export interface BaseEntityUpdate {
   id: number;
   name?: string;
 }
 
-export interface NoteType {
-  name: string;
-  id: number;
-  note_count: number;
-}
+export interface Tag extends BaseEntity {}
 
-export interface NoteTypeCreate {
-  name: string;
-}
+export interface TagCreate extends BaseEntityCreate {}
 
-export interface NoteTypeUpdate {
-  id: number;
-  name?: string;
-}
+export interface TagUpdate extends BaseEntityUpdate {}
+
+export interface NoteType extends BaseEntity {}
+
+export interface NoteTypeCreate extends BaseEntityCreate {}
+
+export interface NoteTypeUpdate extends BaseEntityUpdate {}
