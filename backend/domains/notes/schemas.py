@@ -28,6 +28,18 @@ class NoteTypeResponse(BaseModel):
     name: str
 
 
+class NoteTypeWithCount(NoteTypeResponse):
+    note_count: int
+
+
+class NoteTypeCreate(BaseModel):
+    name: str
+
+
+class NoteTypeUpdate(BaseModel):
+    name: Optional[str] = None
+
+
 class NoteStatus(str, Enum):
     none = "none"
     open = "open"

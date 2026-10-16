@@ -39,7 +39,9 @@ const TagsView = () => {
   const { updateTag } = useUpdateTag();
   const { deleteTag } = useDeleteTag();
 
-  const sortedTags = [...tags].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedTags = [...tags].sort(
+    (a, b) => b.note_count - a.note_count || a.name.localeCompare(b.name),
+  );
   const maxNoteCount = Math.max(...tags.map((tag) => tag.note_count));
 
   if (isLoading) return <LoadingSpinner />;

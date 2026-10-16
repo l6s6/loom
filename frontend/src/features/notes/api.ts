@@ -6,6 +6,8 @@ import type {
   NoteType,
   TagCreate,
   TagUpdate,
+  NoteTypeCreate,
+  NoteTypeUpdate,
 } from "@/features/notes/types.ts";
 
 // GET Notes
@@ -34,6 +36,13 @@ export const createTag = (tag: TagCreate) =>
     body: JSON.stringify(tag),
   });
 
+// POST Create NoteType
+export const createNoteType = (type: NoteTypeCreate) =>
+  apiClient<Note>(`/notes/types`, {
+    method: "POST",
+    body: JSON.stringify(type),
+  });
+
 // PUT Update Note
 export const updateNote = (note: NoteUpdate) =>
   apiClient<Note>(`/notes/${note.id}`, {
@@ -48,10 +57,21 @@ export const updateTag = (tag: TagUpdate) =>
     body: JSON.stringify(tag),
   });
 
+// PUT Update NoteType
+export const updateNoteType = (type: NoteTypeUpdate) =>
+  apiClient<Note>(`/notes/types/${type.id}`, {
+    method: "PUT",
+    body: JSON.stringify(type),
+  });
+
 // DELETE Note by ID
 export const deleteNote = (noteId: number) =>
   apiClient<void>(`/notes/${noteId}`, { method: "DELETE" });
 
 // DELETE Tag by ID
-export const deleteTag = (noteId: number) =>
-  apiClient<void>(`/notes/tags/${noteId}`, { method: "DELETE" });
+export const deleteTag = (tagId: number) =>
+  apiClient<void>(`/notes/tags/${tagId}`, { method: "DELETE" });
+
+// DELETE NoteType by ID
+export const deleteNoteType = (typeId: number) =>
+  apiClient<void>(`/notes/types/${typeId}`, { method: "DELETE" });

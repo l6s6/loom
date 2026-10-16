@@ -82,4 +82,14 @@ export interface TagUpdate {
 export interface NoteType {
   name: string;
   id: number;
+  note_count: number;
+}
+
+export interface NoteTypeCreate {
+  name: string;
+}
+
+export interface NoteTypeUpdate {
+  id: number;
+  name?: string;
 }
