@@ -27,6 +27,8 @@ class NoteTypeResponse(BaseModel):
     id: int
     name: str
 
+class NoteTypeWithCount(NoteTypeResponse):
+    note_count: int
 
 class NoteStatus(str, Enum):
     none = "none"

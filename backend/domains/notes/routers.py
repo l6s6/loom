@@ -6,7 +6,7 @@ from sqlalchemy.sql.operators import or_, and_
 from core.database import get_db
 from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
 from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse, TagCreate, \
-    TagUpdate, TagWithCount
+    TagUpdate, TagWithCount, NoteTypeWithCount
 from domains.notes.models import Note, NoteType, Tag, note_has_tags
 
 router = APIRouter(prefix="/notes", tags=["notes"])
@@ -84,9 +84,26 @@ def get_notes(
     return db.query(Note).options(joinedload(Note.note_type), selectinload(Note.tags)).filter(*filters).all()
 
 
-@router.get("/types", response_model=list[NoteTypeResponse])
+@router.get("/types", response_model=list[NoteTypeWithCount])
 def get_note_types(db: Session = Depends(get_db)):
-    return db.query(NoteType).all()
+    results = (
+        db.query(NoteType, func.count(Note.id).label("note_count"))
+        .outerjoin(Note, and_(
+            Note.note_type_id == NoteType.id,
+            Note.is_archived == False
+        ))
+        .group_by(NoteType.id)
+        .all()
+    )
+    formatted_types = []
+    for note_type, count in results:
+        formatted_types.append({
+            "id": note_type.id,
+            "name": note_type.name,
+            "note_count": count
+        })
+
+    return formatted_types
 
 
 @router.get("/tags", response_model=list[TagWithCount])
