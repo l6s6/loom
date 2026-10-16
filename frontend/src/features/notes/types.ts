@@ -67,6 +67,7 @@ export interface NoteUpdate {
 export interface Tag {
   name: string;
   id: number;
+  note_count: number;
 }
 
 export interface TagCreate {

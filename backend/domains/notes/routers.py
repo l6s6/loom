@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session, joinedload, selectinload
-from sqlalchemy.sql.operators import or_
+from sqlalchemy.sql.operators import or_, and_
 
 from core.database import get_db
 from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
 from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse, TagCreate, \
-    TagUpdate
-from domains.notes.models import Note, NoteType, Tag
-
+    TagUpdate, TagWithCount
+from domains.notes.models import Note, NoteType, Tag, note_has_tags
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
@@ -89,9 +89,27 @@ def get_note_types(db: Session = Depends(get_db)):
     return db.query(NoteType).all()
 
 
-@router.get("/tags", response_model=list[TagResponse])
+@router.get("/tags", response_model=list[TagWithCount])
 def get_tags(db: Session = Depends(get_db)):
-    return db.query(Tag).all()
+    results = (
+        db.query(Tag, func.count(note_has_tags.c.note_id).label("note_count"))
+        .outerjoin(note_has_tags, note_has_tags.c.tag_id == Tag.id)
+        .outerjoin(Note, and_(
+            Note.id == note_has_tags.c.note_id,
+            Note.is_archived == False
+        ))
+        .group_by(Tag.id)
+        .all()
+    )
+    formatted_tags = []
+    for tag, count in results:
+        formatted_tags.append({
+            "id": tag.id,
+            "name": tag.name,
+            "note_count": count
+        })
+
+    return formatted_tags
 
 
 @router.post("/tags", response_model=TagResponse)
