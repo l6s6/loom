@@ -38,7 +38,7 @@ export function NotesView() {
   const queryString = buildQueryString();
 
   const { notes } = useGetNotes(queryString);
-  const { createAndNavigate } = useCreateAndNavigateNote();
+  const { createAndNavigateNote } = useCreateAndNavigateNote();
   const { deleteNote } = useDeleteNote();
 
   const handleFilterChange = (name: string, value: string) => {
@@ -80,7 +80,7 @@ export function NotesView() {
               >
                 <NoteGridItem
                   note={note}
-                  onCreate={createAndNavigate}
+                  onCreate={createAndNavigateNote}
                   onDelete={deleteNote}
                 />
               </CommandItem>

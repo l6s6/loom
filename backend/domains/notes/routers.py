@@ -4,7 +4,8 @@ from sqlalchemy.sql.operators import or_
 
 from core.database import get_db
 from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
-from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse, TagCreate
+from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse, TagCreate, \
+    TagUpdate
 from domains.notes.models import Note, NoteType, Tag
 
 
@@ -104,6 +105,23 @@ def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_tag)
     return new_tag
+
+
+@router.put("/tags/{tag_id}", response_model=TagResponse)
+def update_note(tag_id: int, tag_update: TagUpdate, db: Session = Depends(get_db)):
+    if db.query(Tag).filter(Tag.name == tag_update.name).first():
+        raise HTTPException(status_code=409, detail=f"Tag with name {tag_update.name} already exists")
+
+    tag =  get_tag_or_404(db, tag_id)
+
+    update_data = tag_update.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(tag, key, value)
+
+    db.commit()
+    db.refresh(tag)
+    return tag
 
 
 @router.delete("/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)

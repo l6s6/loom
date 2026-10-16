@@ -11,6 +11,7 @@ import {
   getNoteTypes,
   getTags,
   updateNote,
+  updateTag,
 } from "@/features/notes/api.ts";
 import type { Note, NoteStatus } from "@/features/notes/types.ts";
 
@@ -94,7 +95,7 @@ export function useCreateAndNavigateNote() {
   });
 
   return {
-    createAndNavigate: mutateAsync,
+    createAndNavigateNote: mutateAsync,
     isLoading: isPending,
     error: error ? error.message : null,
   };
@@ -109,7 +110,7 @@ export function useCreateTag() {
   });
 
   return {
-    create: mutateAsync,
+    createTag: mutateAsync,
     isLoading: isPending,
     error: error ? error.message : null,
   };
@@ -135,6 +136,20 @@ export function useUpdateNote() {
   });
 
   return { updateNote: mutateAsync, isLoading: isPending, error };
+}
+
+export function useUpdateTag() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: updateTag,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
+  return { updateTag: mutateAsync, isLoading: isPending, error };
 }
 
 export function useDeleteNote() {

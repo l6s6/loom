@@ -73,6 +73,11 @@ export interface TagCreate {
   name: string;
 }
 
+export interface TagUpdate {
+  id: number;
+  name?: string;
+}
+
 export interface NoteType {
   name: string;
   id: number;

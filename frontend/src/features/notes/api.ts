@@ -5,6 +5,7 @@ import type {
   NoteUpdate,
   NoteType,
   TagCreate,
+  TagUpdate,
 } from "@/features/notes/types.ts";
 
 // GET Notes
@@ -38,6 +39,13 @@ export const updateNote = (note: NoteUpdate) =>
   apiClient<Note>(`/notes/${note.id}`, {
     method: "PUT",
     body: JSON.stringify(note),
+  });
+
+// PUT Update Tag
+export const updateTag = (tag: TagUpdate) =>
+  apiClient<Note>(`/notes/tags/${tag.id}`, {
+    method: "PUT",
+    body: JSON.stringify(tag),
   });
 
 // DELETE Note by ID

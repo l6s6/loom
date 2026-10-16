@@ -25,7 +25,7 @@ import { ClipLoader } from "react-spinners";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const { createAndNavigate } = useCreateAndNavigateNote();
+  const { createAndNavigateNote } = useCreateAndNavigateNote();
 
   const [isResetting, setIsResetting] = useState(false);
 
@@ -92,7 +92,7 @@ const Sidebar = () => {
 
       <div className="flex gap-2  flex-row border-t border-border-subtle py-4 w-full">
         <Button
-          onClick={() => createAndNavigate()}
+          onClick={() => createAndNavigateNote()}
           className="flex-1"
           size="xl"
         >

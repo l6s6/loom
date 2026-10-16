@@ -2,12 +2,13 @@ import {
   useCreateTag,
   useDeleteTag,
   useGetTags,
+  useUpdateTag,
 } from "@/features/notes/hooks.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
 import ErrorView from "@/components/ErrorView.tsx";
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
 import { MoreVertical, Plus } from "lucide-react";
-import type { Note, Tag, TagCreate } from "@/features/notes/types.ts";
+import type { Tag, TagCreate, TagUpdate } from "@/features/notes/types.ts";
 import {
   Card,
   CardAction,
@@ -33,14 +34,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog.tsx";
-import { useState } from "react";
+import { type JSX, useState } from "react";
 import { Field, FieldGroup } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import type { UseMutateAsyncFunction } from "@tanstack/react-query";
 
 const TagsView = () => {
   const { tags, isLoading, error } = useGetTags();
-  const { create } = useCreateTag();
+  const { createTag } = useCreateTag();
+  const { updateTag } = useUpdateTag();
   const { deleteTag } = useDeleteTag();
 
   const sortedTags = [...tags].sort((a, b) => a.name.localeCompare(b.name));
@@ -61,14 +62,31 @@ const TagsView = () => {
               <span className="text-content-muted text-sm ">
                 {tags.length} tags in total
               </span>
-              <CreateTagDialog createTag={create} />
+              <TagDialog
+                onSubmit={(newTag) => createTag(newTag as TagCreate)}
+                label="Create"
+                trigger={
+                  <Button
+                    variant="outline"
+                    className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
+                    size="icon"
+                  >
+                    <Plus />
+                  </Button>
+                }
+              />
             </div>
           </CardAction>
         </CardHeader>
         <CardContent>
           {sortedTags && sortedTags.length !== 0 ? (
             sortedTags.map((tag) => (
-              <TagItem key={tag.id} tag={tag} onDelete={deleteTag} />
+              <TagItem
+                key={tag.id}
+                tag={tag}
+                onDelete={deleteTag}
+                onUpdate={updateTag}
+              />
             ))
           ) : (
             <span className="flex flex-row justify-center text-content-muted">
@@ -86,10 +104,12 @@ export default TagsView;
 interface TagItemProps {
   tag: Tag;
   onDelete: (tagId: number) => Promise<void>;
+  onUpdate: (tag: TagUpdate) => Promise<unknown>;
 }
 
-const TagItem = ({ tag, onDelete }: TagItemProps) => {
+const TagItem = ({ tag, onDelete, onUpdate }: TagItemProps) => {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   return (
     <div
@@ -111,7 +131,18 @@ const TagItem = ({ tag, onDelete }: TagItemProps) => {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>
+              <button
+                type="button"
+                className="w-full flex flex-row justify-start"
+                onClick={() => {
+                  setIsMoreOpen(false);
+                  setIsEditOpen(true);
+                }}
+              >
+                Edit
+              </button>
+            </DropdownMenuItem>
             <DropdownMenuItem variant="destructive">
               <ConfirmDeleteDialog
                 open={isDeleteAlertOpen}
@@ -123,43 +154,54 @@ const TagItem = ({ tag, onDelete }: TagItemProps) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <TagDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          onSubmit={(updatedTag) => onUpdate(updatedTag as TagUpdate)}
+          label="Edit"
+          oldTag={tag}
+        />
       </div>
     </div>
   );
 };
 
-const CreateTagDialog = ({
-  createTag,
+const TagDialog = ({
+  trigger,
+  label,
+  onSubmit,
+  oldTag,
+  open: controlledOpen,
+  onOpenChange,
 }: {
-  createTag: UseMutateAsyncFunction<Note, Error, TagCreate, unknown>;
+  trigger?: JSX.Element;
+  label: string;
+  onSubmit: (tag: TagCreate | TagUpdate) => Promise<unknown>;
+  oldTag?: Tag;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) => {
-  const [name, setName] = useState("");
-  const [open, setOpen] = useState(false);
-  const handleCreateTag = async () => {
-    const tag: TagCreate = {
-      name: name,
-    };
+  const [name, setName] = useState(oldTag?.name ?? "");
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
+
+  const handleSubmit = async () => {
+    const tag = oldTag
+      ? ({ id: oldTag.id, name } satisfies TagUpdate)
+      : ({ name } satisfies TagCreate);
+
+    await onSubmit(tag);
     setName("");
     setOpen(false);
-    await createTag(tag);
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <form onSubmit={handleCreateTag}>
-        <DialogTrigger
-          render={
-            <Button
-              variant="outline"
-              className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
-              size="icon"
-            >
-              <Plus />
-            </Button>
-          }
-        />
+      <form className="w-full">
+        {trigger && <DialogTrigger render={trigger} />}
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Create Tag</DialogTitle>
+            <DialogTitle>{`${label} Tag`}</DialogTitle>
           </DialogHeader>
           <FieldGroup>
             <Field>
@@ -177,12 +219,16 @@ const CreateTagDialog = ({
           <DialogFooter>
             <DialogClose
               render={
-                <Button variant="outline" onClick={() => setName("")}>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setName(oldTag?.name ?? "")}
+                >
                   Cancel
                 </Button>
               }
             />
-            <Button onClick={handleCreateTag}>Create Tag</Button>
+            <Button onClick={handleSubmit}>{`${label} Tag`}</Button>
           </DialogFooter>
         </DialogContent>
       </form>
