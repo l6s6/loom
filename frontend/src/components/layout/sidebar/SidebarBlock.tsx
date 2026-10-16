@@ -12,9 +12,11 @@ const SidebarBlock = ({ label, configObject }: SidebarBlockProps) => {
       <h3 className="text-xs text-content-muted font-bold tracking-wider mb-2">
         {label.toUpperCase()}
       </h3>
-      {configObject.map(({ icon, label, path }: SidebarItemConfig, index) => (
-        <NavItem label={label} icon={icon} key={index} route={path} />
-      ))}
+      <div className="flex flex-col gap-1">
+        {configObject.map(({ icon, label, path }: SidebarItemConfig, index) => (
+          <NavItem label={label} icon={icon} key={index} route={path} />
+        ))}
+      </div>
     </div>
   );
 };
