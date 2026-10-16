@@ -137,7 +137,7 @@ const EntityItem = <T extends BaseEntity>({
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   return (
-    <div className="flex flex-row justify-between w-full border-border-subtle p-2 group items-center">
+    <div className="flex flex-row justify-between w-full border-border-subtle p-2 group items-center hover:bg-sidebar rounded-md">
       {renderBadge(item)}
       <div className="flex flex-row items-center gap-4">
         <div className="flex flex-row items-center gap-2">

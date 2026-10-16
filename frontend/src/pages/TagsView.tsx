@@ -5,6 +5,7 @@ import {
   useUpdateTag,
 } from "@/features/notes/hooks.ts";
 import EntityManagement from "@/components/layout/EntityManagement.tsx";
+import { Link } from "react-router-dom";
 
 const TagsView = () => {
   const { tags, isLoading, error } = useGetTags();
@@ -24,9 +25,11 @@ const TagsView = () => {
       onDelete={deleteTag}
       canDelete={() => true}
       renderBadge={(item) => (
-        <div className="px-4 py-2 border border-border-subtle rounded-sm bg-bg-sidebar">
-          <span className="font-bold text-content-muted">#{item.name}</span>
-        </div>
+        <Link to={`/?tag=${item.name}`}>
+          <div className="px-4 py-2 border border-border-subtle rounded-sm bg-bg-sidebar">
+            <span className="font-bold text-content-muted">#{item.name}</span>
+          </div>
+        </Link>
       )}
     />
   );

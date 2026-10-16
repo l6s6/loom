@@ -5,6 +5,7 @@ import {
   useUpdateNoteType,
 } from "@/features/notes/hooks.ts";
 import EntityManagement from "@/components/layout/EntityManagement.tsx";
+import { Link } from "react-router-dom";
 
 const NoteTypesView = () => {
   const { types, isLoading, error } = useGetNoteTypes();
@@ -24,9 +25,11 @@ const NoteTypesView = () => {
       onDelete={deleteNoteType}
       canDelete={(item) => item.note_count === 0}
       renderBadge={(item) => (
-        <div className="px-4 py-2 border border-transparent rounded-sm bg-primary-bg">
-          <span className="font-bold text-primary">{item.name}</span>
-        </div>
+        <Link to={`/?type=${item.name}`}>
+          <div className="px-4 py-2 border border-transparent rounded-sm bg-primary-bg cursor-pointer">
+            <span className="font-bold text-primary">{item.name}</span>
+          </div>
+        </Link>
       )}
     />
   );
