@@ -8,6 +8,7 @@ import GraphView from "@/pages/GraphView.tsx";
 import EditorView from "./pages/EditorView.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import TagsView from "@/pages/TagsView.tsx";
+import NoteTypesView from "@/pages/NoteTypesView.tsx";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
           <Routes>
             <Route path="/" element={<NotesView />} />
             <Route path="/tags" element={<TagsView />} />
+            <Route path="/note-types" element={<NoteTypesView />} />
             <Route path="/graph" element={<GraphView />} />
             <Route path="/n/:noteId" element={<EditorView />} />;
           </Routes>

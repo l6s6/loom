@@ -27,7 +27,7 @@ def get_tag_or_404(db: Session, tag_id: int) -> Note:
 
 
 def get_note_type_or_404(db: Session, type_id: int) -> Note:
-    type = db.query(NoteType).filter(NoteType.id == NoteType).first()
+    type = db.query(NoteType).filter(NoteType.id == type_id).first()
     if type is None:
         raise HTTPException(status_code=404, detail=f"Note type with id {type_id} not found")
     return type

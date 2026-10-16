@@ -3,14 +3,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
   createNote,
+  createNoteType,
   createTag,
   deleteNote,
+  deleteNoteType,
   deleteTag,
   getNoteById,
   getNotes,
   getNoteTypes,
   getTags,
   updateNote,
+  updateNoteType,
   updateTag,
 } from "@/features/notes/api.ts";
 import type { Note, NoteStatus } from "@/features/notes/types.ts";
@@ -82,6 +85,22 @@ export function useDeleteTag() {
   };
 }
 
+export function useDeleteNoteType() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: deleteNoteType,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["note_types"] }),
+  });
+
+  return {
+    deleteNoteType: mutateAsync,
+    isLoading: isPending,
+    error: error ? error.message : null,
+  };
+}
+
 export function useCreateAndNavigateNote() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -111,6 +130,22 @@ export function useCreateTag() {
 
   return {
     createTag: mutateAsync,
+    isLoading: isPending,
+    error: error ? error.message : null,
+  };
+}
+
+export function useCreateNoteType() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: createNoteType,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["note_types"] }),
+  });
+
+  return {
+    createNoteType: mutateAsync,
     isLoading: isPending,
     error: error ? error.message : null,
   };
@@ -150,6 +185,20 @@ export function useUpdateTag() {
   });
 
   return { updateTag: mutateAsync, isLoading: isPending, error };
+}
+
+export function useUpdateNoteType() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: updateNoteType,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["note_types"] });
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
+  return { updateNoteType: mutateAsync, isLoading: isPending, error };
 }
 
 export function useDeleteNote() {
