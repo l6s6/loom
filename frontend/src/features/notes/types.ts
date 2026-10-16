@@ -55,7 +55,7 @@ export interface Note {
   modified_at: string;
 }
 
-export interface UpdateNote {
+export interface NoteUpdate {
   id: number;
   title?: string;
   content?: string;
@@ -67,6 +67,16 @@ export interface UpdateNote {
 export interface Tag {
   name: string;
   id: number;
+  note_count: number;
+}
+
+export interface TagCreate {
+  name: string;
+}
+
+export interface TagUpdate {
+  id: number;
+  name?: string;
 }
 
 export interface NoteType {

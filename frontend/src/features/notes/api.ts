@@ -2,8 +2,10 @@ import { apiClient } from "@/api/apiClient.ts";
 import type {
   Tag,
   Note,
-  UpdateNote,
+  NoteUpdate,
   NoteType,
+  TagCreate,
+  TagUpdate,
 } from "@/features/notes/types.ts";
 
 // GET Notes
@@ -23,18 +25,33 @@ export const getTags = () => apiClient<Tag[]>("/notes/tags");
 export const getNoteTypes = () => apiClient<NoteType[]>("/notes/types");
 
 // POST Create Note
-export const createNote = () =>
-  apiClient<Note>(`/notes`, {
+export const createNote = () => apiClient<Note>(`/notes`, { method: "POST" });
+
+// POST Create Tag
+export const createTag = (tag: TagCreate) =>
+  apiClient<Note>(`/notes/tags`, {
     method: "POST",
+    body: JSON.stringify(tag),
   });
 
 // PUT Update Note
-export const updateNote = (note: UpdateNote) =>
+export const updateNote = (note: NoteUpdate) =>
   apiClient<Note>(`/notes/${note.id}`, {
     method: "PUT",
     body: JSON.stringify(note),
   });
 
+// PUT Update Tag
+export const updateTag = (tag: TagUpdate) =>
+  apiClient<Note>(`/notes/tags/${tag.id}`, {
+    method: "PUT",
+    body: JSON.stringify(tag),
+  });
+
 // DELETE Note by ID
 export const deleteNote = (noteId: number) =>
   apiClient<void>(`/notes/${noteId}`, { method: "DELETE" });
+
+// DELETE Tag by ID
+export const deleteTag = (noteId: number) =>
+  apiClient<void>(`/notes/tags/${noteId}`, { method: "DELETE" });

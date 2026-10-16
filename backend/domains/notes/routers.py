@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session, joinedload, selectinload
-from sqlalchemy.sql.operators import or_
+from sqlalchemy.sql.operators import or_, and_
 
 from core.database import get_db
 from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
-from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse
-from domains.notes.models import Note, NoteType, Tag
-
+from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse, TagCreate, \
+    TagUpdate, TagWithCount
+from domains.notes.models import Note, NoteType, Tag, note_has_tags
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
@@ -16,6 +17,13 @@ def get_note_or_404(db: Session, note_id: int) -> Note:
     if note is None:
         raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
     return note
+
+
+def get_tag_or_404(db: Session, tag_id: int) -> Note:
+    tag = db.query(Tag).filter(Tag.id == tag_id).first()
+    if tag is None:
+        raise HTTPException(status_code=404, detail=f"Tag with id {tag_id} not found")
+    return tag
 
 
 def _get_or_create_note_type(db: Session, note_type_name: str) -> NoteType:
@@ -81,9 +89,66 @@ def get_note_types(db: Session = Depends(get_db)):
     return db.query(NoteType).all()
 
 
-@router.get("/tags", response_model=list[TagResponse])
-def get_tag_types(db: Session = Depends(get_db)):
-    return db.query(Tag).all()
+@router.get("/tags", response_model=list[TagWithCount])
+def get_tags(db: Session = Depends(get_db)):
+    results = (
+        db.query(Tag, func.count(note_has_tags.c.note_id).label("note_count"))
+        .outerjoin(note_has_tags, note_has_tags.c.tag_id == Tag.id)
+        .outerjoin(Note, and_(
+            Note.id == note_has_tags.c.note_id,
+            Note.is_archived == False
+        ))
+        .group_by(Tag.id)
+        .all()
+    )
+    formatted_tags = []
+    for tag, count in results:
+        formatted_tags.append({
+            "id": tag.id,
+            "name": tag.name,
+            "note_count": count
+        })
+
+    return formatted_tags
+
+
+@router.post("/tags", response_model=TagResponse)
+def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
+    if db.query(Tag).filter(Tag.name == tag.name).first():
+        raise HTTPException(status_code=409, detail=f"Tag with name {tag.name} already exists")
+
+    new_tag = Tag(name=tag.name)
+    db.add(new_tag)
+
+    db.commit()
+    db.refresh(new_tag)
+    return new_tag
+
+
+@router.put("/tags/{tag_id}", response_model=TagResponse)
+def update_note(tag_id: int, tag_update: TagUpdate, db: Session = Depends(get_db)):
+    if db.query(Tag).filter(Tag.name == tag_update.name).first():
+        raise HTTPException(status_code=409, detail=f"Tag with name {tag_update.name} already exists")
+
+    tag =  get_tag_or_404(db, tag_id)
+
+    update_data = tag_update.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(tag, key, value)
+
+    db.commit()
+    db.refresh(tag)
+    return tag
+
+
+@router.delete("/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_note(tag_id: int, db: Session = Depends(get_db)):
+    tag = get_tag_or_404(db, tag_id)
+
+    db.delete(tag)
+    db.commit()
+    return {"message": "Tag deleted"}
 
 
 @router.post("", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)

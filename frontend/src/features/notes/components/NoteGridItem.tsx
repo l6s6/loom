@@ -28,7 +28,7 @@ import type { UseMutateAsyncFunction } from "@tanstack/react-query";
 
 interface NoteListItemProps {
   note: Note;
-  onCreate: UseMutateAsyncFunction<Note, Error, void, unknown>;
+  onCreate: UseMutateAsyncFunction<Note, Error>;
   onDelete: (noteId: number, currentUrl?: string) => Promise<void>;
 }
 

@@ -32,7 +32,7 @@ import {
   useGetLinkTypes,
 } from "@/features/links/hooks.ts";
 import type {
-  CreateLink,
+  LinkCreate,
   LinkType,
   Link as NoteLink,
 } from "@/features/links/types.ts";
@@ -81,7 +81,7 @@ const NoteConnections = ({ noteId }: { noteId: number }) => {
     );
 
   const handleAddLink = async (target_id: number) => {
-    const link: CreateLink = {
+    const link: LinkCreate = {
       origin: "manual",
       target_id: target_id,
       source_id: noteId,

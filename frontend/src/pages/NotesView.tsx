@@ -16,7 +16,7 @@ import {
 } from "@/features/notes/hooks.ts";
 import NoteSearchBar from "@/features/notes/components/NoteSearchBar.tsx";
 
-export function App() {
+export function NotesView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const feedFilters = {
     search: searchParams.get("search") || "",
@@ -38,7 +38,7 @@ export function App() {
   const queryString = buildQueryString();
 
   const { notes } = useGetNotes(queryString);
-  const { createAndNavigate } = useCreateAndNavigateNote();
+  const { createAndNavigateNote } = useCreateAndNavigateNote();
   const { deleteNote } = useDeleteNote();
 
   const handleFilterChange = (name: string, value: string) => {
@@ -80,7 +80,7 @@ export function App() {
               >
                 <NoteGridItem
                   note={note}
-                  onCreate={createAndNavigate}
+                  onCreate={createAndNavigateNote}
                   onDelete={deleteNote}
                 />
               </CommandItem>

@@ -10,6 +10,17 @@ class TagResponse(BaseModel):
     id: int
     name: str
 
+class TagWithCount(TagResponse):
+    note_count: int
+
+
+class TagCreate(BaseModel):
+    name: str
+
+
+class TagUpdate(BaseModel):
+    name: Optional[str] = None
+
 
 class NoteTypeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
