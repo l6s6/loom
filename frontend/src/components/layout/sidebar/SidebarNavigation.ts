@@ -25,7 +25,7 @@ export const mainNavItems: SidebarItemConfig[] = [
 
 export const smartViewsConfig: SidebarItemConfig[] = [
   { label: "Open Questions", icon: HelpCircle, path: "/?status=open" },
-  { label: "Loose Ends", icon: Unlink, path: "/loose-ends" },
-  { label: "Raw Quotes", icon: Quote, path: "/quotes" },
-  { label: "Time Capsule", icon: Clock, path: "/time-capsule" },
+  { label: "Loose Ends (TODO)", icon: Unlink, path: "/" },
+  { label: "Raw Quotes (TODO)", icon: Quote, path: "/" },
+  { label: "Time Capsule (TODO)", icon: Clock, path: "/" },
 ];

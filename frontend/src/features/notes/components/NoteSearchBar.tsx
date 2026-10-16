@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { useGetNoteTypes } from "@/features/notes/hooks.ts";
+import { useGetNoteTypes, useGetTags } from "@/features/notes/hooks.ts";
 import { NoteStatus } from "@/features/notes/types.ts";
 
 interface NoteSearchBarProps {
@@ -26,6 +26,7 @@ const NoteSearchBar = ({
   handleFilterChange,
 }: NoteSearchBarProps) => {
   const { types } = useGetNoteTypes();
+  const { tags } = useGetTags();
   return (
     <InputGroup className="w-full">
       <InputGroupInput
@@ -37,6 +38,12 @@ const NoteSearchBar = ({
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
+      <SearchFilterSelector
+        title="Tag"
+        value={feedFilters.tag}
+        onValueChange={(value) => handleFilterChange("tag", value)}
+        values={[...tags.map((t) => t.name)]}
+      />
       <SearchFilterSelector
         title="Status"
         value={feedFilters.status}
@@ -74,8 +81,12 @@ const SearchFilterSelector = ({
         <DropdownMenuTrigger
           render={
             <Button variant="ghost" className="pr-1.5! text-xs">
-              {value || title}
-              <ChevronDown className="size-3" />
+              <span className={value && "text-primary font-bold underline"}>
+                {value || title}
+              </span>
+              <ChevronDown
+                className={`size-3 transition-all ${value && "text-primary rotate-90 ease-in-out"}`}
+              />
             </Button>
           }
         />
