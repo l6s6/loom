@@ -6,7 +6,7 @@ from sqlalchemy.sql.operators import or_, and_
 from core.database import get_db
 from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
 from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse, TagCreate, \
-    TagUpdate, TagWithCount, NoteTypeWithCount
+    TagUpdate, TagWithCount, NoteTypeWithCount, NoteTypeCreate, NoteTypeUpdate
 from domains.notes.models import Note, NoteType, Tag, note_has_tags
 
 router = APIRouter(prefix="/notes", tags=["notes"])
@@ -24,6 +24,13 @@ def get_tag_or_404(db: Session, tag_id: int) -> Note:
     if tag is None:
         raise HTTPException(status_code=404, detail=f"Tag with id {tag_id} not found")
     return tag
+
+
+def get_note_type_or_404(db: Session, type_id: int) -> Note:
+    type = db.query(NoteType).filter(NoteType.id == NoteType).first()
+    if type is None:
+        raise HTTPException(status_code=404, detail=f"Note type with id {type_id} not found")
+    return type
 
 
 def _get_or_create_note_type(db: Session, note_type_name: str) -> NoteType:
@@ -141,13 +148,25 @@ def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
     db.refresh(new_tag)
     return new_tag
 
+@router.post("/types", response_model=TagResponse)
+def create_tag(type: NoteTypeCreate, db: Session = Depends(get_db)):
+    if db.query(NoteType).filter(NoteType.name == type.name).first():
+        raise HTTPException(status_code=409, detail=f"Note type with name {type.name} already exists")
+
+    new_type = NoteType(name=type.name)
+    db.add(new_type)
+
+    db.commit()
+    db.refresh(new_type)
+    return new_type
+
 
 @router.put("/tags/{tag_id}", response_model=TagResponse)
 def update_note(tag_id: int, tag_update: TagUpdate, db: Session = Depends(get_db)):
     if db.query(Tag).filter(Tag.name == tag_update.name).first():
         raise HTTPException(status_code=409, detail=f"Tag with name {tag_update.name} already exists")
 
-    tag =  get_tag_or_404(db, tag_id)
+    tag = get_tag_or_404(db, tag_id)
 
     update_data = tag_update.model_dump(exclude_unset=True)
 
@@ -159,13 +178,39 @@ def update_note(tag_id: int, tag_update: TagUpdate, db: Session = Depends(get_db
     return tag
 
 
+@router.put("/types/{type_id}", response_model=NoteTypeResponse)
+def update_note(type_id: int, type_update: NoteTypeUpdate, db: Session = Depends(get_db)):
+    if db.query(NoteType).filter(NoteType.name == type_update.name).first():
+        raise HTTPException(status_code=409, detail=f"Note type with name {type_update.name} already exists")
+
+    type = get_note_type_or_404(db, type_id)
+
+    update_data = type_update.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(type, key, value)
+
+    db.commit()
+    db.refresh(type)
+    return type
+
+
 @router.delete("/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_note(tag_id: int, db: Session = Depends(get_db)):
+def delete_tag(tag_id: int, db: Session = Depends(get_db)):
     tag = get_tag_or_404(db, tag_id)
 
     db.delete(tag)
     db.commit()
     return {"message": "Tag deleted"}
+
+
+@router.delete("/types/{type_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_note_type(type_id: int, db: Session = Depends(get_db)):
+    type = get_note_type_or_404(db, type_id)
+
+    db.delete(type)
+    db.commit()
+    return {"message": "Note type deleted"}
 
 
 @router.post("", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)
