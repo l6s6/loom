@@ -15,6 +15,8 @@ import {
   useGetNotes,
 } from "@/features/notes/hooks.ts";
 import NoteSearchBar from "@/features/notes/components/NoteSearchBar.tsx";
+import LoadingSpinner from "@/components/LoadingSpinner.tsx";
+import ErrorView from "@/components/ErrorView.tsx";
 
 export function NotesView() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,7 +39,7 @@ export function NotesView() {
 
   const queryString = buildQueryString();
 
-  const { notes } = useGetNotes(queryString);
+  const { notes, isLoading, error } = useGetNotes(queryString);
   const { createAndNavigateNote } = useCreateAndNavigateNote();
   const { deleteNote } = useDeleteNote();
 
@@ -55,6 +57,9 @@ export function NotesView() {
   const sortedNotes = [...notes]
     .sort((a, b) => a.modified_at.localeCompare(b.modified_at))
     .reverse();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorView error={error} />;
 
   return (
     <CenterContainer>
