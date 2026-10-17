@@ -30,13 +30,7 @@ const ConfirmDeleteDialog = ({
 }: ConfirmDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogTrigger
-        render={
-          <button className="w-full flex flex-row justify-start ">
-            {trigger}
-          </button>
-        }
-      />
+      <AlertDialogTrigger render={trigger} />
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
           <AlertDialogMedia className="bg-destructive/10 dark:text-destructive">

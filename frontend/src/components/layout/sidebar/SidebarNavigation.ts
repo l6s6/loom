@@ -18,7 +18,7 @@ export interface SidebarItemConfig {
 
 export const mainNavItems: SidebarItemConfig[] = [
   { label: "Notes", icon: Home, path: "/" },
-  { label: "Graph", icon: Network, path: "/todo?graph" },
+  { label: "Graph", icon: Network, path: "/graph" },
   { label: "Tags", icon: Hash, path: "/tags" },
   { label: "Note Types", icon: Tag, path: "/note-types" },
 ];
