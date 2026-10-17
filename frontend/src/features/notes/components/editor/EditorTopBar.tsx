@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { useDeleteNote } from "@/features/notes/hooks.ts";
 
-const EditorTopBar = ({ noteId }: { noteId: number }) => {
+const EditorTopBar = ({ noteId }: { noteId: string }) => {
   const { deleteNote } = useDeleteNote();
   const match = useMatch("/n/:noteId");
   const urlNoteId = match?.params.noteId;

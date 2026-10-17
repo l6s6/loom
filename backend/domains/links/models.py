@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.database import Base
 from domains.links.constants import DEFAULT_LINK_ORIGIN
+from domains.utils import generate_uuid
 
 if TYPE_CHECKING:
     from domains.notes.models import Note
@@ -13,9 +14,9 @@ if TYPE_CHECKING:
 class Link(Base):
     __tablename__ = "links"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    source_id: Mapped[int] = mapped_column(ForeignKey("notes.id", ondelete="CASCADE"), index=True)
-    target_id: Mapped[int] = mapped_column(ForeignKey("notes.id", ondelete="CASCADE"), index=True)
+    id: Mapped[str] = mapped_column(primary_key=True, default=generate_uuid)
+    source_id: Mapped[str] = mapped_column(ForeignKey("notes.id", ondelete="CASCADE"), index=True)
+    target_id: Mapped[str] = mapped_column(ForeignKey("notes.id", ondelete="CASCADE"), index=True)
     origin: Mapped[str] = mapped_column(default=DEFAULT_LINK_ORIGIN)
 
     __table_args__ = (
@@ -23,7 +24,7 @@ class Link(Base):
     )
 
     # N:1 relationship with LinkType
-    link_type_id: Mapped[int] = mapped_column(ForeignKey("link_types.id"))
+    link_type_id: Mapped[str] = mapped_column(ForeignKey("link_types.id"))
     link_type: Mapped["LinkType"] = relationship(back_populates="links")
 
     source: Mapped["Note"] = relationship(
@@ -37,7 +38,7 @@ class Link(Base):
 class LinkType(Base):
     __tablename__ = "link_types"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True, default=generate_uuid)
     name: Mapped[str] = mapped_column(unique=True)
 
     links: Mapped[list["Link"]] = relationship(back_populates="link_type")

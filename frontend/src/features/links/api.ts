@@ -5,7 +5,7 @@ import type { LinkCreate, LinkType, Link } from "@/features/links/types.ts";
 export const getLinks = () => apiClient<Link[]>("/links");
 
 // GET Link by Note ID
-export const getLinksByNoteId = (noteId: number) =>
+export const getLinksByNoteId = (noteId: string) =>
   apiClient<Link[]>(`/links?note_id=${noteId}`);
 
 // GET Link Types
@@ -19,5 +19,5 @@ export const createLink = (link: LinkCreate) =>
   });
 
 // DELETE Link by ID
-export const deleteLink = (linkId: number) =>
+export const deleteLink = (linkId: string) =>
   apiClient<void>(`/links/${linkId}`, { method: "DELETE" });

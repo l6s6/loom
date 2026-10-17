@@ -31,7 +31,7 @@ export function useGetNotes(queryString?: string) {
   };
 }
 
-export function useGetNoteById(noteId: number) {
+export function useGetNoteById(noteId: string) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["note", noteId],
     queryFn: () => getNoteById(noteId),
@@ -213,7 +213,7 @@ export function useDeleteNote() {
     },
   });
 
-  const remove = async (noteId: number, currentUrl?: string) => {
+  const remove = async (noteId: string, currentUrl?: string) => {
     await mutateAsync(noteId);
     if (!currentUrl || currentUrl === noteId.toString()) {
       navigate("/");

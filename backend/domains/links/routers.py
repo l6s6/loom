@@ -13,7 +13,7 @@ from domains.links.schemas import LinkTypeResponse, LinkResponse, LinkCreate, Li
 router = APIRouter(prefix="/links", tags=["links"])
 
 
-def _get_link_or_404(db: Session, link_id: int) -> Link:
+def _get_link_or_404(db: Session, link_id: str) -> Link:
     note = db.query(Link).filter(Link.id == link_id).first()
     if note is None:
         raise HTTPException(status_code=404, detail=f"Link with id {link_id} not found")
@@ -32,9 +32,9 @@ def _get_or_create_link_type(db: Session, link_type_name: str) -> LinkType:
 
 @router.get("", response_model=list[LinkResponse])
 def get_links(db: Session = Depends(get_db),
-              note_id: int | None = None,
-              source_id: int | None = None,
-              target_id: int | None = None,
+              note_id: str | None = None,
+              source_id: str | None = None,
+              target_id: str | None = None,
               origin: str | None = None,
               type: str | None = None):
     filters = []
@@ -86,7 +86,7 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/{link_id}", response_model=LinkResponse)
-def update_note(link_id: int, link_update: LinkUpdate, db: Session = Depends(get_db)):
+def update_note(link_id: str, link_update: LinkUpdate, db: Session = Depends(get_db)):
     link =  _get_link_or_404(db, link_id)
 
     update_data = link_update.model_dump(exclude_unset=True)
@@ -106,7 +106,7 @@ def update_note(link_id: int, link_update: LinkUpdate, db: Session = Depends(get
 
 
 @router.delete("/{link_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_note(link_id: int, db: Session = Depends(get_db)):
+def delete_note(link_id: str, db: Session = Depends(get_db)):
     link =  _get_link_or_404(db, link_id)
 
     db.delete(link)

@@ -7,7 +7,7 @@ from enum import Enum
 
 class TagResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int
+    id: str
     name: str
 
 class TagWithCount(TagResponse):
@@ -24,7 +24,7 @@ class TagUpdate(BaseModel):
 
 class NoteTypeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int
+    id: str
     name: str
 
 
@@ -57,7 +57,7 @@ class NoteUpdate(BaseModel):
 
 class NoteResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int
+    id: str
     title: str
     content: str
     status: NoteStatus
@@ -72,7 +72,7 @@ class NoteResponse(BaseModel):
 
 class NoteSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int
+    id: str
     title: str
     note_type: NoteTypeResponse
 

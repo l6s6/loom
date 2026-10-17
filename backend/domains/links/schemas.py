@@ -12,13 +12,13 @@ class LinkOrigin(str, Enum):
 
 class LinkTypeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int
+    id: str
     name: str
 
 
 class LinkResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int
+    id: str
     origin: LinkOrigin
     link_type: LinkTypeResponse
     source: NoteSummary
@@ -27,8 +27,8 @@ class LinkResponse(BaseModel):
 class LinkCreate(BaseModel):
     origin: LinkOrigin
     link_type_name: str
-    source_id: int
-    target_id: int
+    source_id: str
+    target_id: str
 
 
 class LinkUpdate(BaseModel):

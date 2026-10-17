@@ -17,7 +17,7 @@ export const getNotes = (queryString?: string) => {
 };
 
 // GET Note by ID
-export const getNoteById = (noteId: number) =>
+export const getNoteById = (noteId: string) =>
   apiClient<Note>(`/notes/${noteId}`);
 
 // GET Note Tags
@@ -65,13 +65,13 @@ export const updateNoteType = (type: NoteTypeUpdate) =>
   });
 
 // DELETE Note by ID
-export const deleteNote = (noteId: number) =>
+export const deleteNote = (noteId: string) =>
   apiClient<void>(`/notes/${noteId}`, { method: "DELETE" });
 
 // DELETE Tag by ID
-export const deleteTag = (tagId: number) =>
+export const deleteTag = (tagId: string) =>
   apiClient<void>(`/notes/tags/${tagId}`, { method: "DELETE" });
 
 // DELETE NoteType by ID
-export const deleteNoteType = (typeId: number) =>
+export const deleteNoteType = (typeId: string) =>
   apiClient<void>(`/notes/types/${typeId}`, { method: "DELETE" });

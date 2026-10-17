@@ -29,7 +29,7 @@ import type { UseMutateAsyncFunction } from "@tanstack/react-query";
 interface NoteListItemProps {
   note: Note;
   onCreate: UseMutateAsyncFunction<Note, Error>;
-  onDelete: (noteId: number, currentUrl?: string) => Promise<void>;
+  onDelete: (noteId: string, currentUrl?: string) => Promise<void>;
 }
 
 const NoteGridItem = ({ note, onCreate, onDelete }: NoteListItemProps) => {

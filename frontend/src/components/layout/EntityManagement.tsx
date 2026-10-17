@@ -35,8 +35,8 @@ interface EntityManagementProps<T extends BaseEntity> {
   isLoading: boolean;
   error: any;
   onCreate: (name: string) => Promise<unknown>;
-  onUpdate: (id: number, name: string) => Promise<unknown>;
-  onDelete: (id: number) => Promise<void>;
+  onUpdate: (id: string, name: string) => Promise<unknown>;
+  onDelete: (id: string) => Promise<void>;
   renderBadge: (item: T) => JSX.Element;
   canDelete?: (item: T) => boolean;
 }

@@ -45,7 +45,7 @@ export const NOTE_STATUS_CONFIG: Record<NoteStatus, NoteStatusConfigProps> = {
 };
 
 export interface Note {
-  id: number;
+  id: string;
   title: string;
   content: string;
   status: NoteStatus;
@@ -56,7 +56,7 @@ export interface Note {
 }
 
 export interface NoteUpdate {
-  id: number;
+  id: string;
   title?: string;
   content?: string;
   status?: NoteStatus;
@@ -65,7 +65,7 @@ export interface NoteUpdate {
 }
 
 export interface BaseEntity {
-  id: number;
+  id: string;
   name: string;
   note_count: number;
 }
@@ -75,7 +75,7 @@ export interface BaseEntityCreate {
 }
 
 export interface BaseEntityUpdate {
-  id: number;
+  id: string;
   name?: string;
 }
 
