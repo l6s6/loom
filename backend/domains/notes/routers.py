@@ -92,7 +92,7 @@ def get_notes(
 
 
 @router.get("/types", response_model=list[NoteTypeWithCount])
-def get_note_types(db: Session = Depends(get_db)):
+def get_note_types(db: Session = Depends(get_db))-> list[NoteTypeWithCount]:
     results = (
         db.query(NoteType, func.count(Note.id).label("note_count"))
         .outerjoin(Note, and_(
@@ -104,17 +104,17 @@ def get_note_types(db: Session = Depends(get_db)):
     )
     formatted_types = []
     for note_type, count in results:
-        formatted_types.append({
-            "id": note_type.id,
-            "name": note_type.name,
-            "note_count": count
-        })
+        formatted_types.append(NoteTypeWithCount(
+            id=note_type.id,
+            name=note_type.name,
+            note_count=count
+        ))
 
     return formatted_types
 
 
 @router.get("/tags", response_model=list[TagWithCount])
-def get_tags(db: Session = Depends(get_db)):
+def get_tags(db: Session = Depends(get_db)) -> list[TagWithCount]:
     results = (
         db.query(Tag, func.count(note_has_tags.c.note_id).label("note_count"))
         .outerjoin(note_has_tags, note_has_tags.c.tag_id == Tag.id)
@@ -127,11 +127,11 @@ def get_tags(db: Session = Depends(get_db)):
     )
     formatted_tags = []
     for tag, count in results:
-        formatted_tags.append({
-            "id": tag.id,
-            "name": tag.name,
-            "note_count": count
-        })
+        formatted_tags.append(TagWithCount(
+            id=tag.id,
+            name=tag.name,
+            note_count=count
+        ))
 
     return formatted_tags
 

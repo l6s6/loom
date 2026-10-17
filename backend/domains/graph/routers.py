@@ -3,11 +3,10 @@ from pygments.lexers import verifpal
 from sqlalchemy.orm import Session
 
 from core.database import get_db
-from domains.graph.schemas import Graph, VertexType
+from domains.graph.schemas import Graph, VertexType, Vertex, Edge
 from domains.links.models import Link
-from domains.links.routers import get_links
-from domains.notes.models import Note, Tag, NoteType
-from domains.notes.routers import get_notes
+from domains.notes.models import Note
+from domains.notes.routers import get_tags, get_note_types
 
 router = APIRouter(prefix="/graph", tags=["graph"])
 
@@ -16,43 +15,45 @@ router = APIRouter(prefix="/graph", tags=["graph"])
 def get_graph(db: Session = Depends(get_db)):
     vertices = []
     edges = []
+    links = db.query(Link).all()
+    note_types = get_note_types(db)
+    tags = get_tags(db)
+    notes = db.query(Note).all()
 
     # Vertices
-    notes = db.query(Note).all()
     for note in notes:
-        vertices.append({
-            "id": note.id,
-            "name": note.title,
-            "type": VertexType.note.name,
-            "val": 1
-        })
+        incoming_count = sum(1 for l in links if l.target_id == note.id)
+        outgoing_count = sum(1 for l in links if l.source_id == note.id)
+        vertices.append(Vertex(
+            id=str(note.id),
+            name=str(note.title),
+            type=VertexType.note,
+            val=max(1, incoming_count+outgoing_count)
+        ))
 
-    tags = db.query(Tag).all()
     for tag in tags:
-        vertices.append({
-            "id": tag.id,
-            "name": tag.name,
-            "type": VertexType.tag.name,
-            "val": 1
-        })
+        vertices.append(Vertex(
+            id=tag.id,
+            name=tag.name,
+            type=VertexType.tag,
+            val=max(1, tag.note_count)
+        ))
 
-    note_types = db.query(NoteType).all()
     for note_type in note_types:
-        vertices.append({
-            "id": note_type.id,
-            "name": note_type.name,
-            "type": VertexType.note_type.name,
-            "val": 1
-        })
+        vertices.append(Vertex(
+            id=note_type.id,
+            name=note_type.name,
+            type=VertexType.note_type,
+            val=max(1, note_type.note_count)
+        ))
 
 
     # Edges
-    links = db.query(Link).all()
     for link in links:
-        edges.append({
-            "source_id": link.source_id,
-            "target_id": link.target_id,
-            "type": link.link_type.name
-        })
+        edges.append(Edge(
+            source_id=link.source.id,
+            target_id=link.target.id,
+            type=link.link_type.name
+        ))
 
-    return {"vertices": vertices, "edges": edges}
+    return Graph(vertices=vertices, edges=edges)
