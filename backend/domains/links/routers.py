@@ -5,10 +5,9 @@ from sqlalchemy.sql.operators import or_
 from core.database import get_db
 from domains.links.constants import DEFAULT_LINK_TYPE_NAME
 from domains.links.models import Link, LinkType
+from domains.links.schemas import LinkTypeResponse, LinkResponse, LinkCreate, LinkUpdate
 from domains.notes.models import Note
 from domains.notes.routers import get_note_or_404
-
-from domains.links.schemas import LinkTypeResponse, LinkResponse, LinkCreate, LinkUpdate
 
 router = APIRouter(prefix="/links", tags=["links"])
 

@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, func
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy.sql.operators import or_, and_
 
 from core.database import get_db
 from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
+from domains.notes.models import Note, NoteType, Tag, note_has_tags
 from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse, TagCreate, \
     TagUpdate, TagWithCount, NoteTypeWithCount, NoteTypeCreate, NoteTypeUpdate
-from domains.notes.models import Note, NoteType, Tag, note_has_tags
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 

@@ -5,6 +5,7 @@ from fastapi import BackgroundTasks
 
 from core.config import settings
 from domains.notes.routers import router as notes_router
+from domains.graph.routers import router as graph_router
 from domains.links.routers import router as links_router
 
 
@@ -25,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(graph_router)
 app.include_router(links_router)
 app.include_router(notes_router)
 

@@ -1,9 +1,10 @@
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
-from enum import Enum
 
 from domains.notes.schemas import NoteSummary
+
 
 class LinkOrigin(str, Enum):
     manual = "manual"
