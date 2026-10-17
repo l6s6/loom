@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
 import NoteEditorCore from "@/features/notes/components/editor/NoteEditorCore.tsx";
 import EditorTopBar from "@/features/notes/components/editor/EditorTopBar.tsx";
@@ -8,8 +8,14 @@ import ErrorView from "@/components/ErrorView.tsx";
 
 export default function EditorView() {
   const { noteId } = useParams();
-  const id = noteId ? parseInt(noteId) : NaN;
+  const navigate = useNavigate();
 
+  let id: string = "";
+  if (!noteId) {
+    navigate("/");
+  } else {
+    id = noteId;
+  }
   const { note, isLoading, error } = useGetNoteById(id);
 
   if (isLoading) return <LoadingSpinner />;

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.database import Base
 from domains.notes.constants import DEFAULT_NOTE_STATUS, DEFAULT_NOTE_TITLE
+from domains.utils import generate_uuid
 
 if TYPE_CHECKING:
     from domains.links.models  import Link
@@ -22,7 +23,7 @@ note_has_tags = Table(
 class Note(Base):
     __tablename__ = "notes"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True, default=generate_uuid)
     title: Mapped[str] = mapped_column(default=DEFAULT_NOTE_TITLE)
     content: Mapped[str] = mapped_column(default="")
     status: Mapped[str] = mapped_column(default=DEFAULT_NOTE_STATUS)
@@ -35,7 +36,7 @@ class Note(Base):
     )
 
     # N:1 relationship with NoteType
-    note_type_id: Mapped[int] = mapped_column(ForeignKey("note_types.id"))
+    note_type_id: Mapped[str] = mapped_column(ForeignKey("note_types.id"))
     note_type: Mapped["NoteType"] = relationship(back_populates="notes")
 
     # N:M relationship with NoteTag
@@ -59,7 +60,7 @@ class Note(Base):
 class NoteType(Base):
     __tablename__ = "note_types"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True, default=generate_uuid)
     name: Mapped[str] = mapped_column(unique=True)
 
     notes: Mapped[list["Note"]] = relationship(back_populates="note_type")
@@ -68,7 +69,7 @@ class NoteType(Base):
 class Tag(Base):
     __tablename__ = "tags"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True, default=generate_uuid)
     name: Mapped[str] = mapped_column(unique=True)
 
     notes: Mapped[list["Note"]] = relationship(

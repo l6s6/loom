@@ -20,7 +20,7 @@ export function useGetLinks() {
   };
 }
 
-export function useGetLinksByNoteId(noteId: number) {
+export function useGetLinksByNoteId(noteId: string) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["links", noteId],
     queryFn: () => getLinksByNoteId(noteId),

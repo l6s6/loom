@@ -46,7 +46,7 @@ import { Link } from "react-router-dom";
 import { getStringPreview } from "@/lib/utils.ts";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 
-const NoteConnections = ({ noteId }: { noteId: number }) => {
+const NoteConnections = ({ noteId }: { noteId: string }) => {
   const { notes } = useGetNotes();
   const { links } = useGetLinksByNoteId(noteId);
   const { types } = useGetLinkTypes();
@@ -80,7 +80,7 @@ const NoteConnections = ({ noteId }: { noteId: number }) => {
           note.content.toLowerCase().includes(searchQuery.toLowerCase())),
     );
 
-  const handleAddLink = async (target_id: number) => {
+  const handleAddLink = async (target_id: string) => {
     const link: LinkCreate = {
       origin: "manual",
       target_id: target_id,
@@ -231,7 +231,7 @@ const NoteLinks = ({ links, icon, type }: NoteLinksProps) => {
   const isIncoming = type === "incoming";
   const label = isIncoming ? "Incoming Links" : "Outgoing Links";
 
-  const handleDeleteLink = async (linkId: number) => {
+  const handleDeleteLink = async (linkId: string) => {
     await deleteLink(linkId);
   };
 

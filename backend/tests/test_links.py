@@ -136,7 +136,7 @@ def test_create_link_invalid_note(client, db_session):
     note1 = make_note(db_session)
     link_type_name="LinkType"
     payload = {"source_id":note1.id,
-               "target_id":123,
+               "target_id":"abc",
                "origin":"manual",
                "link_type_name":link_type_name
                }
