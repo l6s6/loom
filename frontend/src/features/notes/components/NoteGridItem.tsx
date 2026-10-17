@@ -33,7 +33,7 @@ interface NoteListItemProps {
 
 const NoteGridItem = ({ note, onCreate, onDelete }: NoteListItemProps) => {
   const contentPreview = getStringPreview(
-    50,
+    45,
     note.content,
     "No content yet...",
   );
@@ -55,26 +55,41 @@ const NoteGridItem = ({ note, onCreate, onDelete }: NoteListItemProps) => {
             <CardHeader>
               <CardTitle>{titlePreview}</CardTitle>
               <CardDescription>
-                <div className="flex flex-row gap-4">
-                  <span className="text-content-muted">
+                <div className="flex flex-row items-center gap-3 min-w-0">
+                  <span className="text-content-muted text-xs whitespace-nowrap shrink-0">
                     {formattedModifiedAt}
                   </span>
-                  <div className="flex flex-row gap-2">
-                    <div className="px-1 py-0.5 rounded-sm flex flex-row items-center gap-1 bg-primary-bg">
-                      <span className="text-xs text-primary">
+                  <div className="flex flex-row items-center w-52 gap-1.5 min-w-0 scrollbar-none overflow-auto px-2 flex-nowrap">
+                    <div className="px-1.5 py-0.5 rounded-sm shrink-0 bg-primary-bg">
+                      <span className="text-xs text-primary font-medium">
                         {note.note_type.name}
                       </span>
                     </div>
-                    {note.tags.map((tag) => (
+
+                    {note.tags.slice(0, 1).map((tag) => (
                       <div
                         key={tag.id}
-                        className="px-1 py-0.5 border border-border-subtle rounded-sm flex bg-bg-sidebar"
+                        className="px-1.5 py-0.5 border border-border-subtle rounded-sm bg-bg-sidebar shrink-0"
                       >
                         <span className="text-xs text-content-muted">
                           #{tag.name}
                         </span>
                       </div>
                     ))}
+
+                    {note.tags.length > 1 && (
+                      <div
+                        className="px-1.5 py-0.5 border border-border-subtle rounded-sm bg-bg-sidebar shrink-0"
+                        title={note.tags
+                          .slice(1)
+                          .map((t) => `#${t.name}`)
+                          .join(", ")}
+                      >
+                        <span className="text-xs text-content-muted font-medium">
+                          +{note.tags.length - 1}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardDescription>

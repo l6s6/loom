@@ -16,7 +16,7 @@ Use cases and requirements for [Loom](../README.md), written before the first li
 
 A tool for capturing thoughts, questions, quotes, and ideas, with the ability to later reflect on them, link them, and explore them as a network. The focus is on open questions: they are tracked, resurfaced on demand, and closed by the note that answers them. No active reminder system — a tool used when wanted.
 
-Also a learning project for full-stack development: the code is written by hand, AI is used only for planning, understanding bugs, and code review.
+Also a learning project for full-stack development: the code is mostly written by hand, AI is used for planning, understanding bugs, and code review.
 
 ## Use Cases
 

@@ -2,7 +2,7 @@
 
 Personal note-taking and knowledge-management app. Capture short notes (thoughts, questions, quotes, ideas), organize them by type, tag, and status, and link related notes to each other. The focus is on open questions: tracking them, resurfacing them, and recording which later note answered them.
 
-This is also a learning project: a full-stack app built to practice backend architecture, frontend development, and database design, without using AI to write the code. See [`docs/learnings.md`](docs/learnings.md) for what came out of that.
+This is also a learning project: a full-stack app built to practice backend architecture, frontend development, and database design, using very little AI to write code. See [`docs/learnings.md`](docs/learnings.md) for what came out of that.
 
 ## Live Demo
 

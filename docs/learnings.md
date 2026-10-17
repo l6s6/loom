@@ -22,4 +22,4 @@ General topics and concepts learned while building Loom, grouped by area.
 - GitHub: Using GitHub for version management, managing branches and setting up continious integration (CI) for automated tests 
 - Software Engineering Rules: avoiding duplicates, keeping it simple and not implementing features that are not needed
 - Domain Driven Design (DDD): Using domain driven folder structures for backend  and frontend
-- Using an AI for code review, optimization, debugging, explanation, and planning rather than code generation
+- Using an AI for code review, optimization, debugging, explanation, and planning rather than large scale code generation

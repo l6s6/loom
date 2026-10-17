@@ -58,7 +58,6 @@ export function NotesView() {
     .sort((a, b) => a.modified_at.localeCompare(b.modified_at))
     .reverse();
 
-  if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorView error={error} />;
 
   return (
@@ -71,27 +70,31 @@ export function NotesView() {
           feedFilters={feedFilters}
           handleFilterChange={handleFilterChange}
         />
-        <CommandList className="max-h-full mt-4">
-          <CommandEmpty>
-            <span className="text-content-muted">No Notes found.</span>
-          </CommandEmpty>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <CommandList className="max-h-full mt-4">
+            <CommandEmpty>
+              <span className="text-content-muted">No Notes found.</span>
+            </CommandEmpty>
 
-          <CommandGroup className="**:[[cmdk-group-items]]:grid **:[[cmdk-group-items]]:grid-cols-1 md:**:[[cmdk-group-items]]:grid-cols-2 **:[[cmdk-group-items]]:gap-2">
-            {/* Use [&>svg]:hidden on CommandItem to hide Check Mark placeholder  */}
-            {sortedNotes.map((note) => (
-              <CommandItem
-                key={note.id}
-                className="p-0 w-full [&>svg]:hidden data-selected:bg-transparent"
-              >
-                <NoteGridItem
-                  note={note}
-                  onCreate={createAndNavigateNote}
-                  onDelete={deleteNote}
-                />
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </CommandList>
+            <CommandGroup className="**:[[cmdk-group-items]]:grid **:[[cmdk-group-items]]:grid-cols-1 md:**:[[cmdk-group-items]]:grid-cols-2 **:[[cmdk-group-items]]:gap-2">
+              {/* Use [&>svg]:hidden on CommandItem to hide Check Mark placeholder  */}
+              {sortedNotes.map((note) => (
+                <CommandItem
+                  key={note.id}
+                  className="p-0 w-full [&>svg]:hidden data-selected:bg-transparent"
+                >
+                  <NoteGridItem
+                    note={note}
+                    onCreate={createAndNavigateNote}
+                    onDelete={deleteNote}
+                  />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        )}
       </Command>
     </CenterContainer>
   );
