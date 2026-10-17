@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/card.tsx";
 
 import { NOTE_STATUS_CONFIG } from "@/features/notes/types.ts";
-import { capitalizeFirstLetter } from "@/lib/utils.ts";
 import type { UseMutateAsyncFunction } from "@tanstack/react-query";
 
 interface NoteListItemProps {
@@ -87,9 +86,9 @@ const NoteGridItem = ({ note, onCreate, onDelete }: NoteListItemProps) => {
                     className={`w-1.5 h-1.5 rounded-full ${NOTE_STATUS_CONFIG[note.status].dotColor}`}
                   />
                   <span
-                    className={`text-xs ${NOTE_STATUS_CONFIG[note.status].textColor}`}
+                    className={`text-xs capitalize ${NOTE_STATUS_CONFIG[note.status].textColor}`}
                   >
-                    {capitalizeFirstLetter(note.status)}
+                    {note.status}
                   </span>
                 </div>
               </CardAction>

@@ -5,6 +5,12 @@ export const VertexType = {
 } as const;
 export type VertexType = (typeof VertexType)[keyof typeof VertexType];
 
+export const VERTEX_COLORS: Record<string, string> = {
+  [VertexType.note]: "#ef4444",
+  [VertexType.tag]: "#3b82f6",
+  [VertexType.note_type]: "#10b981",
+};
+
 export interface Vertex {
   id: string;
   name: string;
