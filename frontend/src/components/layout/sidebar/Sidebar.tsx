@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, Search, Trash } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { BookOpen, Trash } from "lucide-react";
 import {
   mainNavItems,
   smartViewsConfig,
@@ -98,15 +98,10 @@ const Sidebar = () => {
         >
           <div className="flex flex-row items-center gap-4">
             <h3 className="text-sm truncate text-white font-medium">
-              Capture Thought
+              Create Note
             </h3>
           </div>
         </Button>
-        <Link to="/">
-          <Button variant="outline" className="flex" size="icon-xl">
-            <Search />
-          </Button>
-        </Link>
       </div>
     </aside>
   );
