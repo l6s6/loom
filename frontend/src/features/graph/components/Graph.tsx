@@ -28,6 +28,7 @@ const Graph = ({
         ref={fgRef}
         graphData={graphData}
         d3VelocityDecay={0.7}
+        d3AlphaDecay={0.1}
         backgroundColor="white"
         showNavInfo={true}
 

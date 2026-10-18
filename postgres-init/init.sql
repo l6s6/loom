@@ -1,0 +1,2 @@
+CREATE DATABASE loom_db;
+CREATE DATABASE loom_test_db;

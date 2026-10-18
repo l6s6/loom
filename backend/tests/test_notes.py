@@ -60,6 +60,8 @@ def test_get_notes_returns_notes(client, db_session):
         ("?is_archived=false", ["a", "c", "d"]),
         ("?is_private=true", ["c", "d"]),
         ("?is_private=false", ["a", "b"]),
+        ("?is_loose_end=true", ["c", "d"]),
+        ("?is_loose_end=false", ["a", "b"]),
 
         # --- Search Filter ---
         ("?search=Meeting", ["a"]),
@@ -94,6 +96,8 @@ def test_get_notes_returns_notes(client, db_session):
         "archived_false",
         "private_true",
         "private_false",
+        "loose_end_true",
+        "loose_end_false",
         "search_title",
         "search_content",
         "search_content_keyword",

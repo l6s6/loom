@@ -51,7 +51,7 @@ const NoteGridItem = ({ note, onCreate, onDelete }: NoteListItemProps) => {
     <ContextMenu key={note.id}>
       <ContextMenuTrigger className="w-full h-full">
         <Link to={`/n/${note.id}`}>
-          <Card className="hover:bg-bg-sidebar gap-4">
+          <Card className="hover:bg-bg-sidebar bg-red gap-4 backdrop-filter backdrop-blur-sm bg-opacity-30 bg-clip-padding">
             <CardHeader>
               <CardTitle>{titlePreview}</CardTitle>
               <CardDescription>
@@ -59,7 +59,7 @@ const NoteGridItem = ({ note, onCreate, onDelete }: NoteListItemProps) => {
                   <span className="text-content-muted text-xs whitespace-nowrap shrink-0">
                     {formattedModifiedAt}
                   </span>
-                  <div className="flex flex-row items-center w-52 gap-1.5 min-w-0 scrollbar-none overflow-auto px-2 flex-nowrap">
+                  <div className="flex flex-row items-center w-52 gap-1.5 min-w-0 scrollbar-none overflow-hidden px-2 flex-nowrap mask-[linear-gradient(to_right,black_85%,transparent_100%)]">
                     <div className="px-1.5 py-0.5 rounded-sm shrink-0 bg-primary-bg">
                       <span className="text-xs text-primary font-medium">
                         {note.note_type.name}

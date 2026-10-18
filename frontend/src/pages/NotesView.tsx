@@ -25,6 +25,10 @@ export function NotesView() {
     type: searchParams.get("type") || "",
     status: searchParams.get("status") || "",
     tag: searchParams.get("tag") || "",
+    is_loose_end: searchParams.get("is_loose_end") || "",
+    is_archived: searchParams.get("is_archived") || "",
+    is_pinned: searchParams.get("is_pinned") || "",
+    is_private: searchParams.get("is_private") || "",
   };
 
   const buildQueryString = () => {

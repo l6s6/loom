@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy.sql.operators import or_, and_
 
 from core.database import get_db
+from domains.links.models import Link
 from domains.notes.constants import DEFAULT_NOTE_TYPE_NAME
 from domains.notes.models import Note, NoteType, Tag, note_has_tags
 from domains.notes.schemas import NoteResponse, NoteStatus, NoteUpdate, NoteTypeResponse, TagResponse, TagCreate, \
@@ -68,6 +69,7 @@ def get_notes(
     is_archived: bool | None = None,
     is_pinned: bool | None = None,
     is_private: bool | None = None,
+    is_loose_end: bool | None = None,
     search: str | None = None,
 ):
     filters = []
@@ -82,6 +84,18 @@ def get_notes(
         filters.append(Note.is_pinned == is_pinned)
     if is_private is not None:
         filters.append(Note.is_private == is_private)
+    if is_loose_end is not None:
+        has_outgoing = db.query(Link.source_id)
+        has_incoming = db.query(Link.target_id)
+
+        if is_loose_end:
+            filters.append(Note.id.notin_(has_outgoing))
+            filters.append(Note.id.notin_(has_incoming))
+        else:
+            filters.append(or_(
+                Note.id.in_(has_outgoing),
+                Note.id.in_(has_incoming)
+            ))
     if tag is not None:
         filters.append(Note.tags.any(Tag.name == tag))
     if search is not None:
