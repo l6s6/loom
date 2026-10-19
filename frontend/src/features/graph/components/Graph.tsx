@@ -82,6 +82,10 @@ const Graph = ({
         onNodeClick={(node) => {
           if (node.group === VertexType.note) {
             navigate(`/n/${node.id}`);
+          } else if (node.group == VertexType.tag) {
+            navigate(`/?tag=${node.name}`);
+          } else if (node.group == VertexType.note_type) {
+            navigate(`/?type=${node.name}`);
           }
         }}
       />

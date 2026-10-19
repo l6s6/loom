@@ -28,3 +28,12 @@ export interface Graph {
   vertices: Vertex[];
   edges: Edge[];
 }
+
+export const GRAPH_DEFAULT_OPTIONS: Record<string, boolean> = {
+  show_notes: true,
+  show_tags: true,
+  show_note_types: true,
+  show_links: true,
+  show_tag_links: false,
+  show_note_type_links: false,
+};

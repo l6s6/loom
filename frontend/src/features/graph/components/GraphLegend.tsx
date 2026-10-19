@@ -1,4 +1,7 @@
-import { VERTEX_COLORS } from "@/features/graph/types.ts";
+import {
+  GRAPH_DEFAULT_OPTIONS,
+  VERTEX_COLORS,
+} from "@/features/graph/types.ts";
 import {
   Card,
   CardContent,
@@ -6,25 +9,35 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { Switch } from "@/components/ui/switch.tsx";
-import { type Dispatch, type SetStateAction } from "react";
+import { useSearchParams } from "react-router-dom";
 
-interface GraphLegendProps {
-  showLinks: boolean;
-  setShowLinks: Dispatch<SetStateAction<boolean>>;
-  showTagLinks: boolean;
-  setShowTagLinks: Dispatch<SetStateAction<boolean>>;
-  showNoteTypeLinks: boolean;
-  setShowNoteTypeLinks: Dispatch<SetStateAction<boolean>>;
-}
+const GraphLegend = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
 
-const GraphLegend = ({
-  showLinks,
-  setShowLinks,
-  showTagLinks,
-  setShowTagLinks,
-  showNoteTypeLinks,
-  setShowNoteTypeLinks,
-}: GraphLegendProps) => {
+  const getFilter = (key: keyof typeof GRAPH_DEFAULT_OPTIONS) => {
+    const param = searchParams.get(key);
+    return param !== null ? param === "true" : GRAPH_DEFAULT_OPTIONS[key];
+  };
+
+  const showNotes = getFilter("show_notes");
+  const showTags = getFilter("show_tags");
+  const showNoteTypes = getFilter("show_note_types");
+  const showLinks = getFilter("show_links");
+  const showTagLinks = getFilter("show_tag_links");
+  const showNoteTypeLinks = getFilter("show_note_type_links");
+
+  const toggleOption = (name: string, checked: boolean) => {
+    setSearchParams((prev) => {
+      // Remove query string if equal to default value
+      if (checked === GRAPH_DEFAULT_OPTIONS[name]) {
+        prev.delete(name);
+      } else {
+        prev.set(name, checked.toString());
+      }
+      return prev;
+    });
+  };
+
   return (
     <div className="absolute h-full w-96 left-sidebar top-0 bottom-0 z-1 py-8 mx-8">
       <Card className="w-full bg-bg-sidebar backdrop-filter backdrop-blur-sm bg-opacity-30 bg-clip-padding">
@@ -68,10 +81,44 @@ const GraphLegend = ({
 
             <div className="flex flex-col gap-4 p-4">
               <div className="flex flex-row justify-between items-center">
+                <span className="text-base font-medium">Show Notes</span>
+                <Switch
+                  checked={showNotes}
+                  onCheckedChange={(checked) =>
+                    toggleOption("show_notes", checked)
+                  }
+                />
+              </div>
+              <div className="flex flex-row justify-between items-center">
+                <span className="text-base font-medium">Show Tags</span>
+                <Switch
+                  checked={showTags}
+                  onCheckedChange={(checked) =>
+                    toggleOption("show_tags", checked)
+                  }
+                />
+              </div>
+              <div className="flex flex-row justify-between items-center">
+                <span className="text-base font-medium">Show Note Types</span>
+                <Switch
+                  checked={showNoteTypes}
+                  onCheckedChange={(checked) =>
+                    toggleOption("show_note_types", checked)
+                  }
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-4 p-4">
+              <div className="flex flex-row justify-between items-center">
                 <span className="text-base font-medium">
                   Show Links between Notes
                 </span>
-                <Switch checked={showLinks} onCheckedChange={setShowLinks} />
+                <Switch
+                  checked={showLinks}
+                  onCheckedChange={(checked) =>
+                    toggleOption("show_links", checked)
+                  }
+                />
               </div>
               <div className="flex flex-row justify-between items-center">
                 <span className="text-base font-medium">
@@ -79,7 +126,9 @@ const GraphLegend = ({
                 </span>
                 <Switch
                   checked={showTagLinks}
-                  onCheckedChange={setShowTagLinks}
+                  onCheckedChange={(checked) =>
+                    toggleOption("show_tag_links", checked)
+                  }
                 />
               </div>
               <div className="flex flex-row justify-between items-center">
@@ -88,7 +137,9 @@ const GraphLegend = ({
                 </span>
                 <Switch
                   checked={showNoteTypeLinks}
-                  onCheckedChange={setShowNoteTypeLinks}
+                  onCheckedChange={(checked) =>
+                    toggleOption("show_note_type_links", checked)
+                  }
                 />
               </div>
             </div>
