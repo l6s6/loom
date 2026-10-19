@@ -17,6 +17,7 @@ import {
 import NoteSearchBar from "@/features/notes/components/NoteSearchBar.tsx";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
 import ErrorView from "@/components/ErrorView.tsx";
+import { buildQueryString } from "@/lib/utils.ts";
 
 export function NotesView() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,17 +32,7 @@ export function NotesView() {
     is_private: searchParams.get("is_private") || "",
   };
 
-  const buildQueryString = () => {
-    const paramsForBackend = new URLSearchParams();
-    Object.entries(feedFilters).forEach(([key, value]) => {
-      if (value) {
-        paramsForBackend.append(key, value);
-      }
-    });
-    return paramsForBackend.toString();
-  };
-
-  const queryString = buildQueryString();
+  const queryString = buildQueryString(feedFilters);
 
   const { notes, isLoading, error } = useGetNotes(queryString);
   const { createAndNavigateNote } = useCreateAndNavigateNote();

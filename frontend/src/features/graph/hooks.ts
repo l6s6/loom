@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getGraph } from "@/features/graph/api.ts";
 
-export function useGetGraph() {
+export function useGetGraph(queryString: string) {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["graph"],
-    queryFn: getGraph,
+    queryKey: ["graph", queryString],
+    queryFn: () => getGraph(queryString),
   });
 
   return {

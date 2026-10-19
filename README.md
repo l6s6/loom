@@ -2,8 +2,7 @@
 
 Personal note-taking and knowledge-management app. Capture short notes (thoughts, questions, quotes, ideas), organize them by type, tag, and status, and link related notes to each other. The focus is on open questions: tracking them, resurfacing them, and recording which later note answered them.
 
-This is also a learning project: a full-stack app built to practice backend architecture, frontend development, and database design, using very little AI to write code. See [`docs/learnings.md`](docs/learnings.md) for what came out of that.
-
+This is a learning project: a full-stack app built to practice backend architecture, frontend development, and database design. AI tools were used intentionally for assistance with debugging, boilerplate, brainstorming and reviews —no "vibe coding" allowed. See docs/learnings.md for what came out of that process.
 ## Live Demo
 
 [Live demo](https://loom-loom19.vercel.app/) (public instance with sample data)
@@ -41,9 +40,9 @@ Use cases and requirements are documented in [`docs/concept.md`](docs/concept.md
 - [x] Phase 0 — Project setup
 - [x] Phase 1 — Note creation and listing
 - [x] Phase 2 — Types, tags, status, filtering, search
-- [x] Phase 4 — Manual linking between notes (optional link type, backlinks)
-- [ ] Phase 3 — Revisiting open questions
-- [ ] Phase 5 — Graph visualization
+- [X] Phase 3 — Revisiting open questions
+- [x] Phase 4 — Manual linking between notes (backlinks with link type)
+- [X] Phase 5 — Graph visualization
 - [ ] Phase 6 — Embeddings, similarity search, answer suggestions for open questions
 - [ ] Phase 7 — Recurring-thought detection, optional summaries
 - [ ] Phase 8 — Export (JSON, Obsidian-compatible Markdown)
