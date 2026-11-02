@@ -1,3 +1,11 @@
+"""Pytest fixtures and test database setup for the backend test suite.
+
+This module configures a temporary SQLite/Postgres-like test database and
+provides reusable fixtures for API integration tests. It ensures all domain
+models are imported so SQLAlchemy metadata is aware of the schema, creates
+database tables before each test, and tears them down afterward.
+"""
+
 import pytest
 import os
 from sqlalchemy import create_engine
@@ -13,17 +21,23 @@ from core.config import settings
 # Important: All models must be imported so that Base.metadata can recognize them
 from domains import *
 
+# Test database connection string. Loaded from environment or application settings.
 TEST_DB_URL = settings.test_database_url or os.getenv("TEST_DATABASE_URL")
 if not TEST_DB_URL:
     raise ValueError("Failed to load TEST_DATABASE_URL!")
 
 engine = create_engine(TEST_DB_URL)
 
-
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 @pytest.fixture(scope="function")
 def db_session():
+    """Create a fresh test database for each test function.
+
+    Yields:
+        Session: A SQLAlchemy session bound to the test database.
+    """
     Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     try:
@@ -35,6 +49,14 @@ def db_session():
 
 @pytest.fixture(scope="function")
 def client(db_session):
+    """Provide a FastAPI test client wired to the test database session.
+
+    Args:
+        db_session: The per-test database session fixture.
+
+    Yields:
+        TestClient: A client configured to use the shared test DB.
+    """
     def override_get_db():
         try:
             yield db_session
@@ -47,9 +69,13 @@ def client(db_session):
     app.dependency_overrides.clear()
 
 
-
 @pytest.fixture
 def seeded_notes(db_session):
+    """Create a reusable set of notes, tags, and a sample link for API tests.
+
+    Returns:
+        dict: A dictionary containing the seeded note objects keyed by label.
+    """
     type_idea = make_note_type(db_session, name="Idea")
     type_task = make_note_type(db_session, name="Task")
     db_session.add_all([type_idea, type_task])
@@ -125,11 +151,15 @@ def seeded_notes(db_session):
 
 @pytest.fixture
 def seeded_links(db_session):
-    """
-    Links:
+    """Create a small graph of linked notes for testing graph and link APIs.
+
+    The fixture creates:
       - l1: n1 -> n2 | type='relates to' | origin='manual'
-      - l2: n2 -> n3 | type='references' | origin='auto'
-      - l3: n1 -> n3 | type='relates to' | origin='auto'
+      - l2: n2 -> n3 | type='references' | origin='ai'
+      - l3: n1 -> n3 | type='relates to' | origin='ai'
+
+    Returns:
+        dict: A dictionary containing notes and their generated links.
     """
     n1 = make_note(db_session, title="Node 1")
     n2 = make_note(db_session, title="Node 2")

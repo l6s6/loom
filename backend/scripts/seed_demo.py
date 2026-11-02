@@ -1,7 +1,17 @@
+"""Seed script for generating demo metadata in the local database.
+
+This script clears existing note/link/tag data and creates a representative
+example graph of notes, types, tags, and relationships. It is designed to help
+developers visualize the system and test UI features such as filtering, graph
+rendering, and note linking without needing to manually create data.
+"""
+
 import sys
 import os
 from textwrap import dedent
 
+# Ensure the project root is on the Python path so imports work when this script
+# is executed directly from its folder.
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.database import SessionLocal
@@ -10,6 +20,18 @@ from domains.links.models import Link, LinkType
 
 
 def seed_demo_data():
+    """Populate the database with a sample knowledge graph for local demo usage.
+
+    The function:
+      - clears the existing data
+      - creates note types, link types, and tags
+      - creates a set of demo notes with rich Markdown content
+      - links related notes to form a small graph
+      - commits the transaction
+
+    Raises:
+        Exception: If any database operation fails during seeding.
+    """
     db = SessionLocal()
     try:
         print("Cleaning up old data...")
@@ -56,7 +78,7 @@ def seed_demo_data():
             title="Loom Architecture MoC",
             content=dedent("""\
                 # Loom Architecture
-                Loom is a full-stack personal knowledge base system. 
+                Loom is a full-stack personal knowledge base system.
                 This note acts as the central Map of Content (MoC) for the entire project.
 
                 ## Core Pillars
@@ -68,7 +90,7 @@ def seed_demo_data():
             """),
             note_type=type_moc,
             tags=[tag_arch],
-            status="ongoing"
+            status="ongoing",
         )
 
         # --- BACKEND CLUSTER ---
@@ -85,7 +107,7 @@ def seed_demo_data():
             """),
             note_type=type_resource,
             tags=[tag_backend, tag_db],
-            status="closed"
+            status="closed",
         )
 
         n_fastapi_auth = Note(
@@ -97,7 +119,7 @@ def seed_demo_data():
             """),
             note_type=type_snippet,
             tags=[tag_backend],
-            status="open"
+            status="open",
         )
 
         # --- FRONTEND CLUSTER ---
@@ -112,7 +134,7 @@ def seed_demo_data():
             """),
             note_type=type_moc,
             tags=[tag_frontend, tag_react],
-            status="ongoing"
+            status="ongoing",
         )
 
         n_graph_3d = Note(
@@ -126,19 +148,19 @@ def seed_demo_data():
             """),
             note_type=type_resource,
             tags=[tag_frontend, tag_react],
-            status="closed"
+            status="closed",
         )
 
         n_d3_physics = Note(
             title="D3.js Physics Engine",
             content=dedent("""\
-                The underlying engine of the Force Graph. 
+                The underlying engine of the Force Graph.
                 Nodes repel each other (Charge), while links pull them together (Spring).
                 Adjust `d3VelocityDecay` to make the graph stop jiggling faster.
             """),
             note_type=type_concept,
             tags=[tag_frontend, tag_theory],
-            status="closed"
+            status="closed",
         )
 
         # --- THEORY CLUSTER ---
@@ -153,7 +175,7 @@ def seed_demo_data():
             """),
             note_type=type_concept,
             tags=[tag_theory],
-            status="closed"
+            status="closed",
         )
 
         n_degree_centrality = Note(
@@ -165,7 +187,7 @@ def seed_demo_data():
             """),
             note_type=type_concept,
             tags=[tag_theory, tag_arch],
-            status="closed"
+            status="closed",
         )
 
         # --- DEVOPS CLUSTER ---
@@ -179,7 +201,7 @@ def seed_demo_data():
             """),
             note_type=type_resource,
             tags=[tag_devops],
-            status="closed"
+            status="closed",
         )
 
         # --- ORPHANS (No Links - to test graph isolation) ---
@@ -188,7 +210,7 @@ def seed_demo_data():
             content="Great book. Need to summarize the chapter on DRY principles soon.",
             note_type=type_resource,
             tags=[],
-            status="open"
+            status="open",
         )
 
         n_orphan_2 = Note(
@@ -196,15 +218,24 @@ def seed_demo_data():
             content="- Coffee\n- Oat milk\n- Apples",
             note_type=type_snippet,
             tags=[],
-            status="open"
+            status="open",
         )
 
-        db.add_all([
-            n_arch, n_pg_search, n_fastapi_auth,
-            n_frontend_moc, n_graph_3d, n_d3_physics,
-            n_zettelkasten, n_degree_centrality,
-            n_docker, n_orphan_1, n_orphan_2
-        ])
+        db.add_all(
+            [
+                n_arch,
+                n_pg_search,
+                n_fastapi_auth,
+                n_frontend_moc,
+                n_graph_3d,
+                n_d3_physics,
+                n_zettelkasten,
+                n_degree_centrality,
+                n_docker,
+                n_orphan_1,
+                n_orphan_2,
+            ]
+        )
         db.flush()  # Flush to get the IDs for linking
 
         print("Linking the Notes...")
@@ -245,4 +276,5 @@ def seed_demo_data():
 
 
 if __name__ == "__main__":
+    """Run the demo data seeding script when executed directly."""
     seed_demo_data()

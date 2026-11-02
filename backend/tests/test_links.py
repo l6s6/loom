@@ -1,3 +1,13 @@
+"""Tests for the link API endpoints and link-related business rules.
+
+This module verifies the behavior of the /links endpoints, including:
+- listing and filtering links
+- creating links between notes
+- updating link types
+- deleting links
+- cascading deletion when a linked note is removed
+"""
+
 from domains.links.constants import DEFAULT_LINK_TYPE_NAME
 from domains.links.models import LinkType, Link
 from domains.notes.models import Note
@@ -8,6 +18,7 @@ from tests.factories import make_note, make_link
 
 # --- GET /links ---
 def test_get_links_returns_links(client, db_session):
+    """Ensure GET /links returns all persisted links in the database."""
     link1 = make_link(db_session)
     link2 = make_link(db_session)
     response = client.get("/links")
@@ -83,6 +94,7 @@ def test_get_links_returns_links(client, db_session):
     ],
 )
 def test_get_links_filter_matrix(client, seeded_links, param_builder, expected_link_keys):
+    """Validate GET /links filtering behavior across all supported query filters."""
     notes = seeded_links["notes"]
     links = seeded_links["links"]
 
@@ -100,19 +112,19 @@ def test_get_links_filter_matrix(client, seeded_links, param_builder, expected_l
     )
 
 
-
-
 # --- POST /links ---
 def test_create_link(client, db_session):
+    """Ensure POST /links creates a new link with the supplied relationship metadata."""
     note1 = make_note(db_session)
     note2 = make_note(db_session)
-    link_type_name="LinkType"
-    payload = {"source_id":note1.id,
-               "target_id":note2.id,
-               "origin":"manual",
-               "link_type_name":link_type_name
-               }
-    response = client.post("/links",json=payload)
+    link_type_name = "LinkType"
+    payload = {
+        "source_id": note1.id,
+        "target_id": note2.id,
+        "origin": "manual",
+        "link_type_name": link_type_name,
+    }
+    response = client.post("/links", json=payload)
     body = response.json()
 
     assert response.status_code == 201
@@ -129,26 +141,24 @@ def test_create_link(client, db_session):
     assert link_type.name == link_type_name
 
 
-
-
-# --- POST /links ---
 def test_create_link_invalid_note(client, db_session):
+    """Ensure POST /links fails when either source or target note does not exist."""
     note1 = make_note(db_session)
-    link_type_name="LinkType"
-    payload = {"source_id":note1.id,
-               "target_id":"abc",
-               "origin":"manual",
-               "link_type_name":link_type_name
-               }
-    response = client.post("/links",json=payload)
+    link_type_name = "LinkType"
+    payload = {
+        "source_id": note1.id,
+        "target_id": "abc",
+        "origin": "manual",
+        "link_type_name": link_type_name,
+    }
+    response = client.post("/links", json=payload)
 
     assert response.status_code == 404
 
 
-
-
 # --- PUT /links/{id} ---
 def test_update_link_no_changes(client, db_session):
+    """Updating with an empty payload should leave the link unchanged."""
     link = make_link(db_session)
 
     response = client.put(f"/links/{link.id}", json={})
@@ -159,6 +169,7 @@ def test_update_link_no_changes(client, db_session):
 
 
 def test_update_link_create_new_link_type(client, db_session):
+    """Updating the link type should create a new type when needed."""
     link = make_link(db_session)
     new_link_type_name = "NewLinkType"
     response = client.put(f"/links/{link.id}", json={"link_type_name": new_link_type_name})
@@ -173,6 +184,7 @@ def test_update_link_create_new_link_type(client, db_session):
 
 
 def test_update_link_empty_link_type(client, db_session):
+    """Empty link type names should fall back to the default relationship type."""
     link = make_link(db_session)
     response = client.put(f"/links/{link.id}", json={"link_type_name": ""})
     body = response.json()
@@ -185,10 +197,9 @@ def test_update_link_empty_link_type(client, db_session):
     assert_link_response(body, link)
 
 
-
-
 # --- DELETE /links/{id} ---
 def test_delete_link(client, db_session):
+    """Ensure DELETE /links/{id} removes the target link from the database."""
     link = make_link(db=db_session)
 
     response = client.delete(f"/links/{link.id}")
@@ -198,6 +209,7 @@ def test_delete_link(client, db_session):
 
 
 def test_delete_link_by_deleting_note(client, db_session):
+    """Deleting a connected note should cascade and remove the related links."""
     link = make_link(db=db_session)
     source_id = link.source_id
     target_id = link.target_id
@@ -212,5 +224,6 @@ def test_delete_link_by_deleting_note(client, db_session):
 
 
 def test_delete_link_not_existing(client):
-    response = client.delete(f"/links/1")
+    """DELETE /links/{id} should return 404 when the link is missing."""
+    response = client.delete("/links/1")
     assert response.status_code == 404

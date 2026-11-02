@@ -1,13 +1,33 @@
+"""Assertion helpers for backend API response tests.
+
+These utility functions compare API response payloads against ORM objects to
+ensure the JSON returned by FastAPI matches the underlying database state.
+They keep test cases concise while validating identity, relationship payloads,
+and nested note metadata.
+"""
+
 from domains.links.models import Link, LinkType
 from domains.notes.models import Note, NoteType, Tag
 
 
 def assert_type_or_tag_response(actual: dict, expected: NoteType | LinkType | Tag):
+    """Assert that a response object matches a note type, link type, or tag.
+
+    Args:
+        actual: Parsed JSON dict returned from the API.
+        expected: ORM instance used as the expected source of truth.
+    """
     assert actual["id"] == expected.id
     assert actual["name"] == expected.name
 
 
 def assert_link_response(actual: dict, expected: Link):
+    """Assert that a link response matches the expected Link ORM object.
+
+    Args:
+        actual: Parsed JSON dict returned from the API.
+        expected: Link instance representing the expected persisted relationship.
+    """
     assert actual["id"] == expected.id
     assert actual["origin"] == expected.origin
     assert actual["source"]["id"] == expected.source_id
@@ -17,6 +37,12 @@ def assert_link_response(actual: dict, expected: Link):
 
 
 def assert_note_response(actual: dict, expected: Note):
+    """Assert that a note response matches the expected Note ORM object.
+
+    Args:
+        actual: Parsed JSON dict returned from the API.
+        expected: Note instance representing the expected persisted note.
+    """
     assert actual["id"] == expected.id
     assert actual["title"] == expected.title
     assert actual["content"] == expected.content

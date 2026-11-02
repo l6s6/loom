@@ -1,3 +1,14 @@
+"""Backend tests covering note API behavior and filtering rules.
+
+This suite verifies the CRUD endpoints for notes, including:
+- listing notes with optional filters
+- reading note details
+- creating and updating note metadata
+- assigning and replacing tags
+- deleting notes
+- validating note-type defaults and status handling
+"""
+
 from time import sleep
 
 import pytest
@@ -7,16 +18,19 @@ from tests.factories import make_note, make_note_type, make_tag
 from domains.notes.models import Note, NoteType, Tag
 from tests.helpers import assert_note_response, assert_type_or_tag_response
 
+
 # --- GET /notes ---
 def test_get_notes_empty(client, db_session):
+    """GET /notes should return an empty list when no notes exist."""
     response = client.get("/notes")
     body = response.json()
 
     assert response.status_code == 200
-    assert len(body) ==0
+    assert len(body) == 0
 
 
 def test_get_notes_returns_notes(client, db_session):
+    """GET /notes should return all persisted notes."""
     note1 = make_note(db_session)
     note2 = make_note(db_session)
 
@@ -112,6 +126,7 @@ def test_get_notes_returns_notes(client, db_session):
     ],
 )
 def test_get_notes_filter_matrix(client, seeded_notes, query_params, expected_keys):
+    """Validate GET /notes query filters for type, tag, status, search, and booleans."""
     response = client.get(f"/notes{query_params}")
     assert response.status_code == 200
 
@@ -126,22 +141,23 @@ def test_get_notes_filter_matrix(client, seeded_notes, query_params, expected_ke
 
 
 def test_get_notes_invalid_status_returns_422(client):
+    """Invalid status values should be rejected by the request validation layer."""
     response = client.get("/notes?status=invalid_status_value")
     assert response.status_code == 422
 
 
-
-
 # --- GET /notes/types ---
 def test_get_note_types_empty(client, db_session):
+    """GET /notes/types should return an empty list when no note types exist."""
     response = client.get("/notes/types")
     body = response.json()
 
     assert response.status_code == 200
-    assert len(body) ==0
+    assert len(body) == 0
 
 
 def test_get_note_types_returns_note_types(client, db_session):
+    """GET /notes/types should return all persisted note types."""
     note_type1 = make_note_type(db=db_session)
     note_type2 = make_note_type(db=db_session)
 
@@ -156,18 +172,18 @@ def test_get_note_types_returns_note_types(client, db_session):
     assert_type_or_tag_response(types_by_id[note_type2.id], note_type2)
 
 
-
-
 # --- GET /notes/tags ---
 def test_get_tags_empty(client, db_session):
+    """GET /notes/tags should return an empty list when no tags exist."""
     response = client.get("/notes/tags")
     body = response.json()
 
     assert response.status_code == 200
-    assert len(body) ==0
+    assert len(body) == 0
 
 
 def test_get_tags_returns_tags(client, db_session):
+    """GET /notes/tags should return all persisted tags."""
     tag1 = make_tag(db=db_session)
     tag2 = make_tag(db=db_session)
 
@@ -182,9 +198,9 @@ def test_get_tags_returns_tags(client, db_session):
     assert_type_or_tag_response(tags_by_id[tag2.id], tag2)
 
 
-
 # --- GET /notes/{id} ---
 def test_get_note_returns_note(client, db_session):
+    """GET /notes/{id} should return the requested note and nested metadata."""
     note = make_note(db_session)
     make_note(db_session)
 
@@ -196,15 +212,15 @@ def test_get_note_returns_note(client, db_session):
 
 
 def test_get_note_not_existing(client):
-    response = client.get(f"/notes/1")
+    """GET /notes/{id} should return 404 for a missing note."""
+    response = client.get("/notes/1")
 
     assert response.status_code == 404
 
 
-
-
 # --- POST /notes ---
 def test_create_note(client, db_session):
+    """POST /notes should create a note with default values and default type."""
     response = client.post("/notes")
     body = response.json()
 
@@ -220,10 +236,9 @@ def test_create_note(client, db_session):
     assert note.note_type.name == "None"
 
 
-
-
 # --- PUT /notes/{id} ---
 def test_update_note_title_only(client, db_session):
+    """A partial update should only modify the specified field."""
     note = make_note(db_session)
     new_title = "New Title"
     original = note.modified_at
@@ -241,6 +256,7 @@ def test_update_note_title_only(client, db_session):
 
 
 def test_update_note_no_changes(client, db_session):
+    """PUT with an empty payload should be a no-op and return the current note."""
     note = make_note(db_session)
 
     response = client.put(f"/notes/{note.id}", json={})
@@ -251,6 +267,7 @@ def test_update_note_no_changes(client, db_session):
 
 
 def test_update_note_create_new_note_type(client, db_session):
+    """Updating note_type_name should create a new type if needed."""
     note = make_note(db_session)
     new_note_type_name = "NewNoteType"
     response = client.put(f"/notes/{note.id}", json={"note_type_name": new_note_type_name})
@@ -265,6 +282,7 @@ def test_update_note_create_new_note_type(client, db_session):
 
 
 def test_update_note_empty_note_type(client, db_session):
+    """An empty note type name should fallback to the default note type."""
     note = make_note(db_session)
     response = client.put(f"/notes/{note.id}", json={"note_type_name": ""})
     body = response.json()
@@ -278,6 +296,7 @@ def test_update_note_empty_note_type(client, db_session):
 
 
 def test_update_note_create_new_tag(client, db_session):
+    """Updating tag_names should create missing tags and assign them to the note."""
     note = make_note(db_session)
     new_tag_name = "newTag"
     response = client.put(f"/notes/{note.id}", json={"tag_names": [new_tag_name]})
@@ -292,6 +311,7 @@ def test_update_note_create_new_tag(client, db_session):
 
 
 def test_update_note_invalid_status(client, db_session):
+    """Invalid status values should be rejected, and the note should remain valid."""
     note = make_note(db_session)
 
     response = client.put(f"/notes/{note.id}", json={})
@@ -301,9 +321,9 @@ def test_update_note_invalid_status(client, db_session):
     assert_note_response(body, note)
 
 
-
 # --- DELETE /notes/{id}
 def test_delete_note(client, db_session):
+    """DELETE /notes/{id} should remove the note from the database."""
     note = make_note(db_session)
 
     response = client.delete(f"/notes/{note.id}")
@@ -313,6 +333,7 @@ def test_delete_note(client, db_session):
 
 
 def test_delete_note_not_existing(client):
-    response = client.get(f"/notes/1")
+    """DELETE /notes/{id} should return 404 for a missing note."""
+    response = client.get("/notes/1")
 
     assert response.status_code == 404

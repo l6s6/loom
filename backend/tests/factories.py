@@ -1,3 +1,10 @@
+"""Factory helpers for quickly creating test data in the backend test suite.
+
+These functions centralize the creation of note, note-type, tag, and link
+records so tests remain readable and consistent. They also avoid duplicate
+records by checking for existing entries before creating new ones.
+"""
+
 import itertools
 from typing import Sequence
 from sqlalchemy.orm import Session
@@ -10,6 +17,15 @@ _counter = itertools.count(1)
 
 
 def make_note_type(db: Session, name: str | None = None) -> NoteType:
+    """Create a note type or return an existing one with the same name.
+
+    Args:
+        db: Database session to use for lookup and creation.
+        name: Optional explicit name. If omitted, a generated name is used.
+
+    Returns:
+        NoteType: The existing or newly created note type instance.
+    """
     idx = next(_counter)
     type_name = name or f"Type_{idx}"
 
@@ -25,6 +41,15 @@ def make_note_type(db: Session, name: str | None = None) -> NoteType:
 
 
 def make_tag(db: Session, name: str | None = None) -> Tag:
+    """Create a tag or return an existing one with the same name.
+
+    Args:
+        db: Database session to use for lookup and creation.
+        name: Optional explicit name. If omitted, a generated name is used.
+
+    Returns:
+        Tag: The existing or newly created tag instance.
+    """
     idx = next(_counter)
     tag_name = name or f"tag_{idx}"
 
@@ -40,6 +65,15 @@ def make_tag(db: Session, name: str | None = None) -> Tag:
 
 
 def make_link_type(db: Session, name: str | None = None) -> LinkType:
+    """Create a link type or return an existing one with the same name.
+
+    Args:
+        db: Database session to use for lookup and creation.
+        name: Optional explicit name. If omitted, a generated name is used.
+
+    Returns:
+        LinkType: The existing or newly created link type instance.
+    """
     idx = next(_counter)
     type_name = name or f"LinkType_{idx}"
 
@@ -67,6 +101,23 @@ def make_note(
     tags: Sequence[Tag] | None = None,
     **kwargs,
 ) -> Note:
+    """Create a note with sensible defaults for use in tests.
+
+    Args:
+        db: Database session used for persistence.
+        title: Optional custom title. If omitted, a generated title is used.
+        content: Body text for the note.
+        status: Note status value.
+        is_archived: Whether the note is archived.
+        is_pinned: Whether the note is pinned.
+        is_private: Whether the note is private.
+        note_type: Optional custom NoteType instance.
+        tags: Optional sequence of Tag objects to attach.
+        **kwargs: Extra fields passed through to the Note constructor.
+
+    Returns:
+        Note: The created note instance.
+    """
     idx = next(_counter)
 
     resolved_type = note_type or make_note_type(db, name="None")
@@ -98,6 +149,19 @@ def make_link(
     origin: str = "manual",
     **kwargs,
 ) -> Link:
+    """Create a link between two notes with default values if not provided.
+
+    Args:
+        db: Database session used for persistence.
+        source: Optional source Note instance. A new note is created if omitted.
+        target: Optional target Note instance. A new note is created if omitted.
+        link_type: Optional LinkType instance. A default type is created if omitted.
+        origin: String describing how the link originated.
+        **kwargs: Extra fields passed through to the Link constructor.
+
+    Returns:
+        Link: The created link instance.
+    """
     source_note = source or make_note(db)
     target_note = target or make_note(db)
     resolved_link_type = link_type or make_link_type(db, name="relates to")
@@ -114,4 +178,3 @@ def make_link(
     db.commit()
     db.refresh(link)
     return link
-
