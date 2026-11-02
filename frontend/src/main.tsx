@@ -11,8 +11,17 @@ import NoteTypesView from "@/pages/NoteTypesView.tsx";
 import TodoView from "@/pages/TodoView.tsx";
 import GraphView from "@/pages/GraphView.tsx";
 
+/**
+ * Shared React Query client instance for the application.
+ */
 const queryClient = new QueryClient();
 
+/**
+ * Application bootstrap.
+ *
+ * This creates the React root, configures routing, wraps the app in the Query
+ * client provider, and mounts the application layout with all page routes.
+ */
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
@@ -24,7 +33,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/todo" element={<TodoView />} />
             <Route path="/graph" element={<GraphView />} />
             <Route path="/note-types" element={<NoteTypesView />} />
-            <Route path="/n/:noteId" element={<EditorView />} />;
+            <Route path="/n/:noteId" element={<EditorView />} />
           </Routes>
         </Layout>
       </BrowserRouter>

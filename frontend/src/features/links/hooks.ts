@@ -7,6 +7,11 @@ import {
   getLinkTypes,
 } from "@/features/links/api.ts";
 
+/**
+ * Fetch the full list of links and expose the result to a component.
+ *
+ * @returns An object with the links data, loading state, and error message.
+ */
 export function useGetLinks() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["links"],
@@ -20,6 +25,12 @@ export function useGetLinks() {
   };
 }
 
+/**
+ * Fetch the links associated with a specific note.
+ *
+ * @param noteId - The ID of the note whose links should be retrieved.
+ * @returns An object with the current note's links, loading state, and error message.
+ */
 export function useGetLinksByNoteId(noteId: string) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["links", noteId],
@@ -33,6 +44,11 @@ export function useGetLinksByNoteId(noteId: string) {
   };
 }
 
+/**
+ * Mutation hook for creating a new link and invalidating cached link queries.
+ *
+ * @returns An object with the async mutation function and loading/error state.
+ */
 export function useCreateLink() {
   const queryClient = useQueryClient();
 
@@ -51,6 +67,11 @@ export function useCreateLink() {
   };
 }
 
+/**
+ * Mutation hook for deleting a link and invalidating cached link queries.
+ *
+ * @returns An object with the async delete mutation function and loading/error state.
+ */
 export function useDeleteLink() {
   const queryClient = useQueryClient();
 
@@ -66,6 +87,11 @@ export function useDeleteLink() {
   };
 }
 
+/**
+ * Fetch all available link type definitions.
+ *
+ * @returns An object with the link types, loading state, and error message.
+ */
 export function useGetLinkTypes() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["link-types"],

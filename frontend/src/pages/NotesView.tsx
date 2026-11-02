@@ -19,6 +19,13 @@ import LoadingSpinner from "@/components/LoadingSpinner.tsx";
 import ErrorView from "@/components/ErrorView.tsx";
 import { buildQueryString } from "@/lib/utils.ts";
 
+/**
+ * Notes dashboard page for listing, filtering, and managing notes.
+ *
+ * It reads filters from the URL query string, requests the matching notes from
+ * the backend, and renders a searchable note grid with actions to create or
+ * delete entries.
+ */
 export function NotesView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const feedFilters = {
@@ -38,6 +45,12 @@ export function NotesView() {
   const { createAndNavigateNote } = useCreateAndNavigateNote();
   const { deleteNote } = useDeleteNote();
 
+  /**
+   * Updates the current URL query parameters when a filter changes.
+   *
+   * @param name - Name of the query parameter to update.
+   * @param value - The new filter value, or empty string to clear the filter.
+   */
   const handleFilterChange = (name: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
 

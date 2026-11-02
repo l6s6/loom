@@ -13,6 +13,9 @@ import {
 import { Trash } from "lucide-react";
 import type { JSX } from "react";
 
+/**
+ * Props for the confirmation dialog used when deleting an item.
+ */
 interface ConfirmDialogProps {
   name: string;
   onDelete: () => Promise<void>;
@@ -21,6 +24,12 @@ interface ConfirmDialogProps {
   onOpenChange?: ((open: boolean) => void) | undefined;
 }
 
+/**
+ * Reusable confirmation dialog for destructive actions.
+ *
+ * @param props - Dialog configuration including the item name, delete callback, and trigger element.
+ * @returns A confirmation alert dialog used to finalize deletion.
+ */
 const ConfirmDeleteDialog = ({
   onDelete,
   name,

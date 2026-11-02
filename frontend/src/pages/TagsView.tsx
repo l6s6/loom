@@ -7,6 +7,12 @@ import {
 import EntityManagement from "@/components/layout/EntityManagement.tsx";
 import { Link } from "react-router-dom";
 
+/**
+ * Page for managing tags in the application.
+ *
+ * It loads all tags, supports create/update/delete actions through the shared
+ * entity management UI, and links each tag badge to the filtered notes view.
+ */
 const TagsView = () => {
   const { tags, isLoading, error } = useGetTags();
   const { createTag } = useCreateTag();

@@ -6,6 +6,14 @@ import { useGetNoteById } from "@/features/notes/hooks.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
 import ErrorView from "@/components/ErrorView.tsx";
 
+/**
+ * Page view for editing a single note.
+ *
+ * It resolves the current note ID from the route, loads the note data, and
+ * renders the editor with a top bar for navigation and deletion actions.
+ *
+ * @returns A page or loading/error state depending on the note fetch result.
+ */
 export default function EditorView() {
   const { noteId } = useParams();
   const navigate = useNavigate();
@@ -16,6 +24,7 @@ export default function EditorView() {
   } else {
     id = noteId;
   }
+
   const { note, isLoading, error } = useGetNoteById(id);
 
   if (isLoading) return <LoadingSpinner />;

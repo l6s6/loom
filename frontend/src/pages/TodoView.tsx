@@ -1,5 +1,11 @@
 import { CenterContainer } from "@/components/layout/CenterContainer.tsx";
 
+/**
+ * Placeholder page for future TODO functionality.
+ *
+ * This view currently acts as a stub so the route exists while the feature is
+ * still under development.
+ */
 const TodoView = () => {
   return (
     <CenterContainer>

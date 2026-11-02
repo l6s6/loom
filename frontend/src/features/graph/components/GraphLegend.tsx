@@ -11,9 +11,22 @@ import {
 import { Switch } from "@/components/ui/switch.tsx";
 import { useSearchParams } from "react-router-dom";
 
+/**
+ * Sidebar-style legend and filter panel for the 3D graph view.
+ *
+ * It reads and updates graph display options from the URL query string so the
+ * view state is shareable and persists across navigation.
+ */
 const GraphLegend = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  /**
+   * Reads a graph display option from the query string, falling back to the
+   * default when the param is absent.
+   *
+   * @param key - The graph option name.
+   * @returns The current boolean value for that option.
+   */
   const getFilter = (key: keyof typeof GRAPH_DEFAULT_OPTIONS) => {
     const param = searchParams.get(key);
     return param !== null ? param === "true" : GRAPH_DEFAULT_OPTIONS[key];
@@ -26,9 +39,15 @@ const GraphLegend = () => {
   const showTagLinks = getFilter("show_tag_links");
   const showNoteTypeLinks = getFilter("show_note_type_links");
 
+  /**
+   * Toggles a graph option and writes the value into the URL query string.
+   *
+   * @param name - The option key to toggle.
+   * @param checked - The new boolean state for that option.
+   */
   const toggleOption = (name: string, checked: boolean) => {
     setSearchParams((prev) => {
-      // Remove query string if equal to default value
+      // Remove query string if equal to default value.
       if (checked === GRAPH_DEFAULT_OPTIONS[name]) {
         prev.delete(name);
       } else {

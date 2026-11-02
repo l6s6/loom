@@ -21,12 +21,21 @@ interface NoteSearchBarProps {
   handleFilterChange: (name: string, value: string) => void;
 }
 
+/**
+ * Search and filter bar for browsing the note feed.
+ *
+ * It supports free-text searching plus dropdown filters for tag, status, and note type.
+ *
+ * @param props - The current filter values and update callback.
+ * @returns A search input with filter selectors.
+ */
 const NoteSearchBar = ({
   feedFilters,
   handleFilterChange,
 }: NoteSearchBarProps) => {
   const { types } = useGetNoteTypes();
   const { tags } = useGetTags();
+
   return (
     <InputGroup className="w-full">
       <InputGroupInput
@@ -69,6 +78,12 @@ interface SerachFilterSelectorProps {
   values: string[];
 }
 
+/**
+ * Dropdown selector used inside the note search bar for filterable values.
+ *
+ * @param props - Selector configuration.
+ * @returns A dropdown button that lets the user choose a filter value.
+ */
 const SearchFilterSelector = ({
   title,
   value,
@@ -97,11 +112,7 @@ const SearchFilterSelector = ({
           className="w-36"
         >
           <DropdownMenuGroup>
-            <DropdownMenuRadioGroup
-              value={value}
-
-              onValueChange={onValueChange}
-            >
+            <DropdownMenuRadioGroup value={value} onValueChange={onValueChange}>
               <DropdownMenuRadioItem value="">No Filter</DropdownMenuRadioItem>
               {values.map((v) => (
                 <DropdownMenuRadioItem key={v} value={v}>

@@ -46,6 +46,15 @@ import { Link } from "react-router-dom";
 import { getStringPreview } from "@/lib/utils.ts";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 
+/**
+ * Panel for managing the note's incoming and outgoing relationships.
+ *
+ * It lets the user search for related notes, choose a link type, create a new
+ * link, and remove existing connections.
+ *
+ * @param props - Component props containing the current note id.
+ * @param props.noteId - The ID of the note whose connections are being managed.
+ */
 const NoteConnections = ({ noteId }: { noteId: string }) => {
   const { notes } = useGetNotes();
   const { links } = useGetLinksByNoteId(noteId);
@@ -80,6 +89,11 @@ const NoteConnections = ({ noteId }: { noteId: string }) => {
           note.content.toLowerCase().includes(searchQuery.toLowerCase())),
     );
 
+  /**
+   * Creates a new relationship from the current note to a target note.
+   *
+   * @param target_id - ID of the note to connect to.
+   */
   const handleAddLink = async (target_id: string) => {
     const link: LinkCreate = {
       origin: "manual",
@@ -156,6 +170,9 @@ interface LinkTypeSelectorProps {
   onChange: (newType: string) => void;
 }
 
+/**
+ * Dropdown selector for choosing or creating a link type.
+ */
 const LinkTypeSelector = ({
   typeName,
   types,
@@ -224,6 +241,9 @@ interface NoteLinksProps {
   type: "incoming" | "outgoing";
 }
 
+/**
+ * Displays a grouped list of note link cards for one direction of relationship.
+ */
 const NoteLinks = ({ links, icon, type }: NoteLinksProps) => {
   const { deleteLink } = useDeleteLink();
 

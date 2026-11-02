@@ -18,6 +18,12 @@ import {
 } from "@/features/notes/api.ts";
 import type { Note, NoteStatus } from "@/features/notes/types.ts";
 
+/**
+ * Fetches the note list, optionally scoped by a query string.
+ *
+ * @param queryString - Optional URL query string used to filter the notes list.
+ * @returns Result object with notes, loading state, and error message.
+ */
 export function useGetNotes(queryString?: string) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["notes", queryString],
@@ -31,6 +37,12 @@ export function useGetNotes(queryString?: string) {
   };
 }
 
+/**
+ * Fetches a single note by ID.
+ *
+ * @param noteId - The note ID to fetch.
+ * @returns Result object with the note, loading state, and error message.
+ */
 export function useGetNoteById(noteId: string) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["note", noteId],
@@ -44,6 +56,11 @@ export function useGetNoteById(noteId: string) {
   };
 }
 
+/**
+ * Fetches all available note types.
+ *
+ * @returns Result object with note types, loading state, and error message.
+ */
 export function useGetNoteTypes() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["note_types"],
@@ -57,6 +74,11 @@ export function useGetNoteTypes() {
   };
 }
 
+/**
+ * Fetches all tags used across notes.
+ *
+ * @returns Result object with tags, loading state, and error message.
+ */
 export function useGetTags() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["tags"],
@@ -70,6 +92,9 @@ export function useGetTags() {
   };
 }
 
+/**
+ * Deletes a tag and invalidates the tag cache.
+ */
 export function useDeleteTag() {
   const queryClient = useQueryClient();
 
@@ -85,6 +110,9 @@ export function useDeleteTag() {
   };
 }
 
+/**
+ * Deletes a note type and invalidates the note type cache.
+ */
 export function useDeleteNoteType() {
   const queryClient = useQueryClient();
 
@@ -101,6 +129,9 @@ export function useDeleteNoteType() {
   };
 }
 
+/**
+ * Creates a note and navigates to the editor page for the new note.
+ */
 export function useCreateAndNavigateNote() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -120,6 +151,9 @@ export function useCreateAndNavigateNote() {
   };
 }
 
+/**
+ * Creates a new tag and invalidates the tag cache.
+ */
 export function useCreateTag() {
   const queryClient = useQueryClient();
 
@@ -135,6 +169,9 @@ export function useCreateTag() {
   };
 }
 
+/**
+ * Creates a new note type and invalidates the note type cache.
+ */
 export function useCreateNoteType() {
   const queryClient = useQueryClient();
 
@@ -151,6 +188,9 @@ export function useCreateNoteType() {
   };
 }
 
+/**
+ * Updates a note and synchronizes the cached note data and related metadata caches.
+ */
 export function useUpdateNote() {
   const queryClient = useQueryClient();
 
@@ -173,6 +213,9 @@ export function useUpdateNote() {
   return { updateNote: mutateAsync, isLoading: isPending, error };
 }
 
+/**
+ * Updates a tag and invalidates related note and tag queries.
+ */
 export function useUpdateTag() {
   const queryClient = useQueryClient();
 
@@ -187,6 +230,9 @@ export function useUpdateTag() {
   return { updateTag: mutateAsync, isLoading: isPending, error };
 }
 
+/**
+ * Updates a note type and invalidates related note and type queries.
+ */
 export function useUpdateNoteType() {
   const queryClient = useQueryClient();
 
@@ -201,6 +247,9 @@ export function useUpdateNoteType() {
   return { updateNoteType: mutateAsync, isLoading: isPending, error };
 }
 
+/**
+ * Deletes a note, invalidates note queries, and redirects the user home if needed.
+ */
 export function useDeleteNote() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -227,12 +276,15 @@ export function useDeleteNote() {
   };
 }
 
+/**
+ * Encapsulates the local editor state and autosave behavior for a note.
+ */
 export function useNoteEditorLogic(note: Note) {
   const { updateNote } = useUpdateNote();
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
 
-  // Auto-Save Debounce
+  // Auto-save debounce: persist changes after 500 ms when content or title differs.
   useEffect(() => {
     if (title === note.title && content === note.content) return;
 

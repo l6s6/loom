@@ -31,6 +31,15 @@ interface NoteListItemProps {
   onDelete: (noteId: string, currentUrl?: string) => Promise<void>;
 }
 
+/**
+ * Card component representing a single note in a grid.
+ *
+ * It displays the note title, metadata, tag preview, status, and provides a
+ * context menu for quick actions such as creating or deleting notes.
+ *
+ * @param props - Component props containing the note data and action handlers.
+ * @returns A note card link with a context menu.
+ */
 const NoteGridItem = ({ note, onCreate, onDelete }: NoteListItemProps) => {
   const contentPreview = getStringPreview(
     45,
@@ -39,6 +48,7 @@ const NoteGridItem = ({ note, onCreate, onDelete }: NoteListItemProps) => {
   );
   const titlePreview = getStringPreview(35, note.title, "Untitled");
   const modifiedAt: Date = new Date(note.modified_at);
+
   let formattedModifiedAt: string;
   if (isToday(modifiedAt)) {
     formattedModifiedAt = `Today at ${format(modifiedAt, "HH:mm")}`;
@@ -47,6 +57,7 @@ const NoteGridItem = ({ note, onCreate, onDelete }: NoteListItemProps) => {
   } else {
     formattedModifiedAt = format(modifiedAt, "MMM dd");
   }
+
   return (
     <ContextMenu key={note.id}>
       <ContextMenuTrigger className="w-full h-full">

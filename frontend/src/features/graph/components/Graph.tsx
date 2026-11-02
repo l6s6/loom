@@ -3,6 +3,13 @@ import { VertexType } from "@/features/graph/types.ts";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 
+/**
+ * 3D graph view for note/tag/type relationships.
+ *
+ * @param props - Graph data containing nodes and links to visualize.
+ * @param props.graphData - The node/link structure to render in the force graph.
+ * @returns A ForceGraph3D component configured for the application’s knowledge graph.
+ */
 const Graph = ({
   graphData,
 }: {
@@ -28,22 +35,23 @@ const Graph = ({
 
     const fg = fgRef.current;
 
-    // LINK DISTANCE: Spreads the cluster apart
-    // Default is 30. We increase it so that densely connected nodes have some breathing room.
+    // LINK DISTANCE: spreads clusters apart so dense areas remain readable.
+    // Default is 30; a longer distance reduces visual crowding.
     fg.d3Force("link").distance(() => {
-      // Possible return different lengths here depending on the link type
+      // Different link types could potentially use different lengths in the future.
       return 80;
     });
 
-    // CHARGE (Repulsion): Prevents clumping and brings orphans closer
-    // The default is around -30.
+    // CHARGE (Repulsion): prevents clumping while keeping disconnected nodes closer.
+    // Default charge is roughly -30; stronger repulsion is proportional to connectivity.
     fg.d3Force("charge").strength((node: any) => {
       const linkCount = node.val || 1;
-      return 0 - linkCount * 10; // Orphans have 0; the more connections the more repulsion
+      return 0 - linkCount * 10; // Orphans have 0; more connected nodes repel more strongly.
     });
 
     fg.d3ReheatSimulation();
   }, [graphData]);
+
   return (
     <div className="flex-1 overflow-hidden">
       <ForceGraph3D
@@ -53,7 +61,6 @@ const Graph = ({
         d3AlphaDecay={0.1}
         backgroundColor="white"
         showNavInfo={true}
-
         nodeLabel="name"
         nodeOpacity={0.9}
         nodeResolution={20}
@@ -69,7 +76,6 @@ const Graph = ({
               return "black";
           }
         }}
-
         linkLabel="type"
         linkOpacity={0.2}
         linkDirectionalArrowResolution={20}
@@ -78,7 +84,6 @@ const Graph = ({
         linkDirectionalArrowLength={5}
         linkDirectionalArrowRelPos={1}
         linkHoverPrecision={5}
-
         onNodeClick={(node) => {
           if (node.group === VertexType.note) {
             navigate(`/n/${node.id}`);

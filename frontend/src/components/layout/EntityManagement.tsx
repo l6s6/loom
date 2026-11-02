@@ -28,6 +28,11 @@ import { Input } from "@/components/ui/input.tsx";
 import { Progress } from "@/components/ui/progress.tsx";
 import type { BaseEntity } from "@/features/notes/types.ts";
 
+/**
+ * Props for the generic entity management page.
+ *
+ * @template T - Entity type that extends BaseEntity and includes id/name/note_count.
+ */
 interface EntityManagementProps<T extends BaseEntity> {
   title: string;
   entityName: string;
@@ -41,6 +46,16 @@ interface EntityManagementProps<T extends BaseEntity> {
   canDelete?: (item: T) => boolean;
 }
 
+/**
+ * Generic entity management UI for note types, tags, and similar catalog entities.
+ *
+ * It renders a list of items with count bars, create/edit dialogs, and delete
+ * controls while supporting optimistic or conditional deletion rules.
+ *
+ * @template T - Entity type used by the page.
+ * @param props - Entity management configuration and callbacks.
+ * @returns A React page for managing a named entity collection.
+ */
 export default function EntityManagement<T extends BaseEntity>({
   title,
   entityName,
@@ -116,6 +131,11 @@ export default function EntityManagement<T extends BaseEntity>({
   );
 }
 
+/**
+ * Represents a single entity row within the management list.
+ *
+ * Each row shows a badge, usage count progress, and edit/delete actions.
+ */
 const EntityItem = <T extends BaseEntity>({
   item,
   entityName,
@@ -214,6 +234,9 @@ const EntityItem = <T extends BaseEntity>({
   );
 };
 
+/**
+ * Shared create/edit dialog for entity names.
+ */
 const EntityDialog = ({
   entityName,
   trigger,

@@ -1,10 +1,19 @@
 import type { ReactNode } from "react";
 import Sidebar from "@/components/layout/sidebar/Sidebar.tsx";
 
+/**
+ * Props for the main application layout.
+ */
 interface LayoutProps {
   children: ReactNode;
 }
 
+/**
+ * Top-level application layout with a fixed sidebar and scrollable content area.
+ *
+ * @param props - Layout props containing the page content.
+ * @returns A full-height screen layout with a sidebar and main content section.
+ */
 export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="h-screen flex flex-col bg-bg-editor overflow-hidden">

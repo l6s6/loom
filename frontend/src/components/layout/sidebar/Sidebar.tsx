@@ -23,12 +23,22 @@ import { resetDemoData } from "@/api/apiClient.ts";
 import { useState } from "react";
 import { ClipLoader } from "react-spinners";
 
+/**
+ * Sidebar component for the main application layout.
+ *
+ * It renders the primary navigation, demo reset controls (when in demo mode),
+ * and the action button to create a new note.
+ */
 const Sidebar = () => {
   const navigate = useNavigate();
   const { createAndNavigateNote } = useCreateAndNavigateNote();
 
   const [isResetting, setIsResetting] = useState(false);
 
+  /**
+   * Resets the demo database and reloads the page after a delay.
+   * This is intended for demo deployments where sample data can be restored.
+   */
   const handleReset = async () => {
     await resetDemoData();
     setIsResetting(true);
@@ -54,6 +64,7 @@ const Sidebar = () => {
         <SidebarBlock label="workbench" configObject={mainNavItems} />
         <SidebarBlock label="smart views" configObject={smartViewsConfig} />
       </div>
+
       {import.meta.env.VITE_IS_DEMO === "true" && (
         <AlertDialog>
           <AlertDialogTrigger

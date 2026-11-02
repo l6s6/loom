@@ -5,6 +5,13 @@ import Graph from "@/features/graph/components/Graph.tsx";
 import GraphLegend from "@/features/graph/components/GraphLegend.tsx";
 import { useSearchParams } from "react-router-dom";
 
+/**
+ * Graph view page for visualizing the relationship network.
+ *
+ * It reads current graph filter options from the URL, fetches the matching graph
+ * data, transforms it to the 3D visualization format, and renders the legend
+ * alongside the interactive graph.
+ */
 const GraphView = () => {
   const [searchParams] = useSearchParams();
   const { graph, isLoading, error } = useGetGraph(searchParams.toString());

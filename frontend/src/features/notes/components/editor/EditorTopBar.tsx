@@ -15,10 +15,20 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { useDeleteNote } from "@/features/notes/hooks.ts";
 
+/**
+ * Top bar for the note editor.
+ *
+ * It provides a back link to the notes overview and a destructive action to
+ * delete the current note after confirmation.
+ *
+ * @param props - Component props.
+ * @param props.noteId - The ID of the note currently being edited.
+ */
 const EditorTopBar = ({ noteId }: { noteId: string }) => {
   const { deleteNote } = useDeleteNote();
   const match = useMatch("/n/:noteId");
   const urlNoteId = match?.params.noteId;
+
   return (
     <header className="mx-4 flex flex-row items-center h-navbar border-b border-border-subtle">
       <div className="flex flex-row justify-between w-full px-8">
@@ -35,6 +45,7 @@ const EditorTopBar = ({ noteId }: { noteId: string }) => {
             </div>
           </Link>
         </div>
+
         <AlertDialog>
           <AlertDialogTrigger
             render={

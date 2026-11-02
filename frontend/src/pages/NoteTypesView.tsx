@@ -7,6 +7,12 @@ import {
 import EntityManagement from "@/components/layout/EntityManagement.tsx";
 import { Link } from "react-router-dom";
 
+/**
+ * Page for managing note types in the application.
+ *
+ * It loads available note types, allows creation and editing through the generic
+ * entity management UI, and links each type badge to the filtered notes view.
+ */
 const NoteTypesView = () => {
   const { types, isLoading, error } = useGetNoteTypes();
   const { createNoteType } = useCreateNoteType();

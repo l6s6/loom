@@ -11,6 +11,15 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "tiptap-markdown";
 
+/**
+ * Main editor container for a single note.
+ *
+ * It combines the title field, metadata controls, markdown editor, and link
+ * management panel in one cohesive interface.
+ *
+ * @param props - Component props.
+ * @param props.initialNote - The note data to initialize the editor with.
+ */
 const NoteEditorCore = ({ initialNote }: { initialNote: Note }) => {
   const editor = useNoteEditorLogic(initialNote);
   const { types } = useGetNoteTypes();
@@ -57,6 +66,16 @@ interface ContentEditorProps {
   onChange: Dispatch<SetStateAction<string>>;
 }
 
+/**
+ * Rich text editor for writing note markdown content.
+ *
+ * It uses Tiptap with the Markdown extension so the content is stored as Markdown
+ * while still supporting a WYSIWYG editing experience.
+ *
+ * @param props - Editor props.
+ * @param props.content - Current markdown content.
+ * @param props.onChange - Callback used to persist updated markdown content.
+ */
 export function ContentEditor({ content, onChange }: ContentEditorProps) {
   const editor = useEditor({
     extensions: [

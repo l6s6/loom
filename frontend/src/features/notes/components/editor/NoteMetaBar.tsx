@@ -41,6 +41,12 @@ interface NoteMetaBarProps {
   onRemoveTag: (tagToRemove: string) => void;
 }
 
+/**
+ * Top metadata toolbar for editing note status, type, and tags.
+ *
+ * @param props - Metadata configuration and callbacks.
+ * @returns A toolbar containing status, type, and tag controls.
+ */
 const NoteMetaBar = ({
   initialNote,
   onStatusChange,
@@ -75,6 +81,9 @@ interface StatusSelectorProps {
   onChange: (newStatus: NoteStatus) => void;
 }
 
+/**
+ * Dropdown selector for changing a note's workflow status.
+ */
 export const StatusSelector = ({ status, onChange }: StatusSelectorProps) => {
   const [isStatusOpen, setIsStatusOpen] = useState(false);
 
@@ -139,6 +148,9 @@ interface TagSelectorProps {
   onRemove: (tagToRemove: string) => void;
 }
 
+/**
+ * Selector for viewing, adding, and removing tags from a note.
+ */
 export const TagSelector = ({
   tags,
   availableTags,
@@ -235,6 +247,9 @@ interface TypeSelectorProps {
   onChange: (newType: string) => void;
 }
 
+/**
+ * Selector for changing the note's category/type.
+ */
 export const NoteTypeSelector = ({
   typeName,
   types,

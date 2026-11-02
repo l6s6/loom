@@ -1,11 +1,20 @@
 import type { SidebarItemConfig } from "@/components/layout/sidebar/SidebarNavigation.ts";
 import NavItem from "@/components/layout/sidebar/NavItem.tsx";
 
+/**
+ * Props for a sidebar section.
+ */
 interface SidebarBlockProps {
   label: string;
   configObject: SidebarItemConfig[];
 }
 
+/**
+ * Renders a labeled group of navigation items inside the sidebar.
+ *
+ * @param props - The section label and the list of navigation entries to render.
+ * @returns A grouped sidebar block with a title and mapped NavItem entries.
+ */
 const SidebarBlock = ({ label, configObject }: SidebarBlockProps) => {
   return (
     <div className="flex flex-col mb-8">
