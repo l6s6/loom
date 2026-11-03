@@ -56,3 +56,35 @@ export const GRAPH_DEFAULT_OPTIONS: Record<string, boolean> = {
   show_tag_links: false,
   show_note_type_links: false,
 };
+
+export type GraphNode = {
+  id: string;
+  name: string;
+  val: number;
+  group: VertexType;
+};
+export type GraphLink = { source: string; target: string; type: string };
+
+export const GRAPH_COLORS: Record<string, string> = {
+  [VertexType.note]: "#2e5497",
+  [VertexType.tag]: "#2a8f70",
+  [VertexType.note_type]: "#8f3030",
+};
+export const GRAPH_FALLBACK_COLOR = "#94a3b8";
+export const GRAPH_ACCENT_COLOR = "#4f46e5";
+
+export const GRAPH_GROUP_LABEL: Record<string, string> = {
+  [VertexType.note]: "notes",
+  [VertexType.tag]: "tags",
+  [VertexType.note_type]: "types",
+};
+// Row order in the hover card: type and tags first, then linked notes
+export const GRAPH_GROUP_ORDER: string[] = [
+  VertexType.note_type,
+  VertexType.tag,
+  VertexType.note,
+];
+
+export const GRAPH_LINK_BASE = "rgba(120,130,145,0.25)";
+export const GRAPH_LINK_DIM = "rgba(120,130,145,0.04)";
+export const GRAPH_LINK_HOT = "rgba(79,70,229,0.7)";
