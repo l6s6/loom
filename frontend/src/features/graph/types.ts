@@ -10,15 +10,6 @@ export const VertexType = {
 export type VertexType = (typeof VertexType)[keyof typeof VertexType];
 
 /**
- * Visual colors associated with each vertex category in the graph UI.
- */
-export const VERTEX_COLORS: Record<string, string> = {
-  [VertexType.note]: "#ef4444",
-  [VertexType.tag]: "#3b82f6",
-  [VertexType.note_type]: "#10b981",
-};
-
-/**
  * Represents a graph node, such as a note, tag, or note type.
  */
 export interface Vertex {
@@ -65,7 +56,7 @@ export type GraphNode = {
 };
 export type GraphLink = { source: string; target: string; type: string };
 
-export const GRAPH_COLORS: Record<string, string> = {
+export const VERTEX_COLORS: Record<string, string> = {
   [VertexType.note]: "#2e5497",
   [VertexType.tag]: "#2a8f70",
   [VertexType.note_type]: "#8f3030",

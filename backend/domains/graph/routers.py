@@ -2,6 +2,10 @@
 
 This module exposes a single endpoint that constructs a graph payload for the
 frontend, including vertices and edges derived from database records.
+
+The graph is intended to drive the frontend's visual graph renderer, allowing
+users to explore notes, tags, note types, and the relationships between them in
+a single connected network.
 """
 
 from fastapi import APIRouter, Depends
@@ -15,117 +19,82 @@ from domains.notes.models import Note
 from domains.notes.routers import get_tags, get_note_types
 
 router = APIRouter(prefix="/graph", tags=["graph"])
-"""API router for all graph-related endpoints."""
+"""FastAPI router for graph-related API endpoints.
+
+This router groups all API routes used to prepare graph visualization data for
+the frontend.
+"""
 
 @router.get("", response_model=Graph)
-def get_graph(
-    db: Session = Depends(get_db),
-    show_notes: bool | None = True,
-    show_tags: bool | None = True,
-    show_note_types: bool | None = True,
-    show_links: bool | None = True,
-    show_tag_links: bool | None = False,
-    show_note_type_links: bool | None = False,
-):
-    """Build and return a graph representation for frontend visualization.
+def get_graph(db: Session = Depends(get_db)):
+    """Build and return the graph payload used by the frontend visualization.
 
-    This endpoint aggregates database entities into a graph consisting of nodes
-    (notes, tags, note types) and edges (inter-note links, tag membership, note
-    type assignments). Visibility of each graph layer can be toggled with query
-    parameters.
-
-    Args:
-        db (Session): Database session injected by dependency.
-        show_notes (bool | None): Whether to include note vertices.
-        show_tags (bool | None): Whether to include tag vertices.
-        show_note_types (bool | None): Whether to include note-type vertices.
-        show_links (bool | None): Whether to include note-to-note link edges.
-        show_tag_links (bool | None): Whether to include tag membership edges.
-        show_note_type_links (bool | None): Whether to include note-type edges.
+    This endpoint reads all notes, tags, note types, and links from the database
+    and converts them into a graph model containing vertices and edges.
 
     Returns:
-        Graph: Structured graph payload containing vertices and edges.
+        Graph: A graph payload with all note, tag, and note-type vertices, plus
+        all relationship edges between them.
+
+    Notes:
+        - Notes become vertices of type `VertexType.note`.
+        - Tags become vertices of type `VertexType.tag`.
+        - Note types become vertices of type `VertexType.note_type`.
+        - Links between notes become edges.
+        - Tag relationships and note-type assignments are added as explicit edges
+          so the frontend can visualize those relationships as well.
     """
-    vertices = []
-    edges = []
+    # Query all relationships from the database.
     links = db.query(Link).all()
+
+    # Retrieve helper datasets used to build the graph.
     note_types = get_note_types(db)
     tags = get_tags(db)
     notes = db.query(Note).all()
 
-    # Vertices
-    if show_notes:
-        for note in notes:
-            incoming_count = sum(1 for l in links if l.target_id == note.id)
-            outgoing_count = sum(1 for l in links if l.source_id == note.id)
+    # Create the vertex list for all note, tag, and note-type entities.
+    vertices = [
+        Vertex(id=str(n.id), name=str(n.title), type=VertexType.note)
+        for n in notes
+    ]
+    vertices.extend([
+        Vertex(id=str(t.id), name=t.name, type=VertexType.tag)
+        for t in tags
+    ])
+    vertices.extend([
+        Vertex(id=str(nt.id), name=nt.name, type=VertexType.note_type)
+        for nt in note_types
+    ])
 
-            # Adjust node size based on the types of links that are shown
-            note_link_count = (incoming_count + outgoing_count) if show_links else 0
-            tag_link_count = len(note.tags) if show_tag_links else 0
-            type_link_count = 1 if show_note_type_links else 0
-            count_sum = note_link_count + tag_link_count + type_link_count
+    # Create the initial edge list from note-to-note links in the database.
+    edges = [
+        Edge(
+            source_id=str(l.source_id),
+            target_id=str(l.target_id),
+            type=l.link_type.name,
+        )
+        for l in links
+    ]
 
-            vertices.append(
-                Vertex(
-                    id=str(note.id),
-                    name=str(note.title),
-                    type=VertexType.note,
-                    val=max(1, count_sum),
-                )
-            )
-
-    if show_tags:
-        for tag in tags:
-            vertices.append(
-                Vertex(
-                    id=tag.id,
-                    name=tag.name,
-                    type=VertexType.tag,
-                    val=max(1, tag.note_count if show_tag_links else 0),
-                )
-            )
-
-    if show_note_types:
-        for note_type in note_types:
-            vertices.append(
-                Vertex(
-                    id=note_type.id,
-                    name=note_type.name,
-                    type=VertexType.note_type,
-                    val=max(1, note_type.note_count if show_note_type_links else 0),
-                )
-            )
-
-    # Edges
-    if show_links and show_notes:
-        for link in links:
+    # Add tag membership edges and note-type edges to make those relationships
+    # visible in the graph.
+    for n in notes:
+        for t in n.tags:
             edges.append(
                 Edge(
-                    source_id=link.source_id,
-                    target_id=link.target_id,
-                    type=link.link_type.name,
+                    source_id=str(n.id),
+                    target_id=str(t.id),
+                    type="Tag",
                 )
             )
-
-    if show_tag_links and show_tags and show_notes:
-        for note in notes:
-            for tag in note.tags:
-                edges.append(
-                    Edge(
-                        source_id=note.id,
-                        target_id=tag.id,
-                        type="Tag",
-                    )
-                )
-
-    if show_note_type_links and show_note_types and show_notes:
-        for note in notes:
+        if n.note_type_id:
             edges.append(
                 Edge(
-                    source_id=note.id,
-                    target_id=note.note_type_id,
+                    source_id=str(n.id),
+                    target_id=str(n.note_type_id),
                     type="Note Type",
                 )
             )
 
+    # Return a normalized graph payload that matches the frontend contract.
     return Graph(vertices=vertices, edges=edges)

@@ -1,7 +1,7 @@
 import ForceGraph3D from "react-force-graph-3d";
 import {
   GRAPH_ACCENT_COLOR,
-  GRAPH_COLORS,
+  VERTEX_COLORS,
   GRAPH_FALLBACK_COLOR,
   GRAPH_GROUP_ORDER,
   GRAPH_LINK_BASE,
@@ -14,12 +14,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import GraphNodeInfo from "@/features/graph/components/GraphNodeInfo.tsx";
+import { idOf } from "@/lib/utils.ts";
 
 const rgba = (hex: string, a: number) => {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 };
-const idOf = (x: any): string => (typeof x === "object" ? x.id : x);
 
 /**
  * 3D graph view for note/tag/type relationships.
@@ -119,7 +119,7 @@ const Graph = ({
         nodeOpacity={1}
         nodeResolution={20}
         nodeColor={(node: any) => {
-          const base = GRAPH_COLORS[node.group] ?? GRAPH_FALLBACK_COLOR;
+          const base = VERTEX_COLORS[node.group] ?? GRAPH_FALLBACK_COLOR;
           if (!hoverId)
             return rgba(base, node.group === VertexType.note ? 0.8 : 0.95);
           if (node.id === hoverId) return rgba(GRAPH_ACCENT_COLOR, 1);

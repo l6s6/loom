@@ -47,8 +47,10 @@ const GraphLegend = () => {
    */
   const toggleOption = (name: string, checked: boolean) => {
     setSearchParams((prev) => {
-      // Remove query string if equal to default value.
-      if (checked === GRAPH_DEFAULT_OPTIONS[name]) {
+      if (
+        checked ===
+        GRAPH_DEFAULT_OPTIONS[name as keyof typeof GRAPH_DEFAULT_OPTIONS]
+      ) {
         prev.delete(name);
       } else {
         prev.set(name, checked.toString());

@@ -6,6 +6,8 @@ them, with typed vertex categories and validation provided by Pydantic models.
 """
 
 from enum import Enum
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -34,7 +36,7 @@ class Vertex(BaseModel):
     id: str
     name: str
     type: VertexType
-    val: int
+    val: Optional[int] = 1
 
 
 class Edge(BaseModel):

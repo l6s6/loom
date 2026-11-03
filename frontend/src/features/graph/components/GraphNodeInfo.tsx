@@ -1,5 +1,5 @@
 import {
-  GRAPH_COLORS,
+  VERTEX_COLORS,
   GRAPH_FALLBACK_COLOR,
   GRAPH_GROUP_LABEL,
   type GraphNode,
@@ -50,7 +50,7 @@ const GraphNodeInfo = ({
                       className="h-1.5 w-1.5 shrink-0 rounded-full"
                       style={{
                         background:
-                          GRAPH_COLORS[n.group] ?? GRAPH_FALLBACK_COLOR,
+                          VERTEX_COLORS[n.group] ?? GRAPH_FALLBACK_COLOR,
                       }}
                     />
                     <span className="truncate">{n.name}</span>
