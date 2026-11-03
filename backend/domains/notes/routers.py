@@ -295,7 +295,7 @@ def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/types", response_model=TagResponse)
-def create_tag(type: NoteTypeCreate, db: Session = Depends(get_db)):
+def create_note_type(type: NoteTypeCreate, db: Session = Depends(get_db)):
     """Create a new note type if it does not already exist.
 
     Args:
@@ -320,7 +320,7 @@ def create_tag(type: NoteTypeCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/tags/{tag_id}", response_model=TagResponse)
-def update_note(tag_id: str, tag_update: TagUpdate, db: Session = Depends(get_db)):
+def update_tag(tag_id: str, tag_update: TagUpdate, db: Session = Depends(get_db)):
     """Update an existing tag.
 
     Args:
@@ -350,7 +350,7 @@ def update_note(tag_id: str, tag_update: TagUpdate, db: Session = Depends(get_db
 
 
 @router.put("/types/{type_id}", response_model=NoteTypeResponse)
-def update_note(type_id: str, type_update: NoteTypeUpdate, db: Session = Depends(get_db)):
+def update_note_type(type_id: str, type_update: NoteTypeUpdate, db: Session = Depends(get_db)):
     """Update an existing note type.
 
     Args:

@@ -288,6 +288,10 @@ export function useNoteEditorLogic(note: Note) {
   useEffect(() => {
     if (title === note.title && content === note.content) return;
 
+    if (title == "" || title == null) {
+      setTitle(note.title);
+    }
+
     const timer = setTimeout(() => {
       updateNote({ id: note.id, title, content });
     }, 500);
