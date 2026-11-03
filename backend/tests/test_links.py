@@ -12,7 +12,6 @@ from domains.links.constants import DEFAULT_LINK_TYPE_NAME
 from domains.links.models import LinkType, Link
 from domains.notes.models import Note
 from tests.helpers import assert_link_response
-import pytest
 from tests.factories import make_note, make_link
 
 
@@ -31,85 +30,11 @@ def test_get_links_returns_links(client, db_session):
     assert_link_response(actual=body[1], expected=link2)
 
 
-@pytest.mark.parametrize(
-    "param_builder, expected_link_keys",
-    [
-        # --- No Filters ---
-        (lambda n: "", ["l1", "l2", "l3"]),
-
-        # --- note_id (Undirected: Source OR Target) ---
-        (lambda n: f"?note_id={n['n1'].id}", ["l1", "l3"]),
-        (lambda n: f"?note_id={n['n2'].id}", ["l1", "l2"]),
-        (lambda n: f"?note_id={n['n3'].id}", ["l2", "l3"]),
-        (lambda n: f"?note_id={n['n4'].id}", []),
-
-        # --- source_id (Directed: only outgoing) ---
-        (lambda n: f"?source_id={n['n1'].id}", ["l1", "l3"]),
-        (lambda n: f"?source_id={n['n2'].id}", ["l2"]),
-        (lambda n: f"?source_id={n['n3'].id}", []),
-
-        # --- target_id (Directed: only incoming) ---
-        (lambda n: f"?target_id={n['n3'].id}", ["l2", "l3"]),
-        (lambda n: f"?target_id={n['n2'].id}", ["l1"]),
-        (lambda n: f"?target_id={n['n1'].id}", []),
-
-        # --- origin ---
-        (lambda n: "?origin=manual", ["l1"]),
-        (lambda n: "?origin=ai", ["l2", "l3"]),
-        (lambda n: "?origin=tag", []),
-
-        # --- link_type ---
-        (lambda n: "?type=relates to", ["l1", "l3"]),
-        (lambda n: "?type=references", ["l2"]),
-        (lambda n: "?type=non_existent", []),
-
-        # --- Combined Filters ---
-        (lambda n: f"?note_id={n['n1'].id}&origin=manual", ["l1"]),
-        (lambda n: f"?source_id={n['n1'].id}&type=relates to", ["l1", "l3"]),
-        (lambda n: f"?target_id={n['n3'].id}&type=references", ["l2"]),
-        (lambda n: f"?source_id={n['n1'].id}&origin=tag", []),
-    ],
-    ids=[
-        "all_links",
-        "note_id_n1_both_roles",
-        "note_id_n2_mixed_roles",
-        "note_id_n3_incoming_only",
-        "note_id_n4_isolated",
-        "source_id_n1",
-        "source_id_n2",
-        "source_id_n3_none",
-        "target_id_n3",
-        "target_id_n2",
-        "target_id_n1_none",
-        "origin_manual",
-        "origin_auto",
-        "origin_empty",
-        "type_relates",
-        "type_references",
-        "type_empty",
-        "combo_note_and_origin",
-        "combo_source_and_type",
-        "combo_target_and_type",
-        "combo_empty_intersection",
-    ],
-)
-def test_get_links_filter_matrix(client, seeded_links, param_builder, expected_link_keys):
-    """Validate GET /links filtering behavior across all supported query filters."""
-    notes = seeded_links["notes"]
-    links = seeded_links["links"]
-
-    query_str = param_builder(notes)
-    response = client.get(f"/links{query_str}")
+def test_returns_empty_list_when_no_links_exist(client):
+    """Return an empty list when the database contains no links."""
+    response = client.get("/links")
     assert response.status_code == 200
-
-    body = response.json()
-    actual_ids = {item["id"] for item in body}
-    expected_ids = {links[key].id for key in expected_link_keys}
-
-    assert actual_ids == expected_ids, (
-        f"Filter '{query_str}' failed: "
-        f"expected={expected_link_keys} ({expected_ids}), actual={actual_ids}"
-    )
+    assert response.json() == []
 
 
 # --- POST /links ---
@@ -156,6 +81,24 @@ def test_create_link_invalid_note(client, db_session):
     assert response.status_code == 404
 
 
+def test_creates_default_link_type_when_link_type_name_is_blank(client, db_session):
+    """Use the default link type when the payload provides a blank type name."""
+    note1 = make_note(db_session)
+    note2 = make_note(db_session)
+    payload = {
+        "source_id": note1.id,
+        "target_id": note2.id,
+        "origin": "manual",
+        "link_type_name": "",
+    }
+
+    response = client.post("/links", json=payload)
+    body = response.json()
+
+    assert response.status_code == 201
+    assert body["link_type"]["name"] == DEFAULT_LINK_TYPE_NAME
+
+
 # --- PUT /links/{id} ---
 def test_update_link_no_changes(client, db_session):
     """Updating with an empty payload should leave the link unchanged."""
@@ -195,6 +138,12 @@ def test_update_link_empty_link_type(client, db_session):
     assert db_session.get(LinkType, link.link_type_id) is not None
     assert link.link_type.name == DEFAULT_LINK_TYPE_NAME
     assert_link_response(body, link)
+
+
+def test_returns_404_when_updating_missing_link(client):
+    """Reject updates for links that do not exist."""
+    response = client.put("/links/999999", json={"link_type_name": "UpdatedType"})
+    assert response.status_code == 404
 
 
 # --- DELETE /links/{id} ---

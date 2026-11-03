@@ -45,6 +45,24 @@ def test_get_notes_returns_notes(client, db_session):
     assert_note_response(notes_by_id[note2.id], note2)
 
 
+def test_returns_empty_list_when_all_filters_exclude_every_note(client, seeded_notes):
+    """Return an empty list when the filter combination matches no notes."""
+    response = client.get(
+        "/notes?type=Idea&tag=unused_tag&status=closed&search=NotExistingWord123"
+    )
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_filters_notes_case_insensitively_for_text_search(client, seeded_notes):
+    """Match note text search regardless of casing in the title or content."""
+    response = client.get("/notes?search=MEETING")
+    body = response.json()
+
+    assert response.status_code == 200
+    assert {item["id"] for item in body} == {seeded_notes["a"].id}
+
+
 @pytest.mark.parametrize(
     "query_params, expected_keys",
     [
@@ -266,6 +284,30 @@ def test_update_note_no_changes(client, db_session):
     assert_note_response(body, note)
 
 
+def test_replaces_note_tags_with_unique_values_when_updating_tag_names(client, db_session):
+    """Replacing tag names should update the note to the final set without duplicates."""
+    note = make_note(db_session)
+    existing_tag = make_tag(db=db_session, name="existing")
+    note.tags.append(existing_tag)
+    db_session.flush()
+
+    response = client.put(
+        f"/notes/{note.id}",
+        json={"tag_names": ["new-tag", "existing", "new-tag"]},
+    )
+    body = response.json()
+
+    assert response.status_code == 200
+    assert {tag["name"] for tag in body["tags"]} == {"existing", "new-tag"}
+    assert len(body["tags"]) == 2
+
+
+def test_returns_404_when_updating_missing_note(client):
+    """Update should reject requests for notes that do not exist."""
+    response = client.put("/notes/999999", json={"title": "Does not exist"})
+    assert response.status_code == 404
+
+
 def test_update_note_create_new_note_type(client, db_session):
     """Updating note_type_name should create a new type if needed."""
     note = make_note(db_session)
@@ -336,4 +378,20 @@ def test_delete_note_not_existing(client):
     """DELETE /notes/{id} should return 404 for a missing note."""
     response = client.get("/notes/1")
 
+    assert response.status_code == 404
+
+
+def test_removes_note_when_deleted_with_valid_id(client, db_session):
+    """Delete a note and confirm it is removed from the database."""
+    note = make_note(db_session)
+
+    response = client.delete(f"/notes/{note.id}")
+
+    assert response.status_code == 204
+    assert db_session.get(Note, note.id) is None
+
+
+def test_returns_404_when_deleting_missing_note(client):
+    """Delete should reject requests for notes that do not exist."""
+    response = client.delete("/notes/999999")
     assert response.status_code == 404

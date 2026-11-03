@@ -136,9 +136,16 @@ def _apply_tags(db: Session, note: Note, tag_names: list[str]) -> None:
         tag_names: List of tag names to assign to the note.
     """
     new_tags = []
+    seen_names: set[str] = set()
     for tag_name in tag_names:
-        if tag_name.strip():
-            new_tags.append(_get_or_create_tag(db, tag_name.strip()))
+        normalized = tag_name.strip()
+        if not normalized:
+            continue
+        key = normalized.casefold()
+        if key in seen_names:
+            continue
+        seen_names.add(key)
+        new_tags.append(_get_or_create_tag(db, normalized))
     note.tags = new_tags
 
 
@@ -509,4 +516,3 @@ def delete_note(note_id: str, db: Session = Depends(get_db)):
 
     db.delete(note)
     db.commit()
-    return {"message": "Note deleted"}
