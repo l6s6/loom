@@ -107,7 +107,7 @@ def get_graph(
                 )
             )
 
-    if show_tag_links and show_tags:
+    if show_tag_links and show_tags and show_notes:
         for note in notes:
             for tag in note.tags:
                 edges.append(
@@ -118,7 +118,7 @@ def get_graph(
                     )
                 )
 
-    if show_note_type_links and show_note_types:
+    if show_note_type_links and show_note_types and show_notes:
         for note in notes:
             edges.append(
                 Edge(
