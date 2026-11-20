@@ -52,7 +52,7 @@ def get_note_or_404(db: Session, note_id: str) -> Note:
     return note
 
 
-def get_tag_or_404(db: Session, tag_id: str) -> Note:
+def get_tag_or_404(db: Session, tag_id: str) -> Tag:
     """Fetch a tag by ID or raise a 404 if it does not exist.
 
     Args:
@@ -71,7 +71,7 @@ def get_tag_or_404(db: Session, tag_id: str) -> Note:
     return tag
 
 
-def get_note_type_or_404(db: Session, type_id: str) -> Note:
+def get_note_type_or_404(db: Session, type_id: str) -> NoteType:
     """Fetch a note type by ID or raise a 404 if it does not exist.
 
     Args:
@@ -301,7 +301,7 @@ def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
     return new_tag
 
 
-@router.post("/types", response_model=TagResponse)
+@router.post("/types", response_model=NoteTypeResponse)
 def create_note_type(type: NoteTypeCreate, db: Session = Depends(get_db)):
     """Create a new note type if it does not already exist.
 
@@ -341,7 +341,7 @@ def update_tag(tag_id: str, tag_update: TagUpdate, db: Session = Depends(get_db)
     Raises:
         HTTPException: If no tag is found or if the new name conflicts.
     """
-    if db.query(Tag).filter(Tag.name == tag_update.name).first():
+    if db.query(Tag).filter(Tag.name == tag_update.name, Tag.id != tag_id).first():
         raise HTTPException(status_code=409, detail=f"Tag with name {tag_update.name} already exists")
 
     tag = get_tag_or_404(db, tag_id)
@@ -371,7 +371,7 @@ def update_note_type(type_id: str, type_update: NoteTypeUpdate, db: Session = De
     Raises:
         HTTPException: If no note type is found or if the new name conflicts.
     """
-    if db.query(NoteType).filter(NoteType.name == type_update.name).first():
+    if db.query(NoteType).filter(NoteType.name == type_update.name, NoteType.id != type_id).first():
         raise HTTPException(status_code=409, detail=f"Note type with name {type_update.name} already exists")
 
     type = get_note_type_or_404(db, type_id)
