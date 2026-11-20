@@ -137,6 +137,9 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db)):
     if link_type_name == "":
         link_type_name = DEFAULT_LINK_TYPE_NAME
 
+    if get_links(source_id=link.source_id, target_id=link.target_id, type=link.link_type_name, db=db) is not None:
+        raise HTTPException(status_code=409, detail=f"Link already exists")
+
     link_type = _get_or_create_link_type(db, link_type_name)
 
     new_link = Link(
@@ -153,7 +156,7 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/{link_id}", response_model=LinkResponse)
-def update_note(link_id: str, link_update: LinkUpdate, db: Session = Depends(get_db)):
+def update_link(link_id: str, link_update: LinkUpdate, db: Session = Depends(get_db)):
     """Update an existing link record, including its relationship type when provided.
 
     Args:
