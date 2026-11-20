@@ -105,10 +105,10 @@ export interface BaseEntityUpdate {
   name?: string;
 }
 
-export interface Tag extends BaseEntity {}
-export interface TagCreate extends BaseEntityCreate {}
-export interface TagUpdate extends BaseEntityUpdate {}
+export type Tag = BaseEntity;
+export type TagCreate = BaseEntityCreate;
+export type TagUpdate = BaseEntityUpdate;
 
-export interface NoteType extends BaseEntity {}
-export interface NoteTypeCreate extends BaseEntityCreate {}
-export interface NoteTypeUpdate extends BaseEntityUpdate {}
+export type NoteType = BaseEntity;
+export type NoteTypeCreate = BaseEntityCreate;
+export type NoteTypeUpdate = BaseEntityUpdate;

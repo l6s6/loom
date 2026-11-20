@@ -10,7 +10,6 @@ import {
   type GraphNode,
   VertexType,
 } from "@/features/graph/types.ts";
-import { idOf } from "@/lib/utils.ts";
 import { useMemo } from "react";
 
 /**
@@ -88,8 +87,8 @@ const GraphView = () => {
     const visibleLinks: GraphLink[] = [];
 
     graph.edges.forEach((e) => {
-      const sourceId = String(idOf(e.source_id ?? (e as any).source));
-      const targetId = String(idOf(e.target_id ?? (e as any).target));
+      const sourceId = String(e.source_id);
+      const targetId = String(e.target_id);
 
       if (!visibleNodeIds.has(sourceId) || !visibleNodeIds.has(targetId)) {
         return;

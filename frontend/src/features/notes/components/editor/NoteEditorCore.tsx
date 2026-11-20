@@ -39,6 +39,7 @@ const NoteEditorCore = ({ initialNote }: { initialNote: Note }) => {
           type="text"
           value={editor.title}
           onChange={(e) => editor.setTitle(e.target.value)}
+          onBlur={editor.handleTitleBlur}
           placeholder="Untitled"
           className="w-full text-4xl font-extrabold bg-transparent border-none outline-none focus:ring-0 placeholder-slate-200 p-0 mb-6 tracking-tight"
         />
@@ -93,8 +94,10 @@ export function ContentEditor({ content, onChange }: ContentEditorProps) {
       },
     },
     onUpdate: ({ editor }) => {
-      const md = (editor.storage as any).markdown.getMarkdown();
-      onChange(md);
+      const storage = editor.storage as unknown as {
+        markdown?: { getMarkdown: () => string };
+      };
+      onChange(storage.markdown?.getMarkdown() ?? "");
     },
   });
 

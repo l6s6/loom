@@ -33,4 +33,11 @@ export const buildQueryString = (queryFilters: { [s: string]: string }) => {
   return paramsForBackend.toString();
 };
 
-export const idOf = (x: any): string => (typeof x === "object" ? x.id : x);
+export const idOf = (
+  x: string | number | { id?: string | number } | undefined,
+): string => {
+  if (x !== null && typeof x === "object") {
+    return String(x.id ?? "");
+  }
+  return String(x ?? "");
+};

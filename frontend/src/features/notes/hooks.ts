@@ -303,17 +303,20 @@ export function useNoteEditorLogic(note: Note) {
 
   // Auto-save debounce: persist changes after 500 ms when content or title differs.
   useEffect(() => {
-    if (title === note.title && content === note.content) return;
-
-    if (title == "" || title == null) {
-      setTitle(note.title);
-    }
+    const normalizedTitle = title.trim() || "Untitled";
+    if (normalizedTitle === note.title && content === note.content) return;
 
     const timer = setTimeout(() => {
-      updateNote({ id: note.id, title, content });
+      updateNote({ id: note.id, title: normalizedTitle, content });
     }, 500);
     return () => clearTimeout(timer);
   }, [title, content, note.id, note.title, note.content, updateNote]);
+
+  const handleTitleBlur = () => {
+    if (!title.trim()) {
+      setTitle("Untitled");
+    }
+  };
 
   const handleStatusChange = (newStatus: NoteStatus) => {
     updateNote({ id: note.id, status: newStatus });
@@ -339,6 +342,7 @@ export function useNoteEditorLogic(note: Note) {
   return {
     title,
     setTitle,
+    handleTitleBlur,
     content,
     setContent,
     handleStatusChange,

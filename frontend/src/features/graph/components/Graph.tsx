@@ -1,4 +1,9 @@
 import ForceGraph3D from "react-force-graph-3d";
+import type {
+  ForceGraphMethods,
+  LinkObject,
+  NodeObject,
+} from "react-force-graph-3d";
 import {
   GRAPH_ACCENT_COLOR,
   VERTEX_COLORS,
@@ -40,7 +45,7 @@ const Graph = ({
   };
 }) => {
   const navigate = useNavigate();
-  const fgRef = useRef<any>(null);
+  const fgRef = useRef<ForceGraphMethods<GraphNode, GraphLink>>(undefined);
   const [hoverId, setHoverId] = useState<string | null>(null);
 
   // Neighbor sets and node lookup (idOf is needed because the library turns source/target into objects)
@@ -89,21 +94,19 @@ const Graph = ({
 
     const fg = fgRef.current;
 
-    fg.d3Force("link").distance(() => 60);
+    fg.d3Force("link")?.distance(() => 60);
 
     // CHARGE (Repulsion): a base value so nodes without links also keep their distance;
     // more connected nodes repel more strongly.
-    fg.d3Force("charge").strength((node: any) => {
+    fg.d3Force("charge")?.strength((node: NodeObject<GraphNode>) => {
       const linkCount = node.val || 1;
       return -(20 + linkCount * 10);
     });
 
     fg.d3ReheatSimulation();
-
-    console.log(graphData);
   }, [graphData]);
 
-  const isHot = (l: any) =>
+  const isHot = (l: LinkObject<GraphNode, GraphLink>) =>
     !!hoverId && (idOf(l.source) === hoverId || idOf(l.target) === hoverId);
 
   return (
@@ -118,24 +121,26 @@ const Graph = ({
         nodeLabel="name"
         nodeOpacity={1}
         nodeResolution={20}
-        nodeColor={(node: any) => {
+        nodeColor={(node: NodeObject<GraphNode>) => {
           const base = VERTEX_COLORS[node.group] ?? GRAPH_FALLBACK_COLOR;
           if (!hoverId)
             return rgba(base, node.group === VertexType.note ? 0.8 : 0.95);
           if (node.id === hoverId) return rgba(GRAPH_ACCENT_COLOR, 1);
-          if (related?.has(node.id)) return rgba(base, 1); // type, tags and linked notes
+          if (related?.has(String(node.id))) return rgba(base, 1); // type, tags and linked notes
           return rgba(base, 0.1);
         }}
-        onNodeHover={(node: any) => setHoverId(node ? node.id : null)}
+        onNodeHover={(node: NodeObject<GraphNode> | null) =>
+          setHoverId(node ? String(node.id) : null)
+        }
         linkLabel="type"
         linkOpacity={1}
         linkDirectionalArrowResolution={20}
         linkCurvature={0.25}
-        linkWidth={(l: any) => (isHot(l) ? 1.5 : 0)}
-        linkColor={(l: any) =>
+        linkWidth={(l: LinkObject<GraphNode, GraphLink>) => (isHot(l) ? 1.5 : 0)}
+        linkColor={(l: LinkObject<GraphNode, GraphLink>) =>
           isHot(l) ? GRAPH_LINK_HOT : hoverId ? GRAPH_LINK_DIM : GRAPH_LINK_BASE
         }
-        linkDirectionalArrowColor={(l: any) =>
+        linkDirectionalArrowColor={(l: LinkObject<GraphNode, GraphLink>) =>
           isHot(l) ? GRAPH_LINK_HOT : hoverId ? GRAPH_LINK_DIM : GRAPH_LINK_BASE
         }
         linkDirectionalArrowLength={5}

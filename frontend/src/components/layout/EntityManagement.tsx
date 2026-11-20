@@ -38,7 +38,7 @@ interface EntityManagementProps<T extends BaseEntity> {
   entityName: string;
   items: T[];
   isLoading: boolean;
-  error: any;
+  error: string | null;
   onCreate: (name: string) => Promise<unknown>;
   onUpdate: (id: string, name: string) => Promise<unknown>;
   onDelete: (id: string) => Promise<void>;
