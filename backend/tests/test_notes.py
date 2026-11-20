@@ -395,3 +395,71 @@ def test_returns_404_when_deleting_missing_note(client):
     """Delete should reject requests for notes that do not exist."""
     response = client.delete("/notes/999999")
     assert response.status_code == 404
+
+
+# --- Tags & NoteTypes ---
+def test_update_tag_same_name_succeeds(client, db_session):
+    """Updating a tag with its own current name should succeed without 409."""
+    tag = make_tag(db_session, name="architecture")
+
+    response = client.put(f"/notes/tags/{tag.id}", json={"name": "architecture"})
+
+    assert response.status_code == 200
+    assert response.json()["name"] == "architecture"
+
+
+def test_update_tag_duplicate_name_returns_409(client, db_session):
+    """Renaming a tag to an already existing tag name should return 409."""
+    make_tag(db_session, name="existing")
+    tag_to_rename = make_tag(db_session, name="original")
+
+    response = client.put(
+        f"/notes/tags/{tag_to_rename.id}",
+        json={"name": "existing"},
+    )
+
+    assert response.status_code == 409
+
+
+def test_update_note_type_same_name_succeeds(client, db_session):
+    """Updating a note type with its own current name should succeed without 409."""
+    note_type = make_note_type(db_session, name="Question")
+
+    response = client.put(f"/notes/types/{note_type.id}", json={"name": "Question"})
+
+    assert response.status_code == 200
+    assert response.json()["name"] == "Question"
+
+
+def test_update_note_type_duplicate_name_returns_409(client, db_session):
+    """Renaming a note type to an already existing name should return 409."""
+    make_note_type(db_session, name="Idea")
+    type_to_rename = make_note_type(db_session, name="Draft")
+
+    response = client.put(
+        f"/notes/types/{type_to_rename.id}",
+        json={"name": "Idea"},
+    )
+
+    assert response.status_code == 409
+
+
+def test_delete_note_type_unused_succeeds(client, db_session):
+    """Deleting an unused note type should return 204 and remove it."""
+    note_type = make_note_type(db_session, name="UnusedType")
+
+    response = client.delete(f"/notes/types/{note_type.id}")
+
+    assert response.status_code == 204
+    assert db_session.get(NoteType, note_type.id) is None
+
+
+def test_delete_note_type_in_use_returns_409(client, db_session):
+    """Deleting a note type still referenced by a note should return 409."""
+    note_type = make_note_type(db_session, name="InUseType")
+    make_note(db_session, note_type=note_type)
+
+    response = client.delete(f"/notes/types/{note_type.id}")
+
+    assert response.status_code == 409
+    assert db_session.get(NoteType, note_type.id) is not None

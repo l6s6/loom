@@ -12,7 +12,7 @@ from domains.links.constants import DEFAULT_LINK_TYPE_NAME
 from domains.links.models import LinkType, Link
 from domains.notes.models import Note
 from tests.helpers import assert_link_response
-from tests.factories import make_note, make_link
+from tests.factories import make_note, make_link, make_link_type
 
 
 # --- GET /links ---
@@ -176,3 +176,71 @@ def test_delete_link_not_existing(client):
     """DELETE /links/{id} should return 404 when the link is missing."""
     response = client.delete("/links/1")
     assert response.status_code == 404
+
+
+def test_create_duplicate_link_returns_409(client, db_session):
+    """Creating an identical link (same source, target, origin, type) should return 409."""
+    existing = make_link(db_session)
+    payload = {
+        "source_id": existing.source_id,
+        "target_id": existing.target_id,
+        "origin": existing.origin,
+        "link_type_name": existing.link_type.name,
+    }
+
+    response = client.post("/links", json=payload)
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "Link already exists"
+
+
+def test_create_self_link_succeeds(client, db_session):
+    """Self-links (source_id == target_id) should be allowed and return 201."""
+    note = make_note(db_session)
+    payload = {
+        "source_id": note.id,
+        "target_id": note.id,
+        "origin": "manual",
+        "link_type_name": "relates to",
+    }
+
+    response = client.post("/links", json=payload)
+    body = response.json()
+
+    assert response.status_code == 201
+    assert body["source"]["id"] == note.id
+    assert body["target"]["id"] == note.id
+
+
+def test_update_link_same_type_succeeds(client, db_session):
+    """Updating a link with its own current link type should succeed without 409."""
+    link = make_link(db_session)
+
+    response = client.put(
+        f"/links/{link.id}",
+        json={"link_type_name": link.link_type.name},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["link_type"]["name"] == link.link_type.name
+
+
+def test_update_link_duplicate_conflict_returns_409(client, db_session):
+    """Updating a link to match an existing link's type for the same notes should return 409."""
+    link1 = make_link(db_session)
+    other_type = make_link_type(db_session, name="references")
+    link2 = make_link(
+        db_session,
+        source=link1.source,
+        target=link1.target,
+        link_type=other_type,
+        origin=link1.origin,
+    )
+
+    response = client.put(
+        f"/links/{link2.id}",
+        json={"link_type_name": link1.link_type.name},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "Link already exists"
