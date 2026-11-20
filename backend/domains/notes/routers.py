@@ -28,9 +28,11 @@ from domains.notes.schemas import (
     NoteTypeCreate,
     NoteTypeUpdate,
 )
+from domains.utils import commit_or_409
 
 # Router for all note endpoints, prefixed under "/notes".
 router = APIRouter(prefix="/notes", tags=["notes"])
+
 
 
 def get_note_or_404(db: Session, note_id: str) -> Note:
@@ -41,14 +43,17 @@ def get_note_or_404(db: Session, note_id: str) -> Note:
         note_id: Unique identifier of the note.
 
     Returns:
-        The matching Note record.
+        Note: The matching note record.
 
     Raises:
         HTTPException: If no note with the given ID exists.
     """
     note = db.query(Note).filter(Note.id == note_id).first()
     if note is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note with id {note_id} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Note with id {note_id} not found",
+        )
     return note
 
 
@@ -84,10 +89,10 @@ def get_note_type_or_404(db: Session, type_id: str) -> NoteType:
     Raises:
         HTTPException: If no note type with the given ID exists.
     """
-    type = db.query(NoteType).filter(NoteType.id == type_id).first()
-    if type is None:
+    note_type = db.query(NoteType).filter(NoteType.id == type_id).first()
+    if note_type is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note type with id {type_id} not found")
-    return type
+    return note_type
 
 
 def _get_or_create_note_type(db: Session, note_type_name: str) -> NoteType:
@@ -296,7 +301,7 @@ def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
     new_tag = Tag(name=tag.name)
     db.add(new_tag)
 
-    db.commit()
+    commit_or_409(db, "Tag already exists")
     db.refresh(new_tag)
     return new_tag
 
@@ -321,7 +326,7 @@ def create_note_type(type: NoteTypeCreate, db: Session = Depends(get_db)):
     new_type = NoteType(name=type.name)
     db.add(new_type)
 
-    db.commit()
+    commit_or_409(db, "Note type already exists")
     db.refresh(new_type)
     return new_type
 
@@ -351,7 +356,7 @@ def update_tag(tag_id: str, tag_update: TagUpdate, db: Session = Depends(get_db)
     for key, value in update_data.items():
         setattr(tag, key, value)
 
-    db.commit()
+    commit_or_409(db, "Tag already exists")
     db.refresh(tag)
     return tag
 
@@ -374,16 +379,16 @@ def update_note_type(type_id: str, type_update: NoteTypeUpdate, db: Session = De
     if db.query(NoteType).filter(NoteType.name == type_update.name, NoteType.id != type_id).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Note type with name {type_update.name} already exists")
 
-    type = get_note_type_or_404(db, type_id)
+    note_type = get_note_type_or_404(db, type_id)
 
     update_data = type_update.model_dump(exclude_unset=True)
 
     for key, value in update_data.items():
-        setattr(type, key, value)
+        setattr(note_type, key, value)
 
-    db.commit()
-    db.refresh(type)
-    return type
+    commit_or_409(db, "Note type already exists")
+    db.refresh(note_type)
+    return note_type
 
 
 @router.delete("/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -424,11 +429,11 @@ def delete_note_type(type_id: str, db: Session = Depends(get_db)):
     if note_count:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Note type '{note_type.name}' is used by {note_count} note(s)",
+            detail="Note type is in use",
         )
 
     db.delete(note_type)
-    db.commit()
+    commit_or_409(db, "Note type is still in use")
 
 
 @router.post("", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)
@@ -449,7 +454,7 @@ def create_note(db: Session = Depends(get_db)):
     new_note = Note(note_type=note_type)
 
     db.add(new_note)
-    db.commit()
+    commit_or_409(db, "Conflict while creating note")
     db.refresh(new_note)
     return new_note
 
@@ -505,7 +510,7 @@ def update_note(note_id: str, note_update: NoteUpdate, db: Session = Depends(get
     for key, value in update_data.items():
         setattr(note, key, value)
 
-    db.commit()
+    commit_or_409(db, "Conflict while updating note")
     db.refresh(note)
     return note
 

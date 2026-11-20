@@ -8,6 +8,7 @@ from domains.links.models import Link, LinkType
 from domains.links.schemas import LinkTypeResponse, LinkResponse, LinkCreate, LinkUpdate
 from domains.notes.models import Note
 from domains.notes.routers import get_note_or_404
+from domains.utils import commit_or_409
 
 # API router for all link-related endpoints.
 # All routes under this router are prefixed with "/links" and tagged as "links".
@@ -164,7 +165,7 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db)):
     )
 
     db.add(new_link)
-    db.commit()
+    commit_or_409(db, detail="Link already exists")
     db.refresh(new_link)
     return new_link
 
@@ -185,24 +186,36 @@ def update_link(link_id: str, link_update: LinkUpdate, db: Session = Depends(get
         HTTPException: If the target link does not exist.
     """
     link = _get_link_or_404(db, link_id)
-
     update_data = link_update.model_dump(exclude_unset=True)
 
-    if "link_type_name" in update_data:
-        link_type_name = update_data["link_type_name"]
-        if link_type_name == "":
-            link_type_name = DEFAULT_LINK_TYPE_NAME
-
+    if "link_type_name" in update_data and update_data["link_type_name"] is not None:
+        link_type_name = update_data["link_type_name"] or DEFAULT_LINK_TYPE_NAME
+        existing_link = (
+            db.query(Link)
+            .join(Link.link_type)
+            .filter(
+                Link.id != link_id,
+                Link.source_id == link.source_id,
+                Link.target_id == link.target_id,
+                Link.origin == link.origin,
+                LinkType.name == link_type_name,
+            )
+            .first()
+        )
+        if existing_link is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Link already exists",
+            )
         link.link_type = _get_or_create_link_type(db, link_type_name)
-        del update_data["link_type_name"]
 
-    db.commit()
+    commit_or_409(db, "Link already exists")
     db.refresh(link)
     return link
 
 
 @router.delete("/{link_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_note(link_id: str, db: Session = Depends(get_db)):
+def delete_link(link_id: str, db: Session = Depends(get_db)):
     """Delete a link by ID.
 
     Args:
