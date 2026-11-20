@@ -29,7 +29,7 @@ def _get_link_or_404(db: Session, link_id: str) -> Link:
     """
     note = db.query(Link).filter(Link.id == link_id).first()
     if note is None:
-        raise HTTPException(status_code=404, detail=f"Link with id {link_id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Link with id {link_id} not found")
     return note
 
 
@@ -138,7 +138,7 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db)):
         link_type_name = DEFAULT_LINK_TYPE_NAME
 
     if get_links(source_id=link.source_id, target_id=link.target_id, type=link.link_type_name, db=db) is not None:
-        raise HTTPException(status_code=409, detail=f"Link already exists")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Link already exists")
 
     link_type = _get_or_create_link_type(db, link_type_name)
 

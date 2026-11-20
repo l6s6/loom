@@ -48,7 +48,7 @@ def get_note_or_404(db: Session, note_id: str) -> Note:
     """
     note = db.query(Note).filter(Note.id == note_id).first()
     if note is None:
-        raise HTTPException(status_code=404, detail=f"Note with id {note_id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note with id {note_id} not found")
     return note
 
 
@@ -67,7 +67,7 @@ def get_tag_or_404(db: Session, tag_id: str) -> Tag:
     """
     tag = db.query(Tag).filter(Tag.id == tag_id).first()
     if tag is None:
-        raise HTTPException(status_code=404, detail=f"Tag with id {tag_id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Tag with id {tag_id} not found")
     return tag
 
 
@@ -86,7 +86,7 @@ def get_note_type_or_404(db: Session, type_id: str) -> NoteType:
     """
     type = db.query(NoteType).filter(NoteType.id == type_id).first()
     if type is None:
-        raise HTTPException(status_code=404, detail=f"Note type with id {type_id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Note type with id {type_id} not found")
     return type
 
 
@@ -291,7 +291,7 @@ def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
         HTTPException: If a tag with the same name already exists.
     """
     if db.query(Tag).filter(Tag.name == tag.name).first():
-        raise HTTPException(status_code=409, detail=f"Tag with name {tag.name} already exists")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Tag with name {tag.name} already exists")
 
     new_tag = Tag(name=tag.name)
     db.add(new_tag)
@@ -316,7 +316,7 @@ def create_note_type(type: NoteTypeCreate, db: Session = Depends(get_db)):
         HTTPException: If a note type with the same name already exists.
     """
     if db.query(NoteType).filter(NoteType.name == type.name).first():
-        raise HTTPException(status_code=409, detail=f"Note type with name {type.name} already exists")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Note type with name {type.name} already exists")
 
     new_type = NoteType(name=type.name)
     db.add(new_type)
@@ -342,7 +342,7 @@ def update_tag(tag_id: str, tag_update: TagUpdate, db: Session = Depends(get_db)
         HTTPException: If no tag is found or if the new name conflicts.
     """
     if db.query(Tag).filter(Tag.name == tag_update.name, Tag.id != tag_id).first():
-        raise HTTPException(status_code=409, detail=f"Tag with name {tag_update.name} already exists")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Tag with name {tag_update.name} already exists")
 
     tag = get_tag_or_404(db, tag_id)
 
@@ -372,7 +372,7 @@ def update_note_type(type_id: str, type_update: NoteTypeUpdate, db: Session = De
         HTTPException: If no note type is found or if the new name conflicts.
     """
     if db.query(NoteType).filter(NoteType.name == type_update.name, NoteType.id != type_id).first():
-        raise HTTPException(status_code=409, detail=f"Note type with name {type_update.name} already exists")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Note type with name {type_update.name} already exists")
 
     type = get_note_type_or_404(db, type_id)
 
