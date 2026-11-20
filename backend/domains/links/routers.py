@@ -137,8 +137,22 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db)):
     if link_type_name == "":
         link_type_name = DEFAULT_LINK_TYPE_NAME
 
-    if get_links(source_id=link.source_id, target_id=link.target_id, type=link.link_type_name, db=db) is not None:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Link already exists")
+    existing_link = (
+        db.query(Link)
+        .join(Link.link_type)
+        .filter(
+            Link.source_id == link.source_id,
+            Link.target_id == link.target_id,
+            Link.origin == link.origin,
+            LinkType.name == link_type_name,
+        )
+        .first()
+    )
+    if existing_link is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Link already exists",
+        )
 
     link_type = _get_or_create_link_type(db, link_type_name)
 
