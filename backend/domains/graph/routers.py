@@ -9,8 +9,7 @@ a single connected network.
 """
 
 from fastapi import APIRouter, Depends
-from pygments.lexers import verifpal
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from core.database import get_db
 from domains.graph.schemas import Graph, VertexType, Vertex, Edge
@@ -45,12 +44,12 @@ def get_graph(db: Session = Depends(get_db)):
           so the frontend can visualize those relationships as well.
     """
     # Query all relationships from the database.
-    links = db.query(Link).all()
+    links = db.query(Link).options(joinedload(Link.link_type)).all()
 
     # Retrieve helper datasets used to build the graph.
     note_types = get_note_types(db)
     tags = get_tags(db)
-    notes = db.query(Note).all()
+    notes = db.query(Note).options(selectinload(Note.tags)).all()
 
     # Create the vertex list for all note, tag, and note-type entities.
     vertices = [
