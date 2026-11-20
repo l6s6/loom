@@ -57,6 +57,7 @@ export function useCreateLink() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["links"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
     },
   });
 
@@ -77,7 +78,10 @@ export function useDeleteLink() {
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: deleteLink,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["links"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["links"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
+    },
   });
 
   return {

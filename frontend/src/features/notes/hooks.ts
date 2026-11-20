@@ -100,7 +100,11 @@ export function useDeleteTag() {
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: deleteTag,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tags"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
+    },
   });
 
   return {
@@ -118,8 +122,11 @@ export function useDeleteNoteType() {
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: deleteNoteType,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["note_types"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["note_types"] });
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
+    },
   });
 
   return {
@@ -140,6 +147,7 @@ export function useCreateAndNavigateNote() {
     mutationFn: createNote,
     onSuccess: (newNote) => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
       navigate(`/n/${newNote.id}`);
     },
   });
@@ -159,7 +167,10 @@ export function useCreateTag() {
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: createTag,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tags"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
+    },
   });
 
   return {
@@ -177,8 +188,10 @@ export function useCreateNoteType() {
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: createNoteType,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["note_types"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["note_types"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
+    },
   });
 
   return {
@@ -198,6 +211,7 @@ export function useUpdateNote() {
     mutationFn: updateNote,
     onSuccess: (updatedNoteFromServer, variables) => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
       // Update Cache from single note
       queryClient.setQueryData(["note", variables.id], updatedNoteFromServer);
       // Update Cache from NoteTypes and Tags if they have been Changed
@@ -224,6 +238,7 @@ export function useUpdateTag() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
       queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
     },
   });
 
@@ -241,6 +256,7 @@ export function useUpdateNoteType() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["note_types"] });
       queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
     },
   });
 
@@ -259,6 +275,7 @@ export function useDeleteNote() {
     onSuccess: (_, noteId) => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       queryClient.removeQueries({ queryKey: ["note", noteId] });
+      queryClient.invalidateQueries({ queryKey: ["graph"] });
     },
   });
 
