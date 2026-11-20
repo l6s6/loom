@@ -401,25 +401,34 @@ def delete_tag(tag_id: str, db: Session = Depends(get_db)):
 
     db.delete(tag)
     db.commit()
-    return {"message": "Tag deleted"}
 
 
 @router.delete("/types/{type_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_note_type(type_id: str, db: Session = Depends(get_db)):
-    """Delete a note type by ID.
+    """Delete a note type only when no notes are assigned to it.
 
     Args:
         type_id: Unique identifier of the note type to delete.
         db: Database session provided via dependency injection.
 
     Raises:
-        HTTPException: If the note type does not exist.
+        HTTPException: If the note type does not exist or is still in use.
     """
-    type = get_note_type_or_404(db, type_id)
+    note_type = get_note_type_or_404(db, type_id)
 
-    db.delete(type)
+    note_count = (
+        db.query(func.count(Note.id))
+        .filter(Note.note_type_id == note_type.id)
+        .scalar()
+    )
+    if note_count:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Note type '{note_type.name}' is used by {note_count} note(s)",
+        )
+
+    db.delete(note_type)
     db.commit()
-    return {"message": "Note type deleted"}
 
 
 @router.post("", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)
