@@ -1,5 +1,3 @@
-import type { Note } from "@/features/notes/types.ts";
-
 /**
  * Base API URL for backend requests.
  * Falls back to the local FastAPI development server when no environment variable is set.
@@ -29,7 +27,14 @@ export async function apiClient<T>(
 
   // Treat empty successful responses (such as 204 No Content) as an empty object.
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    let message = `HTTP error! status: ${response.status}`;
+    try {
+      const data = (await response.json()) as { detail?: string };
+      if (data.detail) message = data.detail;
+    } catch {
+      // Fallback message
+    }
+    throw new Error(message);
   }
 
   if (response.status === 204 || options.method === "DELETE") {
@@ -45,6 +50,6 @@ export async function apiClient<T>(
  * @returns A promise resolving to the list of restored demo notes.
  */
 export const resetDemoData = () =>
-  apiClient<Note[]>("/reset-demo", {
+  apiClient<{ message?: string; error?: string }>("/reset-demo", {
     method: "POST",
   });

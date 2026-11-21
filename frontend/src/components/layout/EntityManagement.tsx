@@ -68,6 +68,20 @@ export default function EntityManagement<T extends BaseEntity>({
   renderBadge,
   canDelete = () => true,
 }: EntityManagementProps<T>) {
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const runAction = async <R,>(
+    action: () => Promise<R>,
+  ): Promise<R | undefined> => {
+    setActionError(null);
+    try {
+      return await action();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Action failed");
+      return undefined;
+    }
+  };
+
   const sortedItems = [...items].sort(
     (a, b) => b.note_count - a.note_count || a.name.localeCompare(b.name),
   );
@@ -92,7 +106,7 @@ export default function EntityManagement<T extends BaseEntity>({
               <EntityDialog
                 entityName={entityName}
                 label="Create"
-                onSubmit={(name) => onCreate(name)}
+                onSubmit={(name) => runAction(() => onCreate(name))}
                 trigger={
                   <Button
                     variant="outline"
@@ -106,6 +120,9 @@ export default function EntityManagement<T extends BaseEntity>({
             </div>
           </CardAction>
         </CardHeader>
+        {actionError && (
+          <p className="px-6 pt-4 text-sm text-red-600">{actionError}</p>
+        )}
         <CardContent>
           {sortedItems.length > 0 ? (
             sortedItems.map((item) => (
@@ -116,8 +133,10 @@ export default function EntityManagement<T extends BaseEntity>({
                 maxNoteCount={maxNoteCount}
                 renderBadge={renderBadge}
                 canDelete={canDelete(item)}
-                onDelete={() => onDelete(item.id)}
-                onUpdate={(name) => onUpdate(item.id, name)}
+                onDelete={async () => {
+                  await runAction(() => onDelete(item.id));
+                }}
+                onUpdate={(name) => runAction(() => onUpdate(item.id, name))}
               />
             ))
           ) : (

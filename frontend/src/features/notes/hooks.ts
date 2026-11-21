@@ -47,6 +47,7 @@ export function useGetNoteById(noteId: string) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["note", noteId],
     queryFn: () => getNoteById(noteId),
+    enabled: Boolean(noteId),
   });
 
   return {
@@ -224,7 +225,11 @@ export function useUpdateNote() {
     },
   });
 
-  return { updateNote: mutateAsync, isLoading: isPending, error };
+  return {
+    updateNote: mutateAsync,
+    isLoading: isPending,
+    error: error ? error.message : null,
+  };
 }
 
 /**
@@ -242,7 +247,11 @@ export function useUpdateTag() {
     },
   });
 
-  return { updateTag: mutateAsync, isLoading: isPending, error };
+  return {
+    updateTag: mutateAsync,
+    isLoading: isPending,
+    error: error ? error.message : null,
+  };
 }
 
 /**
@@ -260,7 +269,11 @@ export function useUpdateNoteType() {
     },
   });
 
-  return { updateNoteType: mutateAsync, isLoading: isPending, error };
+  return {
+    updateNoteType: mutateAsync,
+    isLoading: isPending,
+    error: error ? error.message : null,
+  };
 }
 
 /**

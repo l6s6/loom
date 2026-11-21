@@ -5,6 +5,7 @@ import EditorTopBar from "@/features/notes/components/editor/EditorTopBar.tsx";
 import { useGetNoteById } from "@/features/notes/hooks.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
 import ErrorView from "@/components/ErrorView.tsx";
+import { useEffect } from "react";
 
 /**
  * Page view for editing a single note.
@@ -18,14 +19,11 @@ export default function EditorView() {
   const { noteId } = useParams();
   const navigate = useNavigate();
 
-  let id: string = "";
-  if (!noteId) {
-    navigate("/");
-  } else {
-    id = noteId;
-  }
+  useEffect(() => {
+    if (!noteId) navigate("/");
+  }, [noteId, navigate]);
 
-  const { note, isLoading, error } = useGetNoteById(id);
+  const { note, isLoading, error } = useGetNoteById(noteId ?? "");
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorView error={error} />;

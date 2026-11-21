@@ -59,7 +59,7 @@ const NoteConnections = ({ noteId }: { noteId: string }) => {
   const { notes } = useGetNotes();
   const { links } = useGetLinksByNoteId(noteId);
   const { types } = useGetLinkTypes();
-  const { createLink } = useCreateLink();
+  const { createLink, error } = useCreateLink();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeName, setTypeName] = useState("relates to");
 
@@ -101,8 +101,12 @@ const NoteConnections = ({ noteId }: { noteId: string }) => {
       source_id: noteId,
       link_type_name: typeName,
     };
-    setSearchQuery("");
-    await createLink(link);
+    try {
+      await createLink(link);
+      setSearchQuery("");
+    } catch {
+      // Error state is exposed by useCreateLink().error and rendered inline
+    }
   };
 
   return (
@@ -132,6 +136,7 @@ const NoteConnections = ({ noteId }: { noteId: string }) => {
               />
             </InputGroupAddon>
           </InputGroup>
+          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           {searchQuery && (
             <ScrollArea className="max-h-72 rounded-md border mt-4">
               <CommandList className="p-2">
