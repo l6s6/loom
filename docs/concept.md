@@ -1,5 +1,7 @@
 # Concept: Loom
 
+> **v1.0 Scope Note:** This document captures the original product vision written before the first line of code. **Phases 0–5** (CRUD, types/tags/status, search & filtering, open-question tracking, bidirectional links, 3D graph visualization, and live demo deployment) are **implemented in v1.0**. Phases 6–10 (AI/embeddings, export, Flutter app) are intentionally out of scope for v1.0.
+
 Use cases and requirements for [Loom](../README.md), written before the first line of code. Decisions that changed during development are marked as such; open questions are marked as open.
 
 ## Contents
@@ -116,7 +118,7 @@ Order: backend + web app first (covers nearly all use cases), then the Flutter a
 
 ## Roadmap & Time Estimate
 
-Rough estimate in hours, assuming intermediate programming skills and no AI code generation. Current implementation status is tracked in the [main README](../README.md#roadmap).
+Rough estimate in hours, assuming intermediate programming skills and no AI code generation. Phases 0–5 are implemented in v1.0 (see [main README](../README.md)).
 
 | Phase | Content | Hrs. |
 |---|---|---|
