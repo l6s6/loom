@@ -3,7 +3,6 @@ import {
   Network,
   HelpCircle,
   Unlink,
-  Quote,
   Hash,
   Tag,
   type LucideIcon,
@@ -36,5 +35,4 @@ export const mainNavItems: SidebarItemConfig[] = [
 export const smartViewsConfig: SidebarItemConfig[] = [
   { label: "Open Questions", icon: HelpCircle, path: "/?status=open" },
   { label: "Loose Ends", icon: Unlink, path: "/?is_loose_end=true" },
-  { label: "Raw Quotes (TODO)", icon: Quote, path: "/todo?raw-quotes" },
 ];
